@@ -2,7 +2,7 @@
       CALL MATLAB(0)
       STOP
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE CLAUSE
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
@@ -30,33 +30,33 @@ C-----------------------------------------------------------------------
       SAVE DO,THENN
       R = -FIN-10
       FIN = 0
-      IF (DDT .EQ. 1) WRITE(WTE,100) PT,RSTK(PT),R
+      IF (DDT == 1) WRITE(WTE,100) PT,RSTK(PT),R
   100 FORMAT(1X,'CLAUSE',3I4)
-      IF (R.LT.1 .OR. R.GT.6) GOTO 01
+      IF (R<1 .OR. R>6) GOTO 01
       GOTO (02,30,30,80,99,90),R
    01 R = RSTK(PT)
       GOTO (99,99,05,40,45,99,99,99,99,99,99,99,15,55,99,99,99),R
-C
-C     FOR
-C
+!
+!     FOR
+!
    02 CALL GETSYM
-      IF (SYM .NE. NAME) CALL ERROR(34)
-      IF (ERR .GT. 0) RETURN
+      IF (SYM /= NAME) CALL ERROR(34)
+      IF (ERR > 0) RETURN
       PT = PT+2
       CALL PUTID(IDS(1,PT),SYN)
       CALL GETSYM
-      IF (SYM .NE. EQUAL) CALL ERROR(34)
-      IF (ERR .GT. 0) RETURN
+      IF (SYM /= EQUAL) CALL ERROR(34)
+      IF (ERR > 0) RETURN
       CALL GETSYM
       RSTK(PT) = 3
-C     *CALL* EXPR
+!     *CALL* EXPR
       RETURN
    05 PSTK(PT-1) = 0
       PSTK(PT) = LPT(4) - 1
       IF (EQID(SYN,DO)) SYM = SEMI
-      IF (SYM .EQ. COMMA) SYM = SEMI
-      IF (SYM .NE. SEMI) CALL ERROR(34)
-      IF (ERR .GT. 0) RETURN
+      IF (SYM == COMMA) SYM = SEMI
+      IF (SYM /= SEMI) CALL ERROR(34)
+      IF (ERR > 0) RETURN
    10 J = PSTK(PT-1)
       LPT(4) = PSTK(PT)
       SYM = SEMI
@@ -67,45 +67,45 @@ C     *CALL* EXPR
       N = NSTK(TOP)
       LJ = L+(J-1)*M
       L2 = L + M*N
-      IF (M .NE. -3) GOTO 12
+      IF (M /= -3) GOTO 12
       LJ = L+3
       L2 = LJ
       STKR(LJ) = STKR(L) + DFLOAT(J-1)*STKR(L+1)
       STKI(LJ) = 0.0
-      IF (STKR(L+1).GT.0.0D0 .AND. STKR(LJ).GT.STKR(L+2)) GOTO 20
-      IF (STKR(L+1).LT.0.0D0 .AND. STKR(LJ).LT.STKR(L+2)) GOTO 20
+      IF (STKR(L+1)>0.0D0 .AND. STKR(LJ)>STKR(L+2)) GOTO 20
+      IF (STKR(L+1)<0.0D0 .AND. STKR(LJ)<STKR(L+2)) GOTO 20
       M = 1
       N = J
-   12 IF (J .GT. N) GOTO 20
-      IF (TOP+1 .GE. BOT) CALL ERROR(18)
-      IF (ERR .GT. 0) RETURN
+   12 IF (J > N) GOTO 20
+      IF (TOP+1 >= BOT) CALL ERROR(18)
+      IF (ERR > 0) RETURN
       TOP = TOP+1
       LSTK(TOP) = L2
       MSTK(TOP) = M
       NSTK(TOP) = 1
       ERR = L2+M - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       CALL WCOPY(M,STKR(LJ),STKI(LJ),1,STKR(L2),STKI(L2),1)
       RHS = 0
       CALL STACKP(IDS(1,PT))
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       PSTK(PT-1) = J
       PSTK(PT) = LPT(4)
       RSTK(PT) = 13
-C     *CALL* PARSE
+!     *CALL* PARSE
       RETURN
    15 GOTO 10
    20 MSTK(TOP) = 0
       NSTK(TOP) = 0
       RHS = 0
       CALL STACKP(IDS(1,PT))
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       PT = PT-2
       GOTO 80
-C
-C     WHILE OR IF
-C
+!
+!     WHILE OR IF
+!
    30 PT = PT+1
       CALL PUTID(IDS(1,PT),SYN)
       PSTK(PT) = LPT(4)-1
@@ -113,18 +113,18 @@ C
       CHRA = BLANK
       CALL GETSYM
       RSTK(PT) = 4
-C     *CALL* EXPR
+!     *CALL* EXPR
       RETURN
-   40 IF (SYM.NE.EQUAL .AND. SYM.NE.LESS .AND. SYM.NE.GREAT)
-     $    CALL ERROR(35)
-      IF (ERR .GT. 0) RETURN
+   40 IF (SYM/=EQUAL .AND. SYM/=LESS .AND. SYM/=GREAT)&
+          CALL ERROR(35)
+      IF (ERR > 0) RETURN
       OP = SYM
       CALL GETSYM
-      IF (SYM.EQ.EQUAL .OR. SYM.EQ.GREAT) OP = OP + SYM
-      IF (OP .GT. GREAT) CALL GETSYM
+      IF (SYM==EQUAL .OR. SYM==GREAT) OP = OP + SYM
+      IF (OP > GREAT) CALL GETSYM
       PSTK(PT) = 256*PSTK(PT) + OP
       RSTK(PT) = 5
-C     *CALL* EXPR
+!     *CALL* EXPR
       RETURN
    45 OP = MOD(PSTK(PT),256)
       PSTK(PT) = PSTK(PT)/256
@@ -134,56 +134,56 @@ C     *CALL* EXPR
       E2 = STKR(L)
       TOP = TOP - 2
       IF (EQID(SYN,DO) .OR. EQID(SYN,THENN)) SYM = SEMI
-      IF (SYM .EQ. COMMA) SYM = SEMI
-      IF (SYM .NE. SEMI) CALL ERROR(35)
-      IF (ERR .GT. 0) RETURN
-      IF (OP.EQ.EQUAL         .AND. E1.EQ.E2) GOTO 50
-      IF (OP.EQ.LESS          .AND. E1.LT.E2) GOTO 50
-      IF (OP.EQ.GREAT         .AND. E1.GT.E2) GOTO 50
-      IF (OP.EQ.(LESS+EQUAL)  .AND. E1.LE.E2) GOTO 50
-      IF (OP.EQ.(GREAT+EQUAL) .AND. E1.GE.E2) GOTO 50
-      IF (OP.EQ.(LESS+GREAT)  .AND. E1.NE.E2) GOTO 50
+      IF (SYM == COMMA) SYM = SEMI
+      IF (SYM /= SEMI) CALL ERROR(35)
+      IF (ERR > 0) RETURN
+      IF (OP==EQUAL         .AND. E1==E2) GOTO 50
+      IF (OP==LESS          .AND. E1<E2) GOTO 50
+      IF (OP==GREAT         .AND. E1>E2) GOTO 50
+      IF (OP==(LESS+EQUAL)  .AND. E1<=E2) GOTO 50
+      IF (OP==(GREAT+EQUAL) .AND. E1>=E2) GOTO 50
+      IF (OP==(LESS+GREAT)  .AND. E1/=E2) GOTO 50
       PT = PT-1
       GOTO 80
    50 RSTK(PT) = 14
-C     *CALL* PARSE
+!     *CALL* PARSE
       RETURN
    55 IF (EQID(IDS(1,PT),WHILE)) GOTO 35
       PT = PT-1
       IF (EQID(SYN,ELSE)) GOTO 80
       RETURN
-C
-C     SEARCH FOR MATCHING END OR ELSE
+!
+!     SEARCH FOR MATCHING END OR ELSE
    80 KOUNT = 0
       CALL GETSYM
-   82 IF (SYM .EQ. EOL) RETURN
-      IF (SYM .NE. NAME) GOTO 83
-      IF (EQID(SYN,ENND) .AND. KOUNT.EQ.0) RETURN
-      IF (EQID(SYN,ELSE) .AND. KOUNT.EQ.0) RETURN
-      IF (EQID(SYN,ENND) .OR. EQID(SYN,ELSE))
-     $       KOUNT = KOUNT-1
-      IF (EQID(SYN,FOR) .OR. EQID(SYN,WHILE)
-     $       .OR. EQID(SYN,IFF)) KOUNT = KOUNT+1
+   82 IF (SYM == EOL) RETURN
+      IF (SYM /= NAME) GOTO 83
+      IF (EQID(SYN,ENND) .AND. KOUNT==0) RETURN
+      IF (EQID(SYN,ELSE) .AND. KOUNT==0) RETURN
+      IF (EQID(SYN,ENND) .OR. EQID(SYN,ELSE))&
+             KOUNT = KOUNT-1
+      IF (EQID(SYN,FOR) .OR. EQID(SYN,WHILE)&
+             .OR. EQID(SYN,IFF)) KOUNT = KOUNT+1
    83 CALL GETSYM
       GOTO 82
-C
-C     EXIT FROM LOOP
-   90 IF (DDT .EQ. 1) WRITE(WTE,190) (RSTK(I),I=1,PT)
+!
+!     EXIT FROM LOOP
+   90 IF (DDT == 1) WRITE(WTE,190) (RSTK(I),I=1,PT)
   190 FORMAT(1X,'EXIT  ',10I4)
-      IF (RSTK(PT) .EQ. 14) PT = PT-1
-      IF (PT .LE. PTZ) RETURN
-      IF (RSTK(PT) .EQ. 14) PT = PT-1
-      IF (PT-1 .LE. PTZ) RETURN
-      IF (RSTK(PT) .EQ. 13) TOP = TOP-1
-      IF (RSTK(PT) .EQ. 13) PT = PT-2
+      IF (RSTK(PT) == 14) PT = PT-1
+      IF (PT <= PTZ) RETURN
+      IF (RSTK(PT) == 14) PT = PT-1
+      IF (PT-1 <= PTZ) RETURN
+      IF (RSTK(PT) == 13) TOP = TOP-1
+      IF (RSTK(PT) == 13) PT = PT-2
       GOTO 80
-C
+!
    99 CALL ERROR(22)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE COMAND(ID)
       INTEGER ID(4)
       DOUBLE PRECISION STKR(50505),STKI(50505)
@@ -204,25 +204,25 @@ C-----------------------------------------------------------------------
       DATA CMDL/17/,A/10/,D/13/,E/14/,Z/35/,EOL/99/,SEMI/39/,COMMA/48/
       DATA BLANK/36/,NAME/1/,DOT/47/
       SAVE CMDL,A,D,E,Z,EOL,SEMI,COMMA,BLANK,NAME,DOT
-C
-C       CLEAR ELSE  END   EXIT
-C       FOR   HELP  IF    LONG
-C       RETUR SEMI
-C       SHORT WHAT  WHILE
-C       WHO   WHY   LALA  FOO
-      DATA CMD/
-     $  12,21,14,10, 14,21,28,14, 14,23,13,36, 14,33,18,29,
-     $  15,24,27,36, 17,14,21,25, 18,15,36,36, 21,24,23,16,
-     $  27,14,29,30, 28,14,22,18,
-     $  28,17,24,27, 32,17,10,29, 32,17,18,21,
-     $  32,17,24,36, 32,17,34,36, 21,10,21,10, 15,30,12,20/
-C
+!
+!       CLEAR ELSE  END   EXIT
+!       FOR   HELP  IF    LONG
+!       RETUR SEMI
+!       SHORT WHAT  WHILE
+!       WHO   WHY   LALA  FOO
+      DATA CMD/&
+        12,21,14,10, 14,21,28,14, 14,23,13,36, 14,33,18,29,&
+        15,24,27,36, 17,14,21,25, 18,15,36,36, 21,24,23,16,&
+        27,14,29,30, 28,14,22,18,&
+        28,17,24,27, 32,17,10,29, 32,17,18,21,&
+        32,17,24,36, 32,17,34,36, 21,10,21,10, 15,30,12,20/
+!
       DATA LRECL/80/
       save LRECL
   101 FORMAT(80A1)
   102 FORMAT(1X,80A1)
-C
-      IF (DDT .EQ. 1) WRITE(WTE,100)
+!
+      IF (DDT == 1) WRITE(WTE,100)
   100 FORMAT(1X,'COMAND')
       FUN = 0
       DO 10 K = 1, CMDL
@@ -230,17 +230,17 @@ C
    10 CONTINUE
       FIN = 0
       RETURN
-C
-   20 IF (CHRA.EQ.COMMA .OR. CHRA.EQ.SEMI .OR. CHRA.EQ.EOL) GOTO 22
-      IF (CHRA.LE.Z .OR. K.EQ.6) GOTO 22
+!
+   20 IF (CHRA==COMMA .OR. CHRA==SEMI .OR. CHRA==EOL) GOTO 22
+      IF (CHRA<=Z .OR. K==6) GOTO 22
       CALL ERROR(16)
       RETURN
-C
+!
    22 FIN = 1
       GOTO (25,36,38,40,30,80,34,52,44,55,50,65,32,60,70,46,48),K
-C
-C     CLEAR
-   25 IF (CHRA.GE.A .AND. CHRA.LE.Z) GOTO 26
+!
+!     CLEAR
+   25 IF (CHRA>=A .AND. CHRA<=Z) GOTO 26
       BOT = LSIZE-3
       GOTO 98
    26 CALL GETSYM
@@ -249,11 +249,11 @@ C     CLEAR
       NSTK(TOP) = 0
       RHS = 0
       CALL STACKP(SYN)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       FIN = 1
       GOTO 98
-C
-C     FOR, WHILE, IF, ELSE, END
+!
+!     FOR, WHILE, IF, ELSE, END
    30 FIN = -11
       GOTO 99
    32 FIN = -12
@@ -264,21 +264,21 @@ C     FOR, WHILE, IF, ELSE, END
       GOTO 99
    38 FIN = -15
       GOTO 99
-C
-C     EXIT
-   40 IF (PT .GT. PTZ) FIN = -16
-      IF (PT .GT. PTZ) GOTO 98
+!
+!     EXIT
+   40 IF (PT > PTZ) FIN = -16
+      IF (PT > PTZ) GOTO 98
       K = IDINT(STKR(VSIZE-2))
       WRITE(WTE,140) K
-      IF (WIO .NE. 0) WRITE(WIO,140) K
+      IF (WIO /= 0) WRITE(WIO,140) K
   140 FORMAT(/1X,'total flops ',I9//1X,'ADIOS'/)
       FUN = 99
       GOTO 98
-C
-C     RETURN
+!
+!     RETURN
    44 K = LPT(1) - 7
-      IF (K .LE. 0) FUN = 99
-      IF (K .LE. 0) GOTO 98
+      IF (K <= 0) FUN = 99
+      IF (K <= 0) GOTO 98
       CALL FILES(-RIO,BUF)
       LPT(1) = LIN(K+1)
       LPT(4) = LIN(K+2)
@@ -289,50 +289,50 @@ C     RETURN
       CHRA = BLANK
       SYM = COMMA
       GOTO 99
-C
-C     LALA
+!
+!     LALA
    46 WRITE(WTE,146)
   146 FORMAT(1X,'QUIT SINGING AND GET BACK TO WORK.')
       GOTO 98
-C
-C     FOO
+!
+!     FOO
    48 WRITE(WTE,148)
   148 FORMAT(1X,'YOUR PLACE OR MINE')
       GOTO 98
-C
-C     SHORT, LONG
+!
+!     SHORT, LONG
    50 FMT = 1
       GOTO 54
    52 FMT = 2
-   54 IF (CHRA.EQ.E .OR. CHRA.EQ.D) FMT = FMT+2
-      IF (CHRA .EQ. Z) FMT = 5
-      IF (CHRA.EQ.E .OR. CHRA.EQ.D .OR. CHRA.EQ.Z) CALL GETSYM
+   54 IF (CHRA==E .OR. CHRA==D) FMT = FMT+2
+      IF (CHRA == Z) FMT = 5
+      IF (CHRA==E .OR. CHRA==D .OR. CHRA==Z) CALL GETSYM
       GOTO 98
-C
-C     SEMI
+!
+!     SEMI
    55 LCT(3) = 1 - LCT(3)
       GOTO 98
-C
-C     WHO
+!
+!     WHO
    60 WRITE(WTE,160)
-      IF (WIO .NE. 0) WRITE(WIO,160)
+      IF (WIO /= 0) WRITE(WIO,160)
   160 FORMAT(1X,'Your current variables are...')
       CALL PRNTID(IDSTK(1,BOT),LSIZE-BOT+1)
       L = VSIZE-LSTK(BOT)+1
       WRITE(WTE,161) L,VSIZE
-      IF (WIO .NE. 0) WRITE(WIO,161) L,VSIZE
+      IF (WIO /= 0) WRITE(WIO,161) L,VSIZE
   161 FORMAT(1X,'using ',I7,' out of ',I7,' elements.')
       GOTO 98
-C
-C     WHAT
+!
+!     WHAT
    65 WRITE(WTE,165)
   165 FORMAT(1X,'The functions and commands are...')
       H(1) = 0
       CALL FUNS(H)
       CALL PRNTID(CMD,CMDL-2)
       GOTO 98
-C
-C     WHY
+!
+!     WHY
    70 K = IDINT(9.0D0*URAND(RAN(1))+1.0D0)
       GOTO (71,72,73,74,75,76,77,78,79),K
    71 WRITE(WTE,171)
@@ -362,29 +362,29 @@ C     WHY
    79 WRITE(WTE,179)
   179 FORMAT(1X,'SYSTEM ERROR, RETRY')
       GOTO 98
-C
-C     HELP
-   80 IF (CHRA .NE. EOL) GOTO 81
+!
+!     HELP
+   80 IF (CHRA /= EOL) GOTO 81
       WRITE(WTE,180)
-      IF (WIO .NE. 0) WRITE(WIO,180)
-  180 FORMAT(1X,'Type HELP followed by ...'
-     $  /1X,'INTRO   (To get started)'
-     $  /1X,'NEWS    (recent revisions)')
+      IF (WIO /= 0) WRITE(WIO,180)
+  180 FORMAT(1X,'Type HELP followed by ...'&
+        /1X,'INTRO   (To get started)'&
+        /1X,'NEWS    (recent revisions)')
       H(1) = 0
       CALL FUNS(H)
       CALL PRNTID(CMD,CMDL-2)
       J = BLANK+2
       WRITE(WTE,181)
-      IF (WIO .NE. 0) WRITE(WIO,181)
+      IF (WIO /= 0) WRITE(WIO,181)
   181 FORMAT(1X,'ANS   EDIT  FILE  FUN   MACRO')
       WRITE(WTE,182) (ALFA(I),I=J,ALFL)
-      IF (WIO .NE. 0) WRITE(WIO,182) (ALFA(I),I=J,ALFL)
+      IF (WIO /= 0) WRITE(WIO,182) (ALFA(I),I=J,ALFL)
   182 FORMAT(1X,17(A1,1X)/)
       GOTO 98
-C
+!
    81 CALL GETSYM
-      IF (SYM .EQ. NAME) GOTO 82
-      IF (SYM .EQ. 0) SYM = DOT
+      IF (SYM == NAME) GOTO 82
+      IF (SYM == 0) SYM = DOT
       H(1) = ALFA(SYM+1)
       H(2) = ALFA(BLANK+1)
       H(3) = ALFA(BLANK+1)
@@ -395,45 +395,45 @@ C
         H(I) = ALFA(CH+1)
    83 CONTINUE
 
-   84 IF(HIO .NE. 0) THEN
+   84 IF(HIO /= 0) THEN
       READ(HIO,101,END=89) (BUF(I),I=1,LRECL)
-CDC.. IF (EOF(HIO).NE.0) GOTO 89
+!DC.. IF (EOF(HIO)/=0) GOTO 89
       DO 85 I = 1, 4
-        IF (H(I) .NE. BUF(I)) GOTO 84
+        IF (H(I) /= BUF(I)) GOTO 84
    85 CONTINUE
       WRITE(WTE,102)
-      IF (WIO .NE. 0) WRITE(WIO,102)
+      IF (WIO /= 0) WRITE(WIO,102)
    86 K = LRECL + 1
    87 K = K - 1
-      IF (BUF(K) .EQ. ALFA(BLANK+1)) GOTO 87
+      IF (BUF(K) == ALFA(BLANK+1)) GOTO 87
       WRITE(WTE,102) (BUF(I),I=1,K)
-      IF (WIO .NE. 0) WRITE(WIO,102) (BUF(I),I=1,K)
+      IF (WIO /= 0) WRITE(WIO,102) (BUF(I),I=1,K)
       READ(HIO,101) (BUF(I),I=1,LRECL)
-      IF (BUF(1) .EQ. ALFA(BLANK+1)) GOTO 86
+      IF (BUF(1) == ALFA(BLANK+1)) GOTO 86
       CALL FILES(-HIO,BUF)
       GOTO 98
       ENDIF
-C
+!
    89 WRITE(WTE,189) (H(I),I=1,4)
   189 FORMAT(1X,'SORRY, NO HELP ON ',4A1)
       CALL FILES(-HIO,BUF)
       GOTO 98
-C
+!
    98 CALL GETSYM
    99 RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE EDIT(BUF,N)
       INTEGER BUF(N)
-C
-C     CALLED AFTER INPUT OF A SINGLE BACKSLASH
-C     BUF CONTAINS PREVIOUS INPUT LINE, ONE CHAR PER WORD
-C     ENTER LOCAL EDITOR IF AVAILABLE
-C     OTHERWISE JUST
+!
+!     CALLED AFTER INPUT OF A SINGLE BACKSLASH
+!     BUF CONTAINS PREVIOUS INPUT LINE, ONE CHAR PER WORD
+!     ENTER LOCAL EDITOR IF AVAILABLE
+!     OTHERWISE JUST
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE ERROR(N)
       INTEGER N
       DOUBLE PRECISION STKR(50505),STKI(50505)
@@ -449,17 +449,17 @@ C-----------------------------------------------------------------------
       COMMON /COM/ SYM,SYN,BUF,CHRA,FLP,FIN,FUN,LHS,RHS,RAN
       CHARACTER*80 BLH
       BLH(1:80)='        '
-C
+!
       K = LPT(2) - LPT(1)
-      IF (K .LT. 1) K = 1
+      IF (K < 1) K = 1
       LUNIT = WTE
-   98 CONTINUE 
-C     ASSUME CHAR(7) IS CTRL-G 
+   98 CONTINUE
+!     ASSUME CHAR(7) IS CTRL-G
       WRITE(LUNIT,'(1X,A,''/--ERROR'',A1)') BLH(1:K),ERRMSG,CHAR(7)
 
-      GOTO (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,
-     $      23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40),N
-C
+      GOTO (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,&
+            23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40),N
+!
     1 WRITE(LUNIT,101)
   101 FORMAT(1X,'IMPROPER MULTIPLE ASSIGNMENT')
       GOTO 99
@@ -515,8 +515,8 @@ C
    17 LB = VSIZE - LSTK(BOT) + 1
       LT = ERR + LSTK(BOT)
       WRITE(LUNIT,117) LB,LT,VSIZE
-  117 FORMAT(1X,'TOO MUCH MEMORY REQUIRED'
-     $  /1X,' ',I7,' VARIABLES,',I7,' TEMPORARIES,',I7,' AVAILABLE.')
+  117 FORMAT(1X,'TOO MUCH MEMORY REQUIRED'&
+        /1X,' ',I7,' VARIABLES,',I7,' TEMPORARIES,',I7,' AVAILABLE.')
       GOTO 99
    18 WRITE(LUNIT,118)
   118 FORMAT(1X,'TOO MANY NAMES')
@@ -587,13 +587,13 @@ C
    40 WRITE(LUNIT,140)
   140 FORMAT(1X,'EXPECT STATEMENT TERMINATOR')
       GOTO 99
-C
+!
    99 ERR = N
-      IF (LUNIT.EQ.WIO .OR. WIO.EQ.0) RETURN
+      IF (LUNIT==WIO .OR. WIO==0) RETURN
       LUNIT = WIO
       GOTO 98
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE EXPR
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
@@ -608,63 +608,63 @@ C-----------------------------------------------------------------------
       DATA COLON/40/,BLANK/36/,PLUS/41/,MINUS/42/,NAME/1/
       DATA EYE/14,34,14,36/
       SAVE COLON,BLANK,PLUS,MINUS,NAME,EYE
-      IF (DDT .EQ. 1) WRITE(WTE,100) PT,RSTK(PT)
+      IF (DDT == 1) WRITE(WTE,100) PT,RSTK(PT)
   100 FORMAT(1X,'EXPR  ',2I4)
       R = RSTK(PT)
-      GOTO (01,01,01,01,01,05,25,99,99,01,01,99,99,99,99,99,99,01,01,
-     $       01),R
-   01 IF (SYM .EQ. COLON) CALL PUTID(SYN,EYE)
-      IF (SYM .EQ. COLON) SYM = NAME
+      GOTO (01,01,01,01,01,05,25,99,99,01,01,99,99,99,99,99,99,01,01,&
+             01),R
+   01 IF (SYM == COLON) CALL PUTID(SYN,EYE)
+      IF (SYM == COLON) SYM = NAME
       KOUNT = 1
    02 SIGN = PLUS
-      IF (SYM .EQ. MINUS) SIGN = MINUS
-      IF (SYM.EQ.PLUS .OR. SYM.EQ.MINUS) CALL GETSYM
+      IF (SYM == MINUS) SIGN = MINUS
+      IF (SYM==PLUS .OR. SYM==MINUS) CALL GETSYM
       PT = PT+1
-      IF (PT .GT. PSIZE-1) CALL ERROR(26)
-      IF (ERR .GT. 0) RETURN
+      IF (PT > PSIZE-1) CALL ERROR(26)
+      IF (ERR > 0) RETURN
       PSTK(PT) = SIGN + 256*KOUNT
       RSTK(PT) = 6
-C     *CALL* TERM
+!     *CALL* TERM
       RETURN
    05 SIGN = MOD(PSTK(PT),256)
       KOUNT = PSTK(PT)/256
       PT = PT-1
-      IF (SIGN .EQ. MINUS) CALL STACK1(MINUS)
-      IF (ERR .GT. 0) RETURN
-   10 IF (SYM.EQ.PLUS .OR. SYM.EQ.MINUS) GOTO 20
+      IF (SIGN == MINUS) CALL STACK1(MINUS)
+      IF (ERR > 0) RETURN
+   10 IF (SYM==PLUS .OR. SYM==MINUS) GOTO 20
       GOTO 50
-   20 IF (RSTK(PT) .NE. 10) GOTO 21
-C     BLANK IS DELIMITER INSIDE ANGLE BRACKETS
+   20 IF (RSTK(PT) /= 10) GOTO 21
+!     BLANK IS DELIMITER INSIDE ANGLE BRACKETS
       LS = LPT(3) - 2
-      IF (LIN(LS) .EQ. BLANK) GOTO 50
+      IF (LIN(LS) == BLANK) GOTO 50
    21 OP = SYM
       CALL GETSYM
       PT = PT+1
       PSTK(PT) = OP + 256*KOUNT
       RSTK(PT) = 7
-C     *CALL* TERM
+!     *CALL* TERM
       RETURN
    25 OP = MOD(PSTK(PT),256)
       KOUNT = PSTK(PT)/256
       PT = PT-1
       CALL STACK2(OP)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       GOTO 10
-   50 IF (SYM .NE. COLON) GOTO 60
+   50 IF (SYM /= COLON) GOTO 60
       CALL GETSYM
       KOUNT = KOUNT+1
       GOTO 02
-   60 IF (KOUNT .GT. 3) CALL ERROR(33)
-      IF (ERR .GT. 0) RETURN
+   60 IF (KOUNT > 3) CALL ERROR(33)
+      IF (ERR > 0) RETURN
       RHS = KOUNT
-      IF (KOUNT .GT. 1) CALL STACK2(COLON)
-      IF (ERR .GT. 0) RETURN
+      IF (KOUNT > 1) CALL STACK2(COLON)
+      IF (ERR > 0) RETURN
       RETURN
    99 CALL ERROR(22)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE FACTOR
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
@@ -683,60 +683,60 @@ C-----------------------------------------------------------------------
       SAVE DSTAR,SEMI,EOL,BLANK
       SAVE STAR,COMMA,LPAREN,RPAREN
       SAVE LESS,GREAT,QUOTE,NUM,NAME,ALFL
-      IF (DDT .EQ. 1) WRITE(WTE,100) PT,RSTK(PT),SYM
+      IF (DDT == 1) WRITE(WTE,100) PT,RSTK(PT),SYM
   100 FORMAT(1X,'FACTOR',3I4)
       R = RSTK(PT)
       GOTO (99,99,99,99,99,99,99,01,01,25,45,65,99,99,99,55,75,32,37),R
-   01 IF (SYM.EQ.NUM .OR. SYM.EQ.QUOTE .OR.  SYM.EQ.LESS) GOTO 10
-      IF (SYM .EQ. GREAT) GOTO 30
+   01 IF (SYM==NUM .OR. SYM==QUOTE .OR.  SYM==LESS) GOTO 10
+      IF (SYM == GREAT) GOTO 30
       EXCNT = 0
-      IF (SYM .EQ. NAME) GOTO 40
+      IF (SYM == NAME) GOTO 40
       ID(1) = BLANK
-      IF (SYM .EQ. LPAREN) GOTO 42
+      IF (SYM == LPAREN) GOTO 42
       CALL ERROR(2)
-      IF (ERR .GT. 0) RETURN
-C
-C     PUT SOMETHING ON THE STACK
+      IF (ERR > 0) RETURN
+!
+!     PUT SOMETHING ON THE STACK
    10 L = 1
-      IF (TOP .GT. 0) L = LSTK(TOP) + MSTK(TOP)*NSTK(TOP)
-      IF (TOP+1 .GE. BOT) CALL ERROR(18)
-      IF (ERR .GT. 0) RETURN
+      IF (TOP > 0) L = LSTK(TOP) + MSTK(TOP)*NSTK(TOP)
+      IF (TOP+1 >= BOT) CALL ERROR(18)
+      IF (ERR > 0) RETURN
       TOP = TOP+1
       LSTK(TOP) = L
-      IF (SYM .EQ. QUOTE) GOTO 15
-      IF (SYM .EQ. LESS) GOTO 20
-C
-C     SINGLE NUMBER, GETSYM STORED IT IN STKI
+      IF (SYM == QUOTE) GOTO 15
+      IF (SYM == LESS) GOTO 20
+!
+!     SINGLE NUMBER, GETSYM STORED IT IN STKI
       MSTK(TOP) = 1
       NSTK(TOP) = 1
       STKR(L) = STKI(VSIZE)
       STKI(L) = 0.0D0
       CALL GETSYM
       GOTO 60
-C
-C     STRING
+!
+!     STRING
    15 N = 0
       LPT(4) = LPT(3)
       CALL GETCH
-   16 IF (CHRA .EQ. QUOTE) GOTO 18
+   16 IF (CHRA == QUOTE) GOTO 18
    17 LN = L+N
-      IF (CHRA .EQ. EOL) CALL ERROR(31)
-      IF (ERR .GT. 0) RETURN
+      IF (CHRA == EOL) CALL ERROR(31)
+      IF (ERR > 0) RETURN
       STKR(LN) = DFLOAT(CHRA)
       STKI(LN) = 0.0D0
       N = N+1
       CALL GETCH
       GOTO 16
    18 CALL GETCH
-      IF (CHRA .EQ. QUOTE) GOTO 17
-      IF (N .LE. 0) CALL ERROR(31)
-      IF (ERR .GT. 0) RETURN
+      IF (CHRA == QUOTE) GOTO 17
+      IF (N <= 0) CALL ERROR(31)
+      IF (ERR > 0) RETURN
       MSTK(TOP) = 1
       NSTK(TOP) = N
       CALL GETSYM
       GOTO 60
-C
-C     EXPLICIT MATRIX
+!
+!     EXPLICIT MATRIX
    20 MSTK(TOP) = 0
       NSTK(TOP) = 0
    21 TOP = TOP + 1
@@ -744,62 +744,62 @@ C     EXPLICIT MATRIX
       MSTK(TOP) = 0
       NSTK(TOP) = 0
       CALL GETSYM
-   22 IF (SYM.EQ.SEMI .OR. SYM.EQ.GREAT .OR. SYM.EQ.EOL) GOTO 27
-      IF (SYM .EQ. COMMA) CALL GETSYM
+   22 IF (SYM==SEMI .OR. SYM==GREAT .OR. SYM==EOL) GOTO 27
+      IF (SYM == COMMA) CALL GETSYM
       PT = PT+1
       RSTK(PT) = 10
-C     *CALL* EXPR
+!     *CALL* EXPR
       RETURN
    25 PT = PT-1
       TOP = TOP - 1
-      IF (MSTK(TOP) .EQ. 0) MSTK(TOP) = MSTK(TOP+1)
-      IF (MSTK(TOP) .NE. MSTK(TOP+1)) CALL ERROR(5)
-      IF (ERR .GT. 0) RETURN
+      IF (MSTK(TOP) == 0) MSTK(TOP) = MSTK(TOP+1)
+      IF (MSTK(TOP) /= MSTK(TOP+1)) CALL ERROR(5)
+      IF (ERR > 0) RETURN
       NSTK(TOP) = NSTK(TOP) + NSTK(TOP+1)
       GOTO 22
-   27 IF (SYM.EQ.SEMI .AND. CHRA.EQ.EOL) CALL GETSYM
+   27 IF (SYM==SEMI .AND. CHRA==EOL) CALL GETSYM
       CALL STACK1(QUOTE)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       TOP = TOP - 1
-      IF (MSTK(TOP) .EQ. 0) MSTK(TOP) = MSTK(TOP+1)
-      IF (MSTK(TOP).NE.MSTK(TOP+1) .AND. MSTK(TOP+1).GT.0) CALL ERROR(6)
-      IF (ERR .GT. 0) RETURN
+      IF (MSTK(TOP) == 0) MSTK(TOP) = MSTK(TOP+1)
+      IF (MSTK(TOP)/=MSTK(TOP+1) .AND. MSTK(TOP+1)>0) CALL ERROR(6)
+      IF (ERR > 0) RETURN
       NSTK(TOP) = NSTK(TOP) + NSTK(TOP+1)
-      IF (SYM .EQ. EOL) CALL GETLIN
-      IF (SYM .NE. GREAT) GOTO 21
+      IF (SYM == EOL) CALL GETLIN
+      IF (SYM /= GREAT) GOTO 21
       CALL STACK1(QUOTE)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       CALL GETSYM
       GOTO 60
-C
-C     MACRO STRING
+!
+!     MACRO STRING
    30 CALL GETSYM
-      IF (SYM.EQ.LESS .AND. CHRA.EQ.EOL) CALL ERROR(28)
-      IF (ERR .GT. 0) RETURN
+      IF (SYM==LESS .AND. CHRA==EOL) CALL ERROR(28)
+      IF (ERR > 0) RETURN
       PT = PT+1
       RSTK(PT) = 18
-C     *CALL* EXPR
+!     *CALL* EXPR
       RETURN
    32 PT = PT-1
-      IF (SYM.NE.LESS .AND. SYM.NE.EOL) CALL ERROR(37)
-      IF (ERR .GT. 0) RETURN
-      IF (SYM .EQ. LESS) CALL GETSYM
+      IF (SYM/=LESS .AND. SYM/=EOL) CALL ERROR(37)
+      IF (ERR > 0) RETURN
+      IF (SYM == LESS) CALL GETSYM
       K = LPT(6)
       LIN(K+1) = LPT(1)
       LIN(K+2) = LPT(2)
       LIN(K+3) = LPT(6)
       LPT(1) = K + 4
-C     TRANSFER STACK TO INPUT LINE
+!     TRANSFER STACK TO INPUT LINE
       K = LPT(1)
       L = LSTK(TOP)
       N = MSTK(TOP)*NSTK(TOP)
       DO 34 J = 1, N
          LS = L + J-1
          LIN(K) = IDINT(STKR(LS))
-         IF (LIN(K).LT.0 .OR. LIN(K).GE.ALFL) CALL ERROR(37)
-         IF (ERR .GT. 0) RETURN
-         IF (K.LT.1024) K = K+1
-         IF (K.EQ.1024) WRITE(WTE,33) K
+         IF (LIN(K)<0 .OR. LIN(K)>=ALFL) CALL ERROR(37)
+         IF (ERR > 0) RETURN
+         IF (K<1024) K = K+1
+         IF (K==1024) WRITE(WTE,33) K
    33    FORMAT(1X,'INPUT BUFFER LIMIT IS ',I4,' CHARACTERS.')
    34 CONTINUE
       TOP = TOP-1
@@ -813,7 +813,7 @@ C     TRANSFER STACK TO INPUT LINE
       CALL GETSYM
       PT = PT+1
       RSTK(PT) = 19
-C     *CALL* EXPR
+!     *CALL* EXPR
       RETURN
    37 PT = PT-1
       K = LPT(1) - 4
@@ -823,209 +823,209 @@ C     *CALL* EXPR
       CHRA = BLANK
       CALL GETSYM
       GOTO 60
-C
-C     FUNCTION OR MATRIX ELEMENT
+!
+!     FUNCTION OR MATRIX ELEMENT
    40 CALL PUTID(ID,SYN)
       CALL GETSYM
-      IF (SYM .EQ. LPAREN) GOTO 42
+      IF (SYM == LPAREN) GOTO 42
       RHS = 0
       CALL FUNS(ID)
-      IF (FIN .NE. 0) CALL ERROR(25)
-      IF (ERR .GT. 0) RETURN
+      IF (FIN /= 0) CALL ERROR(25)
+      IF (ERR > 0) RETURN
       CALL STACKG(ID)
-      IF (ERR .GT. 0) RETURN
-      IF (FIN .EQ. 7) GOTO 50
-      IF (FIN .EQ. 0) CALL PUTID(IDS(1,PT+1),ID)
-      IF (FIN .EQ. 0) CALL ERROR(4)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
+      IF (FIN == 7) GOTO 50
+      IF (FIN == 0) CALL PUTID(IDS(1,PT+1),ID)
+      IF (FIN == 0) CALL ERROR(4)
+      IF (ERR > 0) RETURN
       GOTO 60
-C
+!
    42 CALL GETSYM
       EXCNT = EXCNT+1
       PT = PT+1
       PSTK(PT) = EXCNT
       CALL PUTID(IDS(1,PT),ID)
       RSTK(PT) = 11
-C     *CALL* EXPR
+!     *CALL* EXPR
       RETURN
    45 CALL PUTID(ID,IDS(1,PT))
       EXCNT = PSTK(PT)
       PT = PT-1
-      IF (SYM .EQ. COMMA) GOTO 42
-      IF (SYM .NE. RPAREN) CALL ERROR(3)
-      IF (ERR .GT. 0) RETURN
-      IF (SYM .EQ. RPAREN) CALL GETSYM
-      IF (ID(1) .EQ. BLANK) GOTO 60
+      IF (SYM == COMMA) GOTO 42
+      IF (SYM /= RPAREN) CALL ERROR(3)
+      IF (ERR > 0) RETURN
+      IF (SYM == RPAREN) CALL GETSYM
+      IF (ID(1) == BLANK) GOTO 60
       RHS = EXCNT
       CALL STACKG(ID)
-      IF (ERR .GT. 0) RETURN
-      IF (FIN .EQ. 0) CALL FUNS(ID)
-      IF (FIN .EQ. 0) CALL ERROR(4)
-      IF (ERR .GT. 0) RETURN
-C
-C     EVALUATE MATRIX FUNCTION
+      IF (ERR > 0) RETURN
+      IF (FIN == 0) CALL FUNS(ID)
+      IF (FIN == 0) CALL ERROR(4)
+      IF (ERR > 0) RETURN
+!
+!     EVALUATE MATRIX FUNCTION
    50 PT = PT+1
       RSTK(PT) = 16
-C     *CALL* MATFN
+!     *CALL* MATFN
       RETURN
    55 PT = PT-1
       GOTO 60
-C
-C     CHECK FOR QUOTE (TRANSPOSE) AND ** (POWER)
-   60 IF (SYM .NE. QUOTE) GOTO 62
+!
+!     CHECK FOR QUOTE (TRANSPOSE) AND ** (POWER)
+   60 IF (SYM /= QUOTE) GOTO 62
          I = LPT(3) - 2
-         IF (LIN(I) .EQ. BLANK) GOTO 90
+         IF (LIN(I) == BLANK) GOTO 90
          CALL STACK1(QUOTE)
-         IF (ERR .GT. 0) RETURN
+         IF (ERR > 0) RETURN
          CALL GETSYM
-   62 IF (SYM.NE.STAR .OR. CHRA.NE.STAR) GOTO 90
+   62 IF (SYM/=STAR .OR. CHRA/=STAR) GOTO 90
       CALL GETSYM
       CALL GETSYM
       PT = PT+1
       RSTK(PT) = 12
-C     *CALL* FACTOR
+!     *CALL* FACTOR
       GOTO 01
    65 PT = PT-1
       CALL STACK2(DSTAR)
-      IF (ERR .GT. 0) RETURN
-      IF (FUN .NE. 2) GOTO 90
-C     MATRIX POWER, USE EIGENVECTORS
+      IF (ERR > 0) RETURN
+      IF (FUN /= 2) GOTO 90
+!     MATRIX POWER, USE EIGENVECTORS
       PT = PT+1
       RSTK(PT) = 17
-C     *CALL* MATFN
+!     *CALL* MATFN
       RETURN
    75 PT = PT-1
    90 RETURN
    99 CALL ERROR(22)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE FILES(LUNIT,INAME)
       INTEGER LUNIT
-C
-C     AMIGA SPECIFIC ROUTINE TO ALLOCATE FILES
-C     LUNIT = LOGICAL UNIT NUMBER
-C     NAME = FILE NAME, 1 CHARACTER PER WORD
-C
+!
+!     AMIGA SPECIFIC ROUTINE TO ALLOCATE FILES
+!     LUNIT = LOGICAL UNIT NUMBER
+!     NAME = FILE NAME, 1 CHARACTER PER WORD
+!
       INTEGER INAME(256)
       character*1024 NAME
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
       COMMON /IOP/ DDT,ERR,FMT,LCT,LIN,LPT,HIO,RIO,WIO,RTE,WTE,FE
-C
-C  Amiga dependent stuff to squeeze the NAME from one CHAR per word to one
-C  per byte
-C
+!
+!  Amiga dependent stuff to squeeze the NAME from one CHAR per word to one
+!  per byte
+!
       character*1024 NAME2
       integer*1 strip(4,256),strip2(32)
       character*32 NAME3
       equivalence (NAME2,strip),(NAME3,strip2)
       WRITE(NAME,'(256A4)')(INAME(I),I=1,256)
-C
+!
       FE=0
-C
-C ERROR CATCHER
-      IF (LUNIT .EQ. 0) RETURN
-C
-C PRINTER
-      !if (LUNIT .eq. RTE) return
-C
-C TERMINAL I/O
-      !if (LUNIT .eq. WTE) return
+!
+! ERROR CATCHER
+      IF (LUNIT == 0) RETURN
+!
+! PRINTER
+      !if (LUNIT == RTE) return
+!
+! TERMINAL I/O
+      !if (LUNIT == WTE) return
 
-      if (LUNIT .eq. 5) return
-      if (LUNIT .eq. 6) return
-C-----------------------------------------------------------------------
-C HELP FILE
-      if (LUNIT .eq. 11) then
+      if (LUNIT == 5) return
+      if (LUNIT == 6) return
+!-----------------------------------------------------------------------
+! HELP FILE
+      if (LUNIT == 11) then
          OPEN(11,FILE='matlab88_help.txt',STATUS='OLD',ERR=14)
          write(WTE,'(/,1X,''HELP is available'')')
          return
-      elseif (LUNIT .eq. -11 .AND. HIO .NE. 0) then
+      elseif (LUNIT == -11 .AND. HIO /= 0) then
          rewind (11,ERR=99)
          return
-      elseif (LUNIT .lt. 0) then
+      elseif (LUNIT < 0) then
          close(unit=-LUNIT,ERR=99)
          return
       end if
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
    10 continue
-C
-C  ALL OTHER FILES
-C
+!
+!  ALL OTHER FILES
+!
       NAME2=NAME
       do 37 j=1,32
    37 strip2(j)=strip(1,j)
       OPEN(UNIT=LUNIT,FILE=NAME3,STATUS='UNKNOWN',ERR=98)
       RETURN
-C-----------------------------------------------------------------------
-C HELP FILE NOT FOUND
-C
-   14 CONTINUE 
+!-----------------------------------------------------------------------
+! HELP FILE NOT FOUND
+!
+   14 CONTINUE
       WRITE(WTE,'(1x,''HELP IS NOT AVAILABLE'')')
       HIO = 0
       RETURN
-C-----------------------------------------------------------------------
-C GENERAL FILE OPEN FAILURE
-C
+!-----------------------------------------------------------------------
+! GENERAL FILE OPEN FAILURE
+!
    98 WRITE(WTE,'(1X,''OPEN FILE FAILED'')')
       FE=1
 
-C IF THIS WAS A DIARY FILE (OUTPUT), SET ITS FILE HANDLE TO 0
+! IF THIS WAS A DIARY FILE (OUTPUT), SET ITS FILE HANDLE TO 0
 
-      IF(LUNIT .EQ. 8) THEN
+      IF(LUNIT == 8) THEN
         WIO=0
-C
-C OTHERWISE, SET THE I/O TO TERMINAL I/O
-C
+!
+! OTHERWISE, SET THE I/O TO TERMINAL I/O
+!
       ELSE
         RIO=RTE
       ENDIF
       RETURN
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
    99 CONTINUE
       RETURN
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       END
 
       DOUBLE PRECISION FUNCTION FLOP(X)
       DOUBLE PRECISION X
-C     SYSTEM DEPENDENT FUNCTION
-C     COUNT AND POSSIBLY CHOP EACH FLOATING POINT OPERATION
-C     FLP(1) IS FLOP COUNTER
-C     FLP(2) IS NUMBER OF PLACES TO BE CHOPPED
-C
+!     SYSTEM DEPENDENT FUNCTION
+!     COUNT AND POSSIBLY CHOP EACH FLOATING POINT OPERATION
+!     FLP(1) IS FLOP COUNTER
+!     FLP(2) IS NUMBER OF PLACES TO BE CHOPPED
+!
       INTEGER SYM,SYN(4),BUF(256),CHRA,FLP(2),FIN,FUN,LHS,RHS,RAN(2)
       COMMON /COM/ SYM,SYN,BUF,CHRA,FLP,FIN,FUN,LHS,RHS,RAN
-C
+!
       DOUBLE PRECISION MASK(14),XX,MM
       real mas(2,14)
       LOGICAL LX(2),LM(2)
       EQUIVALENCE (LX(1),XX),(LM(1),MM)
       equivalence (MASK(1),mas(1,1))
-      data mas/
-     $ Z'ffffffff',Z'fff0ffff',
-     $ Z'ffffffff',Z'ff00ffff',
-     $ Z'ffffffff',Z'f000ffff',
-     $ Z'ffffffff',Z'0000ffff',
-     $ Z'ffffffff',Z'0000fff0',
-     $ Z'ffffffff',Z'0000ff00',
-     $ Z'ffffffff',Z'0000f000',
-     $ Z'ffffffff',Z'00000000',
-     $ Z'fff0ffff',Z'00000000',
-     $ Z'ff00ffff',Z'00000000',
-     $ Z'f000ffff',Z'00000000',
-     $ Z'0000ffff',Z'00000000',
-     $ Z'0000fff0',Z'00000000',
-     $ Z'0000ff80',Z'00000000'/
+      data mas/&
+       Z'ffffffff',Z'fff0ffff',&
+       Z'ffffffff',Z'ff00ffff',&
+       Z'ffffffff',Z'f000ffff',&
+       Z'ffffffff',Z'0000ffff',&
+       Z'ffffffff',Z'0000fff0',&
+       Z'ffffffff',Z'0000ff00',&
+       Z'ffffffff',Z'0000f000',&
+       Z'ffffffff',Z'00000000',&
+       Z'fff0ffff',Z'00000000',&
+       Z'ff00ffff',Z'00000000',&
+       Z'f000ffff',Z'00000000',&
+       Z'0000ffff',Z'00000000',&
+       Z'0000fff0',Z'00000000',&
+       Z'0000ff80',Z'00000000'/
       save mas
-C
+!
       FLP(1) = FLP(1) + 1
       K = FLP(2)
       FLOP = X
-      IF (K .LE. 0) RETURN
+      IF (K <= 0) RETURN
       FLOP = 0.0D0
-      IF (K .GE. 15) RETURN
+      IF (K >= 15) RETURN
       XX = X
       MM = MASK(K)
       LX(1) = LX(1) .AND. LM(1)
@@ -1033,23 +1033,23 @@ C
       FLOP = XX
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE FORMZ(LUNIT,X,Y)
       DOUBLE PRECISION X,Y
-C
-C     SYSTEM DEPENDENT ROUTINE TO PRINT WITH Z FORMAT
-C
-      IF (Y .NE. 0.0D0) WRITE(LUNIT,10) X,Y
-      IF (Y .EQ. 0.0D0) WRITE(LUNIT,10) X
+!
+!     SYSTEM DEPENDENT ROUTINE TO PRINT WITH Z FORMAT
+!
+      IF (Y /= 0.0D0) WRITE(LUNIT,10) X,Y
+      IF (Y == 0.0D0) WRITE(LUNIT,10) X
    10 FORMAT(2Z18)
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE FUNS(ID)
       INTEGER ID(4)
-C
-C     SCAN FUNCTION LIST
-C
+!
+!     SCAN FUNCTION LIST
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
@@ -1060,67 +1060,67 @@ C
       LOGICAL EQID
       INTEGER FUNL,FUNN(4,57),FUNP(57)
       DATA FUNL/57/
-C
-C    1  ABS   ATAN  BASE  CHAR
-C    2  CHOL  CHOP  COND  CONJ
-C    3  COS   DET   DIAG  DIAR
-C    4  DISP  EIG   EPS   EXEC
-C    5  EXP   EYE   FLOP  HESS
-C    6  HILB  IMAG  INV   KRON
-C    7  LINE  LOAD  LOG   LU
-C    8  MAGIC NORM  ONES  ORTH
-C    9  PINV  PLOT  POLY  PRINT
-C    $  PROD  QR    RAND  RANK
-C    1  RAT   RCOND REAL  ROOT
-C    2  ROUND RREF  SAVE  SCHUR
-C    3  SIN   SIZE  SQRT  SUM
-C    4  SVD   TRIL  TRIU  USER
-C    5  DEBUG
-C
-      DATA FUNN/
-     1  10,11,28,36, 10,29,10,23, 11,10,28,14, 12,17,10,27,
-     2  12,17,24,21, 12,17,24,25, 12,24,23,13, 12,24,23,19,
-     3  12,24,28,36, 13,14,29,36, 13,18,10,16, 13,18,10,27,
-     4  13,18,28,25, 14,18,16,36, 14,25,28,36, 14,33,14,12,
-     5  14,33,25,36, 14,34,14,36, 15,21,24,25, 17,14,28,28,
-     6  17,18,21,11, 18,22,10,16, 18,23,31,36, 20,27,24,23,
-     7  21,18,23,14, 21,24,10,13, 21,24,16,36, 21,30,36,36,
-     8  22,10,16,18, 23,24,27,22, 24,23,14,28, 24,27,29,17,
-     9  25,18,23,31, 25,21,24,29, 25,24,21,34, 25,27,18,23,
-     $  25,27,24,13, 26,27,36,36, 27,10,23,13, 27,10,23,20,
-     1  27,10,29,36, 27,12,24,23, 27,14,10,21, 27,24,24,29,
-     2  27,24,30,23, 27,27,14,15, 28,10,31,14, 28,12,17,30,
-     3  28,18,23,36, 28,18,35,14, 28,26,27,29, 28,30,22,36,
-     4  28,31,13,36, 29,27,18,21, 29,27,18,30, 30,28,14,27,
-     5  13,14,11,30/
-C
-      DATA FUNP/
-     1  221,203,507,509, 106,609,303,225, 202,102,602,505,
-     4  506,211,000,501, 204,606,000,213, 105,224,101,611,
-     7  508,503,206,104, 601,304,608,402, 302,510,214,504,
-     $  604,401,607,305, 511,103,223,215, 222,107,502,212,
-     3  201,610,205,603, 301,614,615,605, 512/
+!
+!    1  ABS   ATAN  BASE  CHAR
+!    2  CHOL  CHOP  COND  CONJ
+!    3  COS   DET   DIAG  DIAR
+!    4  DISP  EIG   EPS   EXEC
+!    5  EXP   EYE   FLOP  HESS
+!    6  HILB  IMAG  INV   KRON
+!    7  LINE  LOAD  LOG   LU
+!    8  MAGIC NORM  ONES  ORTH
+!    9  PINV  PLOT  POLY  PRINT
+!    $  PROD  QR    RAND  RANK
+!    1  RAT   RCOND REAL  ROOT
+!    2  ROUND RREF  SAVE  SCHUR
+!    3  SIN   SIZE  SQRT  SUM
+!    4  SVD   TRIL  TRIU  USER
+!    5  DEBUG
+!
+      DATA FUNN/&
+        10,11,28,36, 10,29,10,23, 11,10,28,14, 12,17,10,27,&
+        12,17,24,21, 12,17,24,25, 12,24,23,13, 12,24,23,19,&
+        12,24,28,36, 13,14,29,36, 13,18,10,16, 13,18,10,27,&
+        13,18,28,25, 14,18,16,36, 14,25,28,36, 14,33,14,12,&
+        14,33,25,36, 14,34,14,36, 15,21,24,25, 17,14,28,28,&
+        17,18,21,11, 18,22,10,16, 18,23,31,36, 20,27,24,23,&
+        21,18,23,14, 21,24,10,13, 21,24,16,36, 21,30,36,36,&
+        22,10,16,18, 23,24,27,22, 24,23,14,28, 24,27,29,17,&
+        25,18,23,31, 25,21,24,29, 25,24,21,34, 25,27,18,23,&
+        25,27,24,13, 26,27,36,36, 27,10,23,13, 27,10,23,20,&
+        27,10,29,36, 27,12,24,23, 27,14,10,21, 27,24,24,29,&
+        27,24,30,23, 27,27,14,15, 28,10,31,14, 28,12,17,30,&
+        28,18,23,36, 28,18,35,14, 28,26,27,29, 28,30,22,36,&
+        28,31,13,36, 29,27,18,21, 29,27,18,30, 30,28,14,27,&
+        13,14,11,30/
+!
+      DATA FUNP/&
+        221,203,507,509, 106,609,303,225, 202,102,602,505,&
+        506,211,000,501, 204,606,000,213, 105,224,101,611,&
+        508,503,206,104, 601,304,608,402, 302,510,214,504,&
+        604,401,607,305, 511,103,223,215, 222,107,502,212,&
+        201,610,205,603, 301,614,615,605, 512/
       save funl, funn, funp
-C
-      IF (ID(1).EQ.0) CALL PRNTID(FUNN,FUNL-1)
-      IF (ID(1).EQ.0) RETURN
-C
+!
+      IF (ID(1)==0) CALL PRNTID(FUNN,FUNL-1)
+      IF (ID(1)==0) RETURN
+!
       DO 10 K = 1, FUNL
          IF (EQID(ID,FUNN(1,K))) GOTO 20
    10 CONTINUE
       FIN = 0
       RETURN
-C
+!
    20 FIN = MOD(FUNP(K),100)
       FUN = FUNP(K)/100
-      IF (RHS.EQ.0 .AND. FUNP(K).EQ.606) FIN = 0
-      IF (RHS.EQ.0 .AND. FUNP(K).EQ.607) FIN = 0
+      IF (RHS==0 .AND. FUNP(K)==606) FIN = 0
+      IF (RHS==0 .AND. FUNP(K)==607) FIN = 0
       RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE GETCH
-C     GET NEXT CHARACTER
+!     GET NEXT CHARACTER
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
       INTEGER SYM,SYN(4),BUF(256),CHRA,FLP(2),FIN,FUN,LHS,RHS,RAN(2)
       COMMON /IOP/ DDT,ERR,FMT,LCT,LIN,LPT,HIO,RIO,WIO,RTE,WTE,FE
@@ -1130,13 +1130,13 @@ C     GET NEXT CHARACTER
       save EOL
       L = LPT(4)
       CHRA = LIN(L)
-      IF (CHRA .NE. EOL) LPT(4) = L + 1
+      IF (CHRA /= EOL) LPT(4) = L + 1
       RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE GETLIN
-C     GET A NEW LINE
+!     GET A NEW LINE
       INTEGER ALFA(52),ALFB(52),ALFL,CASE
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
       INTEGER SYM,SYN(4),BUF(256),CHRA,FLP(2),FIN,FUN,LHS,RHS,RAN(2)
@@ -1147,39 +1147,39 @@ C     GET A NEW LINE
       DATA EOL/99/,DOT/47/,BLANK/36/,RETU/27,14,29,30/
       DATA SLASH/44/,BSLASH/45/,LRECL/80/
       SAVE  EOL, DOT, BLANK, RETU, SLASH, BSLASH, LRECL
-C
+!
    10 L = LPT(1)
    11 DO 12 J = 1, LRECL
          BUF(J) = ALFA(BLANK+1)
    12 CONTINUE
       READ(RIO,101,END=50,ERR=15) (BUF(J),J=1,LRECL)
-CDC.. IF (EOF(RIO).NE.0) GOTO 50
+!DC.. IF (EOF(RIO)/=0) GOTO 50
   101 FORMAT(80A1)
       N = LRECL+1
    15 N = N-1
-      IF (BUF(N) .EQ. ALFA(BLANK+1)) GOTO 15
-      IF (MOD(LCT(4),2) .EQ. 1) WRITE(WTE,102) (BUF(J),J=1,N)
-      IF (WIO .NE. 0) WRITE(WIO,102) (BUF(J),J=1,N)
+      IF (BUF(N) == ALFA(BLANK+1)) GOTO 15
+      IF (MOD(LCT(4),2) == 1) WRITE(WTE,102) (BUF(J),J=1,N)
+      IF (WIO /= 0) WRITE(WIO,102) (BUF(J),J=1,N)
   102 FORMAT(1X,80A1)
-C
+!
       DO 40 J = 1, N
          DO 20 K = 1, ALFL
-           IF (BUF(J).EQ.ALFA(K) .OR. BUF(J).EQ.ALFB(K)) GOTO 30
+           IF (BUF(J)==ALFA(K) .OR. BUF(J)==ALFB(K)) GOTO 30
    20    CONTINUE
          K = EOL+1
 !         CALL XCHAR(BUF(J),K)  ! handle backspace
-         IF (K .GT. EOL) GOTO 10
-         IF (K .EQ. EOL) GOTO 45
-         IF (K .EQ. -1) L = L-1
-         IF (K .LE. 0) GOTO 40
-C
+         IF (K > EOL) GOTO 10
+         IF (K == EOL) GOTO 45
+         IF (K == -1) L = L-1
+         IF (K <= 0) GOTO 40
+!
    30    K = K-1
-         IF (K.EQ.SLASH .AND. BUF(J+1).EQ.BUF(J)) GOTO 45
-         IF (K.EQ.DOT .AND. BUF(J+1).EQ.BUF(J)) GOTO 11
-         IF (K.EQ.BSLASH .AND. N.EQ.1) GOTO 60
+         IF (K==SLASH .AND. BUF(J+1)==BUF(J)) GOTO 45
+         IF (K==DOT .AND. BUF(J+1)==BUF(J)) GOTO 11
+         IF (K==BSLASH .AND. N==1) GOTO 60
          LIN(L) = K
-         IF (L.LT.1024) L = L+1
-         IF (L.EQ.1024) WRITE(WTE,33) L
+         IF (L<1024) L = L+1
+         IF (L==1024) WRITE(WTE,33) L
    33    FORMAT(1X,'INPUT BUFFER LIMIT IS ',I4,' CHARACTERS.')
    40 CONTINUE
    45 LIN(L) = EOL
@@ -1190,30 +1190,30 @@ C
       LCT(1) = 0
       CALL GETCH
       RETURN
-C
-   50 IF (RIO .EQ. RTE) GOTO 52
+!
+   50 IF (RIO == RTE) GOTO 52
       CALL PUTID(LIN(L),RETU)
       L = L + 4
       GOTO 45
    52 CALL FILES(-RTE,BUF)
       LIN(L) = EOL
       RETURN
-C
+!
    60 N = LPT(6) - LPT(1)
       DO 61 I = 1, N
          J = L+I-1
          K = LIN(J)
          BUF(I) = ALFA(K+1)
-         IF (CASE.EQ.1 .AND. K.LT.36) BUF(I) = ALFB(K+1)
+         IF (CASE==1 .AND. K<36) BUF(I) = ALFB(K+1)
    61 CONTINUE
       CALL EDIT(BUF,N)
       N = N + 1
       GOTO 15
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE GETSYM
-C     GET A SYMBOL
+!     GET A SYMBOL
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER ALFA(52),ALFB(52),ALFL,CASE
@@ -1229,93 +1229,93 @@ C     GET A SYMBOL
       DATA BLANK/36/,Z/35/,DOT/47/,D/13/,E/14/,EOL/99/,PLUS/41/
       DATA MINUS/42/,NAME/1/,NUM/0/,STAR/43/,SLASH/44/,BSLASH/45/
       SAVE BLANK,Z,DOT,D,E,EOL,PLUS,MINUS,NAME,NUM,STAR,SLASH,BSLASH
-   10 IF (CHRA .NE. BLANK) GOTO 20
+   10 IF (CHRA /= BLANK) GOTO 20
       CALL GETCH
       GOTO 10
    20 LPT(2) = LPT(3)
       LPT(3) = LPT(4)
-      IF (CHRA .LE. 9) GOTO 50
-      IF (CHRA .LE. Z) GOTO 30
-C
-C     SPECIAL CHARACTER
+      IF (CHRA <= 9) GOTO 50
+      IF (CHRA <= Z) GOTO 30
+!
+!     SPECIAL CHARACTER
       SS = SYM
       SYM = CHRA
       CALL GETCH
-      IF (SYM .NE. DOT) GOTO 90
-C
-C     IS DOT PART OF NUMBER OR OPERATOR
+      IF (SYM /= DOT) GOTO 90
+!
+!     IS DOT PART OF NUMBER OR OPERATOR
       SYV = 0.0D0
-      IF (CHRA .LE. 9) GOTO 55
-      IF (CHRA.EQ.STAR.OR.CHRA.EQ.SLASH.OR.CHRA.EQ.BSLASH) GOTO 90
-      IF (SS.EQ.STAR .OR. SS.EQ.SLASH .OR. SS.EQ.BSLASH) GOTO 90
+      IF (CHRA <= 9) GOTO 55
+      IF (CHRA==STAR.OR.CHRA==SLASH.OR.CHRA==BSLASH) GOTO 90
+      IF (SS==STAR .OR. SS==SLASH .OR. SS==BSLASH) GOTO 90
       GOTO 55
-C
-C     NAME
+!
+!     NAME
    30 SYM = NAME
       SYN(1) = CHRA
       CHCNT = 1
    40 CALL GETCH
       CHCNT = CHCNT+1
-      IF (CHRA .GT. Z) GOTO 45
-      IF (CHCNT .LE. 4) SYN(CHCNT) = CHRA
+      IF (CHRA > Z) GOTO 45
+      IF (CHCNT <= 4) SYN(CHCNT) = CHRA
       GOTO 40
-   45 IF (CHCNT .GT. 4) GOTO 47
+   45 IF (CHCNT > 4) GOTO 47
       DO 46 I = CHCNT, 4
    46 SYN(I) = BLANK
    47 CONTINUE
       GOTO 90
-C
-C     NUMBER
+!
+!     NUMBER
    50 CALL GETVAL(SYV)
-      IF (CHRA .NE. DOT) GOTO 60
+      IF (CHRA /= DOT) GOTO 60
       CALL GETCH
    55 CHCNT = LPT(4)
       CALL GETVAL(S)
       CHCNT = LPT(4) - CHCNT
-      IF (CHRA .EQ. EOL) CHCNT = CHCNT+1
+      IF (CHRA == EOL) CHCNT = CHCNT+1
       SYV = SYV + S/10.0D0**CHCNT
-   60 IF (CHRA.NE.D .AND. CHRA.NE.E) GOTO 70
+   60 IF (CHRA/=D .AND. CHRA/=E) GOTO 70
       CALL GETCH
       SIGN = CHRA
-      IF (SIGN.EQ.MINUS .OR. SIGN.EQ.PLUS) CALL GETCH
+      IF (SIGN==MINUS .OR. SIGN==PLUS) CALL GETCH
       CALL GETVAL(S)
-      IF (SIGN .NE. MINUS) SYV = SYV*10.0D0**S
-      IF (SIGN .EQ. MINUS) SYV = SYV/10.0D0**S
+      IF (SIGN /= MINUS) SYV = SYV*10.0D0**S
+      IF (SIGN == MINUS) SYV = SYV/10.0D0**S
    70 STKI(VSIZE) = FLOP(SYV)
       SYM = NUM
-C
-   90 IF (CHRA .NE. BLANK) GOTO 99
+!
+   90 IF (CHRA /= BLANK) GOTO 99
       CALL GETCH
       GOTO 90
-   99 IF (DDT .NE. 1) RETURN
-      IF (SYM.GT.NAME .AND. SYM.LT.ALFL) WRITE(WTE,197) ALFA(SYM+1)
-      IF (SYM .GE. ALFL) WRITE(WTE,198)
-      IF (SYM .EQ. NAME) CALL PRNTID(SYN,1)
-      IF (SYM .EQ. NUM) WRITE(WTE,199) SYV
+   99 IF (DDT /= 1) RETURN
+      IF (SYM>NAME .AND. SYM<ALFL) WRITE(WTE,197) ALFA(SYM+1)
+      IF (SYM >= ALFL) WRITE(WTE,198)
+      IF (SYM == NAME) CALL PRNTID(SYN,1)
+      IF (SYM == NUM) WRITE(WTE,199) SYV
   197 FORMAT(1X,A1)
   198 FORMAT(1X,'EOL')
   199 FORMAT(1X,G8.2)
       RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE GETVAL(S)
       DOUBLE PRECISION S
-C     FORM NUMERICAL VALUE
+!     FORM NUMERICAL VALUE
       INTEGER SYM,SYN(4),BUF(256),CHRA,FLP(2),FIN,FUN,LHS,RHS,RAN(2)
       COMMON /COM/ SYM,SYN,BUF,CHRA,FLP,FIN,FUN,LHS,RHS,RAN
       S = 0.0D0
-   10 IF (CHRA .GT. 9) RETURN
+   10 IF (CHRA > 9) RETURN
       S = 10.0D0*S + CHRA
       CALL GETCH
       GOTO 10
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 
       SUBROUTINE MATFN1
-C
-C     EVALUATE FUNCTIONS INVOLVING GAUSSIAN ELIMINATION
-C
+!
+!     EVALUATE FUNCTIONS INVOLVING GAUSSIAN ELIMINATION
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
@@ -1324,44 +1324,44 @@ C
       COMMON /IOP/ DDT,ERR,FMT,LCT,LIN,LPT,HIO,RIO,WIO,RTE,WTE,FE
       COMMON /COM/ SYM,SYN,BUF,CHRA,FLP,FIN,FUN,LHS,RHS,RAN
       DOUBLE PRECISION DTR(2),DTI(2),SR,SI,RCOND,T,T0,T1,FLOP,EPS,WASUM
-C
-      IF (DDT .EQ. 1) WRITE(WTE,100) FIN
+!
+      IF (DDT == 1) WRITE(WTE,100) FIN
   100 FORMAT(1X,'MATFN1',I4)
-C
+!
       L = LSTK(TOP)
       M = MSTK(TOP)
       N = NSTK(TOP)
-      IF (FIN .EQ. -1) GOTO 10
-      IF (FIN .EQ. -2) GOTO 20
+      IF (FIN == -1) GOTO 10
+      IF (FIN == -2) GOTO 20
       GOTO (30,40,50,60,70,80,85),FIN
-C
-C     MATRIX RIGHT DIVISION, A/A2
+!
+!     MATRIX RIGHT DIVISION, A/A2
    10 L2 = LSTK(TOP+1)
       M2 = MSTK(TOP+1)
       N2 = NSTK(TOP+1)
-      IF (M2 .NE. N2) CALL ERROR(20)
-      IF (ERR .GT. 0) RETURN
-      IF (M*N .EQ. 1) GOTO 16
-      IF (N .NE. N2) CALL ERROR(11)
-      IF (ERR .GT. 0) RETURN
+      IF (M2 /= N2) CALL ERROR(20)
+      IF (ERR > 0) RETURN
+      IF (M*N == 1) GOTO 16
+      IF (N /= N2) CALL ERROR(11)
+      IF (ERR > 0) RETURN
       L3 = L2 + M2*N2
       ERR = L3+N2 - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       CALL WGECO(STKR(L2),STKI(L2),M2,N2,BUF,RCOND,STKR(L3),STKI(L3))
-      IF (RCOND .EQ. 0.0D0) CALL ERROR(19)
-      IF (ERR .GT. 0) RETURN
+      IF (RCOND == 0.0D0) CALL ERROR(19)
+      IF (ERR > 0) RETURN
       T = FLOP(1.0D0 + RCOND)
-      IF (T.EQ.1.0D0 .AND. FUN.NE.21) WRITE(WTE,11) RCOND
-      IF (T.EQ.1.0D0 .AND. FUN.NE.21 .AND. WIO.NE.0) WRITE(WIO,11) RCOND
-   11 FORMAT(1X,'WARNING.'
-     $  /1X,'MATRIX IS CLOSE TO SINGULAR OR BADLY SCALED.'
-     $  /1X,'RESULTS MAY BE INACCURATE.  RCOND =', 1PD13.4/)
-      IF (T.EQ.1.0D0 .AND. FUN.EQ.21) WRITE(WTE,12) RCOND
-      IF (T.EQ.1.0D0 .AND. FUN.EQ.21 .AND. WIO.NE.0) WRITE(WIO,12) RCOND
-   12 FORMAT(1X,'WARNING.'
-     $  /1X,'EIGENVECTORS ARE BADLY CONDITIONED.'
-     $  /1X,'RESULTS MAY BE INACCURATE.  RCOND =', 1PD13.4/)
+      IF (T==1.0D0 .AND. FUN/=21) WRITE(WTE,11) RCOND
+      IF (T==1.0D0 .AND. FUN/=21 .AND. WIO/=0) WRITE(WIO,11) RCOND
+   11 FORMAT(1X,'WARNING.'&
+        /1X,'MATRIX IS CLOSE TO SINGULAR OR BADLY SCALED.'&
+        /1X,'RESULTS MAY BE INACCURATE.  RCOND =', 1PD13.4/)
+      IF (T==1.0D0 .AND. FUN==21) WRITE(WTE,12) RCOND
+      IF (T==1.0D0 .AND. FUN==21 .AND. WIO/=0) WRITE(WIO,12) RCOND
+   12 FORMAT(1X,'WARNING.'&
+        /1X,'EIGENVECTORS ARE BADLY CONDITIONED.'&
+        /1X,'RESULTS MAY BE INACCURATE.  RCOND =', 1PD13.4/)
       DO 15 I = 1, M
          DO 13 J = 1, N
             LS = L+I-1+(J-1)*M
@@ -1377,18 +1377,18 @@ C     MATRIX RIGHT DIVISION, A/A2
             STKI(LL) = -STKI(LS)
    14    CONTINUE
    15 CONTINUE
-      IF (FUN .NE. 21) GOTO 99
-C
-C     CHECK FOR IMAGINARY ROUNDOFF IN MATRIX FUNCTIONS
+      IF (FUN /= 21) GOTO 99
+!
+!     CHECK FOR IMAGINARY ROUNDOFF IN MATRIX FUNCTIONS
       SR = WASUM(N*N,STKR(L),STKR(L),1)
       SI = WASUM(N*N,STKI(L),STKI(L),1)
       EPS = STKR(VSIZE-4)
       T = EPS*SR
-      IF (DDT .EQ. 18) WRITE(WTE,115) SR,SI,EPS,T
+      IF (DDT == 18) WRITE(WTE,115) SR,SI,EPS,T
   115 FORMAT(1X,'SR,SI,EPS,T',1P4D13.4)
-      IF (SI .LE. EPS*SR) CALL RSET(N*N,0.0D0,STKI(L),1)
+      IF (SI <= EPS*SR) CALL RSET(N*N,0.0D0,STKI(L),1)
       GOTO 99
-C
+!
    16 SR = STKR(L)
       SI = STKI(L)
       N = N2
@@ -1397,26 +1397,26 @@ C
       NSTK(TOP) = N
       CALL WCOPY(N*N,STKR(L2),STKI(L2),1,STKR(L),STKI(L),1)
       GOTO 30
-C
-C     MATRIX LEFT DIVISION A BACKSLASH A2
+!
+!     MATRIX LEFT DIVISION A BACKSLASH A2
    20 L2 = LSTK(TOP+1)
       M2 = MSTK(TOP+1)
       N2 = NSTK(TOP+1)
-      IF (M .NE. N) CALL ERROR(20)
-      IF (ERR .GT. 0) RETURN
-      IF (M2*N2 .EQ. 1) GOTO 26
+      IF (M /= N) CALL ERROR(20)
+      IF (ERR > 0) RETURN
+      IF (M2*N2 == 1) GOTO 26
       L3 = L2 + M2*N2
       ERR = L3+N - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       CALL WGECO(STKR(L),STKI(L),M,N,BUF,RCOND,STKR(L3),STKI(L3))
-      IF (RCOND .EQ. 0.0D0) CALL ERROR(19)
-      IF (ERR .GT. 0) RETURN
+      IF (RCOND == 0.0D0) CALL ERROR(19)
+      IF (ERR > 0) RETURN
       T = FLOP(1.0D0 + RCOND)
-      IF (T .EQ. 1.0D0) WRITE(WTE,11) RCOND
-      IF (T.EQ.1.0D0 .AND. WIO.NE.0) WRITE(WIO,11) RCOND
-      IF (M2 .NE. N) CALL ERROR(12)
-      IF (ERR .GT. 0) RETURN
+      IF (T == 1.0D0) WRITE(WTE,11) RCOND
+      IF (T==1.0D0 .AND. WIO/=0) WRITE(WIO,11) RCOND
+      IF (M2 /= N) CALL ERROR(12)
+      IF (ERR > 0) RETURN
       DO 23 J = 1, N2
          LJ = L2+(J-1)*M2
          CALL WGESL(STKR(L),STKI(L),M,N,BUF,STKR(LJ),STKI(LJ),0)
@@ -1427,38 +1427,38 @@ C     MATRIX LEFT DIVISION A BACKSLASH A2
    26 SR = STKR(L2)
       SI = STKI(L2)
       GOTO 30
-C
-C     INV
-C
-   30 IF (M .NE. N) CALL ERROR(20)
-      IF (ERR .GT. 0) RETURN
-      IF (DDT .EQ. 17) GOTO 32
+!
+!     INV
+!
+   30 IF (M /= N) CALL ERROR(20)
+      IF (ERR > 0) RETURN
+      IF (DDT == 17) GOTO 32
       DO 31 J = 1, N
       DO 31 I = 1, N
         LS = L+I-1+(J-1)*N
         T0 = STKR(LS)
         T1 = FLOP(1.0D0/(DFLOAT(I+J-1)))
-        IF (T0 .NE. T1) GOTO 32
+        IF (T0 /= T1) GOTO 32
    31 CONTINUE
       GOTO 72
    32 L3 = L + N*N
       ERR = L3+N - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       CALL WGECO(STKR(L),STKI(L),M,N,BUF,RCOND,STKR(L3),STKI(L3))
-      IF (RCOND .EQ. 0.0D0) CALL ERROR(19)
-      IF (ERR .GT. 0) RETURN
+      IF (RCOND == 0.0D0) CALL ERROR(19)
+      IF (ERR > 0) RETURN
       T = FLOP(1.0D0 + RCOND)
-      IF (T .EQ. 1.0D0) WRITE(WTE,11) RCOND
-      IF (T.EQ.1.0D0 .AND. WIO.NE.0) WRITE(WIO,11) RCOND
+      IF (T == 1.0D0) WRITE(WTE,11) RCOND
+      IF (T==1.0D0 .AND. WIO/=0) WRITE(WIO,11) RCOND
       CALL WGEDI(STKR(L),STKI(L),M,N,BUF,DTR,DTI,STKR(L3),STKI(L3),1)
-      IF (FIN .LT. 0) CALL WSCAL(N*N,SR,SI,STKR(L),STKI(L),1)
+      IF (FIN < 0) CALL WSCAL(N*N,SR,SI,STKR(L),STKI(L),1)
       GOTO 99
-C
-C     DET
-C
-   40 IF (M .NE. N) CALL ERROR(20)
-      IF (ERR .GT. 0) RETURN
+!
+!     DET
+!
+   40 IF (M /= N) CALL ERROR(20)
+      IF (ERR > 0) RETURN
       CALL WGEFA(STKR(L),STKI(L),M,N,BUF,INFO)
       CALL WGEDI(STKR(L),STKI(L),M,N,BUF,DTR,DTI,SR,SI,10)
       K = IDINT(DTR(2))
@@ -1466,15 +1466,15 @@ C
       T = 1.0D0
       DO 41 I = 1, KA
          T = T/10.0D0
-         IF (T .EQ. 0.0D0) GOTO 42
+         IF (T == 0.0D0) GOTO 42
    41 CONTINUE
       STKR(L) = DTR(1)*10.D0**K
       STKI(L) = DTI(1)*10.D0**K
       MSTK(TOP) = 1
       NSTK(TOP) = 1
       GOTO 99
-   42 IF (DTI(1) .EQ. 0.0D0) WRITE(WTE,43) DTR(1),K
-      IF (DTI(1) .NE. 0.0D0) WRITE(WTE,44) DTR(1),DTI(1),K
+   42 IF (DTI(1) == 0.0D0) WRITE(WTE,43) DTR(1),K
+      IF (DTI(1) /= 0.0D0) WRITE(WTE,44) DTR(1),DTI(1),K
    43 FORMAT(1X,'DET =  ',F7.4,7H * 10**,I4)
    44 FORMAT(1X,'DET =  ',F7.4,' + ',F7.4,' i ',7H * 10**,I4)
       STKR(L) = DTR(1)
@@ -1484,21 +1484,21 @@ C
       MSTK(TOP) = 1
       NSTK(TOP) = 2
       GOTO 99
-C
-C     RCOND
-C
-   50 IF (M .NE. N) CALL ERROR(20)
-      IF (ERR .GT. 0) RETURN
+!
+!     RCOND
+!
+   50 IF (M /= N) CALL ERROR(20)
+      IF (ERR > 0) RETURN
       L3 = L + N*N
       ERR = L3+N - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       CALL WGECO(STKR(L),STKI(L),M,N,BUF,RCOND,STKR(L3),STKI(L3))
       STKR(L) = RCOND
       STKI(L) = 0.0D0
       MSTK(TOP) = 1
       NSTK(TOP) = 1
-      IF (LHS .EQ. 1) GOTO 99
+      IF (LHS == 1) GOTO 99
       L = L + 1
       CALL WCOPY(N,STKR(L3),STKI(L3),1,STKR(L),STKI(L),1)
       TOP = TOP + 1
@@ -1506,88 +1506,88 @@ C
       MSTK(TOP) = N
       NSTK(TOP) = 1
       GOTO 99
-C
-C     LU
-C
-   60 IF (M .NE. N) CALL ERROR(20)
-      IF (ERR .GT. 0) RETURN
+!
+!     LU
+!
+   60 IF (M /= N) CALL ERROR(20)
+      IF (ERR > 0) RETURN
       CALL WGEFA(STKR(L),STKI(L),M,N,BUF,INFO)
-      IF (LHS .NE. 2) GOTO 99
+      IF (LHS /= 2) GOTO 99
       NN = N*N
-      IF (TOP+1 .GE. BOT) CALL ERROR(18)
-      IF (ERR .GT. 0) RETURN
+      IF (TOP+1 >= BOT) CALL ERROR(18)
+      IF (ERR > 0) RETURN
       TOP = TOP+1
       LSTK(TOP) = L + NN
       MSTK(TOP) = N
       NSTK(TOP) = N
       ERR = L+NN+NN - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       DO 64 KB = 1, N
         K = N+1-KB
         DO 61 I = 1, N
           LL = L+I-1+(K-1)*N
           LU = LL + NN
-          IF (I .LE. K) STKR(LU) = STKR(LL)
-          IF (I .LE. K) STKI(LU) = STKI(LL)
-          IF (I .GT. K) STKR(LU) = 0.0D0
-          IF (I .GT. K) STKI(LU) = 0.0D0
-          IF (I .LT. K) STKR(LL) = 0.0D0
-          IF (I .LT. K) STKI(LL) = 0.0D0
-          IF (I .EQ. K) STKR(LL) = 1.0D0
-          IF (I .EQ. K) STKI(LL) = 0.0D0
-          IF (I .GT. K) STKR(LL) = -STKR(LL)
-          IF (I .GT. K) STKI(LL) = -STKI(LL)
+          IF (I <= K) STKR(LU) = STKR(LL)
+          IF (I <= K) STKI(LU) = STKI(LL)
+          IF (I > K) STKR(LU) = 0.0D0
+          IF (I > K) STKI(LU) = 0.0D0
+          IF (I < K) STKR(LL) = 0.0D0
+          IF (I < K) STKI(LL) = 0.0D0
+          IF (I == K) STKR(LL) = 1.0D0
+          IF (I == K) STKI(LL) = 0.0D0
+          IF (I > K) STKR(LL) = -STKR(LL)
+          IF (I > K) STKI(LL) = -STKI(LL)
    61   CONTINUE
         I = BUF(K)
-        IF (I .EQ. K) GOTO 64
+        IF (I == K) GOTO 64
         LI = L+I-1+(K-1)*N
         LK = L+K-1+(K-1)*N
         CALL WSWAP(N-K+1,STKR(LI),STKI(LI),N,STKR(LK),STKI(LK),N)
    64 CONTINUE
       GOTO 99
-C
-C     HILBERT
+!
+!     HILBERT
    70 N = IDINT(STKR(L))
       MSTK(TOP) = N
       NSTK(TOP) = N
    72 CALL HILBER(STKR(L),N,N)
       CALL RSET(N*N,0.0D0,STKI(L),1)
-      IF (FIN .LT. 0) CALL WSCAL(N*N,SR,SI,STKR(L),STKI(L),1)
+      IF (FIN < 0) CALL WSCAL(N*N,SR,SI,STKR(L),STKI(L),1)
       GOTO 99
-C
-C     CHOLESKY
-   80 IF (M .NE. N) CALL ERROR(20)
-      IF (ERR .GT. 0) RETURN
+!
+!     CHOLESKY
+   80 IF (M /= N) CALL ERROR(20)
+      IF (ERR > 0) RETURN
       CALL WPOFA(STKR(L),STKI(L),M,N,ERR)
-      IF (ERR .NE. 0) CALL ERROR(29)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR /= 0) CALL ERROR(29)
+      IF (ERR > 0) RETURN
       DO 81 J = 1, N
         LL = L+J+(J-1)*M
         CALL WSET(M-J,0.0D0,0.0D0,STKR(LL),STKI(LL),1)
    81 CONTINUE
       GOTO 99
-C
-C     RREF
-   85 IF (RHS .LT. 2) GOTO 86
+!
+!     RREF
+   85 IF (RHS < 2) GOTO 86
         TOP = TOP-1
         L = LSTK(TOP)
-        IF (MSTK(TOP) .NE. M) CALL ERROR(5)
-        IF (ERR .GT. 0) RETURN
+        IF (MSTK(TOP) /= M) CALL ERROR(5)
+        IF (ERR > 0) RETURN
         N = N + NSTK(TOP)
    86 CALL RREF(STKR(L),STKI(L),M,M,N,STKR(VSIZE-4))
       NSTK(TOP) = N
       GOTO 99
-C
+!
    99 RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
          SUBROUTINE MATFN2
-C
-C     EVALUATE ELEMENTARY FUNCTIONS AND FUNCTIONS INVOLVING
-C     EIGENVALUES AND EIGENVECTORS
-C
+!
+!     EVALUATE ELEMENTARY FUNCTIONS AND FUNCTIONS INVOLVING
+!     EIGENVALUES AND EIGENVECTORS
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
@@ -1597,93 +1597,93 @@ C
       COMMON /COM/ SYM,SYN,BUF,CHRA,FLP,FIN,FUN,LHS,RHS,RAN
       DOUBLE PRECISION PYTHAG,ROUND,TR,TI,SR,SI,POWR,POWI,FLOP
       LOGICAL HERM,SCHUR,VECT,HESS
-C
-      IF (DDT .EQ. 1) WRITE(WTE,100) FIN
+!
+      IF (DDT == 1) WRITE(WTE,100) FIN
   100 FORMAT(1X,'MATFN2',I4)
-C
-C     FUNCTIONS/FIN
-C     **   SIN  COS ATAN  EXP  SQRT LOG
-C      0    1    2    3    4    5    6
-C    EIG  SCHU HESS POLY ROOT
-C     11   12   13   14   15
-C    ABS  ROUN REAL IMAG CONJ
-C     21   22   23   24   25
-      IF (FIN .NE. 0) GOTO 05
+!
+!     FUNCTIONS/FIN
+!     **   SIN  COS ATAN  EXP  SQRT LOG
+!      0    1    2    3    4    5    6
+!    EIG  SCHU HESS POLY ROOT
+!     11   12   13   14   15
+!    ABS  ROUN REAL IMAG CONJ
+!     21   22   23   24   25
+      IF (FIN /= 0) GOTO 05
          L = LSTK(TOP+1)
          POWR = STKR(L)
          POWI = STKI(L)
    05 L = LSTK(TOP)
       M = MSTK(TOP)
       N = NSTK(TOP)
-      IF (FIN .GE. 11 .AND. FIN .LE. 13) GOTO 10
-      IF (FIN .EQ. 14 .AND. (M.EQ.1 .OR. N.EQ.1)) GOTO 50
-      IF (FIN .EQ. 14) GOTO 10
-      IF (FIN .EQ. 15) GOTO 60
-      IF (FIN .GT. 20) GOTO 40
-      IF (M .EQ. 1 .OR. N .EQ. 1) GOTO 40
-C
-C     EIGENVALUES AND VECTORS
-   10 IF (M .NE. N) CALL ERROR(20)
-      IF (ERR .GT. 0) RETURN
-      SCHUR = FIN .EQ. 12
-      HESS = FIN .EQ. 13
-      VECT = LHS.EQ.2 .OR. FIN.LT.10
+      IF (FIN >= 11 .AND. FIN <= 13) GOTO 10
+      IF (FIN == 14 .AND. (M==1 .OR. N==1)) GOTO 50
+      IF (FIN == 14) GOTO 10
+      IF (FIN == 15) GOTO 60
+      IF (FIN > 20) GOTO 40
+      IF (M == 1 .OR. N == 1) GOTO 40
+!
+!     EIGENVALUES AND VECTORS
+   10 IF (M /= N) CALL ERROR(20)
+      IF (ERR > 0) RETURN
+      SCHUR = FIN == 12
+      HESS = FIN == 13
+      VECT = LHS==2 .OR. FIN<10
       NN = N*N
       L2 = L + NN
       LD = L2 + NN
       LE = LD + N
       LW = LE + N
       ERR = LW+N - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       CALL WCOPY(NN,STKR(L),STKI(L),1,STKR(L2),STKI(L2),1)
-C
-C     CHECK IF HERMITIAN
+!
+!     CHECK IF HERMITIAN
       DO 15 J = 1, N
       DO 15 I = 1, J
          LS = L+I-1+(J-1)*N
          LL = L+(I-1)*N+J-1
-         HERM = STKR(LL).EQ.STKR(LS) .AND. STKI(LL).EQ.-STKI(LS)
+         HERM = STKR(LL)==STKR(LS) .AND. STKI(LL)==-STKI(LS)
          IF (.NOT. HERM) GOTO 30
    15 CONTINUE
-C
-C     HERMITIAN EIGENVALUE PROBLEM
+!
+!     HERMITIAN EIGENVALUE PROBLEM
       CALL WSET(NN,0.0D0,0.0D0,STKR(L),STKI(L),1)
       CALL WSET(N,1.0D0,0.0D0,STKR(L),STKI(L),N+1)
       CALL WSET(N,0.0D0,0.0D0,STKI(LD),STKI(LE),1)
       JOB = 0
       IF (VECT) JOB = 1
-      CALL HTRIDI(N,N,STKR(L2),STKI(L2),STKR(LD),STKR(LE),
-     $            STKR(LE),STKR(LW))
+      CALL HTRIDI(N,N,STKR(L2),STKI(L2),STKR(LD),STKR(LE),&
+                  STKR(LE),STKR(LW))
       IF (.NOT.HESS) CALL IMTQL2(N,N,STKR(LD),STKR(LE),STKR(L),ERR,JOB)
-      IF (ERR .GT. 0) CALL ERROR(24)
-      IF (ERR .GT. 0) RETURN
-      IF (JOB .NE. 0)
-     $  CALL HTRIBK(N,N,STKR(L2),STKI(L2),STKR(LW),N,STKR(L),STKI(L))
+      IF (ERR > 0) CALL ERROR(24)
+      IF (ERR > 0) RETURN
+      IF (JOB /= 0)&
+        CALL HTRIBK(N,N,STKR(L2),STKI(L2),STKR(LW),N,STKR(L),STKI(L))
       GOTO 31
-C
-C     NON-HERMITIAN EIGENVALUE PROBLEM
+!
+!     NON-HERMITIAN EIGENVALUE PROBLEM
    30 CALL CORTH(N,N,1,N,STKR(L2),STKI(L2),STKR(LW),STKI(LW))
       IF (.NOT.VECT .AND. HESS) GOTO 31
       JOB = 0
       IF (VECT) JOB = 2
       IF (VECT .AND. SCHUR) JOB = 1
       IF (HESS) JOB = 3
-      CALL COMQR3(N,N,1,N,STKR(LW),STKI(LW),STKR(L2),STKI(L2),
-     $            STKR(LD),STKI(LD),STKR(L),STKI(L),ERR,JOB)
-      IF (ERR .GT. 0) CALL ERROR(24)
-      IF (ERR .GT. 0) RETURN
-C
-C     VECTORS
+      CALL COMQR3(N,N,1,N,STKR(LW),STKI(LW),STKR(L2),STKI(L2),&
+                  STKR(LD),STKI(LD),STKR(L),STKI(L),ERR,JOB)
+      IF (ERR > 0) CALL ERROR(24)
+      IF (ERR > 0) RETURN
+!
+!     VECTORS
    31 IF (.NOT.VECT) GOTO 34
-      IF (TOP+1 .GE. BOT) CALL ERROR(18)
-      IF (ERR .GT. 0) RETURN
+      IF (TOP+1 >= BOT) CALL ERROR(18)
+      IF (ERR > 0) RETURN
       TOP = TOP+1
       LSTK(TOP) = L2
       MSTK(TOP) = N
       NSTK(TOP) = N
-C
-C     DIAGONAL OF VALUES OR CANONICAL FORMS
+!
+!     DIAGONAL OF VALUES OR CANONICAL FORMS
    34 IF (.NOT.VECT .AND. .NOT.SCHUR .AND. .NOT.HESS) GOTO 37
       DO 36 J = 1, N
          LJ = L2+(J-1)*N
@@ -1692,27 +1692,27 @@ C     DIAGONAL OF VALUES OR CANONICAL FORMS
          LL = L2+J*N-LJ
          CALL WSET(LL,0.0D0,0.0D0,STKR(LJ),STKI(LJ),1)
    36 CONTINUE
-      IF (.NOT.HESS .OR. HERM)
-     $   CALL WCOPY(N,STKR(LD),STKI(LD),1,STKR(L2),STKI(L2),N+1)
+      IF (.NOT.HESS .OR. HERM)&
+         CALL WCOPY(N,STKR(LD),STKI(LD),1,STKR(L2),STKI(L2),N+1)
       LL = L2+1
-      IF (HESS .AND. HERM)
-     $   CALL WCOPY(N-1,STKR(LE+1),STKI(LE+1),1,STKR(LL),STKI(LL),N+1)
+      IF (HESS .AND. HERM)&
+         CALL WCOPY(N-1,STKR(LE+1),STKI(LE+1),1,STKR(LL),STKI(LL),N+1)
       LL = L2+N
-      IF (HESS .AND. HERM)
-     $   CALL WCOPY(N-1,STKR(LE+1),STKI(LE+1),1,STKR(LL),STKI(LL),N+1)
-      IF (FIN .LT. 10) GOTO 42
+      IF (HESS .AND. HERM)&
+         CALL WCOPY(N-1,STKR(LE+1),STKI(LE+1),1,STKR(LL),STKI(LL),N+1)
+      IF (FIN < 10) GOTO 42
       IF (VECT .OR. .NOT.(SCHUR.OR.HESS)) GOTO 99
       CALL WCOPY(NN,STKR(L2),STKI(L2),1,STKR(L),STKI(L),1)
       GOTO 99
-C
-C     VECTOR OF EIGENVALUES
-   37 IF (FIN .EQ. 14) GOTO 52
+!
+!     VECTOR OF EIGENVALUES
+   37 IF (FIN == 14) GOTO 52
       CALL WCOPY(N,STKR(LD),STKI(LD),1,STKR(L),STKI(L),1)
       NSTK(TOP) = 1
       GOTO 99
-C
-C     ELEMENTARY FUNCTIONS
-C     FOR MATRICES.. X,D = EIG(A), FUN(A) = X*FUN(D)/X
+!
+!     ELEMENTARY FUNCTIONS
+!     FOR MATRICES.. X,D = EIG(A), FUN(A) = X*FUN(D)/X
    40 INC = 1
       N = M*N
       L2 = L
@@ -1723,32 +1723,32 @@ C     FOR MATRICES.. X,D = EIG(A), FUN(A) = X*FUN(D)/X
         SR = STKR(LS)
         SI = STKI(LS)
         TI = 0.0D0
-        IF (FIN .NE. 0) GOTO 45
+        IF (FIN /= 0) GOTO 45
           CALL WLOG(SR,SI,SR,SI)
           CALL WMUL(SR,SI,POWR,POWI,SR,SI)
           TR = DEXP(SR)*DCOS(SI)
           TI = DEXP(SR)*DSIN(SI)
-   45   IF (FIN .EQ. 1) TR = DSIN(SR)*DCOSH(SI)
-        IF (FIN .EQ. 1) TI = DCOS(SR)*DSINH(SI)
-        IF (FIN .EQ. 2) TR = DCOS(SR)*DCOSH(SI)
-        IF (FIN .EQ. 2) TI = (-DSIN(SR))*DSINH(SI)
-        IF (FIN .EQ. 3) CALL WATAN(SR,SI,TR,TI)
-        IF (FIN .EQ. 4) TR = DEXP(SR)*DCOS(SI)
-        IF (FIN .EQ. 4) TI = DEXP(SR)*DSIN(SI)
-        IF (FIN .EQ. 5) CALL WSQRT(SR,SI,TR,TI)
-        IF (FIN .EQ. 6) CALL WLOG(SR,SI,TR,TI)
-        IF (FIN .EQ. 21) TR = PYTHAG(SR,SI)
-        IF (FIN .EQ. 22) TR = ROUND(SR)
-        IF (FIN .EQ. 23) TR = SR
-        IF (FIN .EQ. 24) TR = SI
-        IF (FIN .EQ. 25) TR = SR
-        IF (FIN .EQ. 25) TI = -SI
-        IF (ERR .GT. 0) RETURN
+   45   IF (FIN == 1) TR = DSIN(SR)*DCOSH(SI)
+        IF (FIN == 1) TI = DCOS(SR)*DSINH(SI)
+        IF (FIN == 2) TR = DCOS(SR)*DCOSH(SI)
+        IF (FIN == 2) TI = (-DSIN(SR))*DSINH(SI)
+        IF (FIN == 3) CALL WATAN(SR,SI,TR,TI)
+        IF (FIN == 4) TR = DEXP(SR)*DCOS(SI)
+        IF (FIN == 4) TI = DEXP(SR)*DSIN(SI)
+        IF (FIN == 5) CALL WSQRT(SR,SI,TR,TI)
+        IF (FIN == 6) CALL WLOG(SR,SI,TR,TI)
+        IF (FIN == 21) TR = PYTHAG(SR,SI)
+        IF (FIN == 22) TR = ROUND(SR)
+        IF (FIN == 23) TR = SR
+        IF (FIN == 24) TR = SI
+        IF (FIN == 25) TR = SR
+        IF (FIN == 25) TI = -SI
+        IF (ERR > 0) RETURN
         STKR(LS) = FLOP(TR)
         STKI(LS) = 0.0D0
-        IF (TI .NE. 0.0D0) STKI(LS) = FLOP(TI)
+        IF (TI /= 0.0D0) STKI(LS) = FLOP(TI)
    46 CONTINUE
-      IF (INC .EQ. 1) GOTO 99
+      IF (INC == 1) GOTO 99
       DO 48 J = 1, N
         LS = L2+(J-1)*INC
         SR = STKR(LS)
@@ -1758,70 +1758,70 @@ C     FOR MATRICES.. X,D = EIG(A), FUN(A) = X*FUN(D)/X
         CALL WCOPY(N,STKR(LS),STKI(LS),1,STKR(LL),STKI(LL),1)
         CALL WSCAL(N,SR,SI,STKR(LS),STKI(LS),1)
    48 CONTINUE
-C     SIGNAL MATFN1 TO DIVIDE BY EIGENVECTORS
+!     SIGNAL MATFN1 TO DIVIDE BY EIGENVECTORS
       FUN = 21
       FIN = -1
       TOP = TOP-1
       GOTO 99
-C
-C     POLY
-C     FORM POLYNOMIAL WITH GIVEN VECTOR AS ROOTS
+!
+!     POLY
+!     FORM POLYNOMIAL WITH GIVEN VECTOR AS ROOTS
    50 N = MAX0(M,N)
       LD = L+N+1
       CALL WCOPY(N,STKR(L),STKI(L),1,STKR(LD),STKI(LD),1)
-C
-C     FORM CHARACTERISTIC POLYNOMIAL
+!
+!     FORM CHARACTERISTIC POLYNOMIAL
    52 CALL WSET(N+1,0.0D0,0.0D0,STKR(L),STKI(L),1)
       STKR(L) = 1.0D0
       DO 56 J = 1, N
-         CALL WAXPY(J,-STKR(LD),-STKI(LD),STKR(L),STKI(L),-1,
-     $              STKR(L+1),STKI(L+1),-1)
+         CALL WAXPY(J,-STKR(LD),-STKI(LD),STKR(L),STKI(L),-1,&
+                    STKR(L+1),STKI(L+1),-1)
          LD = LD+1
    56 CONTINUE
       MSTK(TOP) = N+1
       NSTK(TOP) = 1
       GOTO 99
-C
-C     ROOTS
+!
+!     ROOTS
    60 LL = L+M*N
       STKR(LL) = -1.0D0
       STKI(LL) = 0.0D0
       K = -1
    61 K = K+1
       L1 = L+K
-      IF (DABS(STKR(L1))+DABS(STKI(L1)) .EQ. 0.0D0) GOTO 61
+      IF (DABS(STKR(L1))+DABS(STKI(L1)) == 0.0D0) GOTO 61
       N = MAX0(M*N - K-1, 0)
-      IF (N .LE. 0) GOTO 65
+      IF (N <= 0) GOTO 65
       L2 = L1+N+1
       LW = L2+N*N
       ERR = LW+N - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       CALL WSET(N*N+N,0.0D0,0.0D0,STKR(L2),STKI(L2),1)
       DO 64 J = 1, N
          LL = L2+J+(J-1)*N
          STKR(LL) = 1.0D0
          LS = L1+J
          LL = L2+(J-1)*N
-         CALL WDIV(-STKR(LS),-STKI(LS),STKR(L1),STKI(L1),
-     $             STKR(LL),STKI(LL))
-         IF (ERR .GT. 0) RETURN
+         CALL WDIV(-STKR(LS),-STKI(LS),STKR(L1),STKI(L1),&
+                   STKR(LL),STKI(LL))
+         IF (ERR > 0) RETURN
    64 CONTINUE
-      CALL COMQR3(N,N,1,N,STKR(LW),STKI(LW),STKR(L2),STKI(L2),
-     $            STKR(L),STKI(L),TR,TI,ERR,0)
-      IF (ERR .GT. 0) CALL ERROR(24)
-      IF (ERR .GT. 0) RETURN
+      CALL COMQR3(N,N,1,N,STKR(LW),STKI(LW),STKR(L2),STKI(L2),&
+                  STKR(L),STKI(L),TR,TI,ERR,0)
+      IF (ERR > 0) CALL ERROR(24)
+      IF (ERR > 0) RETURN
    65 MSTK(TOP) = N
       NSTK(TOP) = 1
       GOTO 99
    99 RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE MATFN3
-C
-C     EVALUATE FUNCTIONS INVOLVING SINGULAR VALUE DECOMPOSITION
-C
+!
+!     EVALUATE FUNCTIONS INVOLVING SINGULAR VALUE DECOMPOSITION
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
@@ -1832,52 +1832,52 @@ C
       LOGICAL FRO,INF
       DOUBLE PRECISION P,S,T,TOL,EPS
       DOUBLE PRECISION WDOTCR,WDOTCI,PYTHAG,WNRM2,WASUM,FLOP
-C
-      IF (DDT .EQ. 1) WRITE(WTE,100) FIN
+!
+      IF (DDT == 1) WRITE(WTE,100) FIN
   100 FORMAT(1X,'MATFN3',I4)
-C
-      IF (FIN.EQ.1 .AND. RHS.EQ.2) TOP = TOP-1
+!
+      IF (FIN==1 .AND. RHS==2) TOP = TOP-1
       L = LSTK(TOP)
       M = MSTK(TOP)
       N = NSTK(TOP)
       MN = M*N
       GOTO (50,70,10,30,70), FIN
-C
-C     COND
-C
+!
+!     COND
+!
    10 LD = L + M*N
       L1 = LD + MIN0(M+1,N)
       L2 = L1 + N
       ERR = L2+MIN0(M,N) - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
-      CALL WSVDC(STKR(L),STKI(L),M,M,N,STKR(LD),STKI(LD),
-     $           STKR(L1),STKI(L1),T,T,1,T,T,1,STKR(L2),STKI(L2),
-     $           0,ERR)
-      IF (ERR .NE. 0) CALL ERROR(24)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
+      CALL WSVDC(STKR(L),STKI(L),M,M,N,STKR(LD),STKI(LD),&
+                 STKR(L1),STKI(L1),T,T,1,T,T,1,STKR(L2),STKI(L2),&
+                 0,ERR)
+      IF (ERR /= 0) CALL ERROR(24)
+      IF (ERR > 0) RETURN
       S = STKR(LD)
       LD = LD + MIN0(M,N) - 1
       T = STKR(LD)
-      IF (T .EQ. 0.0D0) GOTO 13
+      IF (T == 0.0D0) GOTO 13
       STKR(L) = FLOP(S/T)
       STKI(L) = 0.0D0
       MSTK(TOP) = 1
       NSTK(TOP) = 1
       GOTO 99
    13 WRITE(WTE,14)
-      IF (WIO .NE. 0) WRITE(WIO,14)
+      IF (WIO /= 0) WRITE(WIO,14)
    14 FORMAT(1X,'CONDITION IS INFINITE')
       MSTK(TOP) = 0
       GOTO 99
-C
-C     NORM
-C
+!
+!     NORM
+!
    30 P = 2.0D0
       INF = .FALSE.
-      IF (RHS .NE. 2) GOTO 31
-      FRO = IDINT(STKR(L)).EQ.15 .AND. MN.GT.1
-      INF = IDINT(STKR(L)).EQ.18 .AND. MN.GT.1
+      IF (RHS /= 2) GOTO 31
+      FRO = IDINT(STKR(L))==15 .AND. MN>1
+      INF = IDINT(STKR(L))==18 .AND. MN>1
       IF (.NOT. FRO) P = STKR(L)
       TOP = TOP-1
       L = LSTK(TOP)
@@ -1886,42 +1886,42 @@ C
       MN = M*N
       IF (FRO) M = MN
       IF (FRO) N = 1
-   31 IF (M .GT. 1 .AND. N .GT. 1) GOTO 40
-      IF (P .EQ. 1.0D0) GOTO 36
-      IF (P .EQ. 2.0D0) GOTO 38
+   31 IF (M > 1 .AND. N > 1) GOTO 40
+      IF (P == 1.0D0) GOTO 36
+      IF (P == 2.0D0) GOTO 38
       I = IWAMAX(MN,STKR(L),STKI(L),1) + L - 1
       S = DABS(STKR(I)) + DABS(STKI(I))
-      IF (INF .OR. S .EQ. 0.0D0) GOTO 49
+      IF (INF .OR. S == 0.0D0) GOTO 49
       T = 0.0D0
       DO 33 I = 1, MN
          LS = L+I-1
          T = FLOP(T + (PYTHAG(STKR(LS),STKI(LS))/S)**P)
    33 CONTINUE
-      IF (P .NE. 0.0D0) P = 1.0D0/P
+      IF (P /= 0.0D0) P = 1.0D0/P
       S = FLOP(S*T**P)
       GOTO 49
    36 S = WASUM(MN,STKR(L),STKI(L),1)
       GOTO 49
    38 S = WNRM2(MN,STKR(L),STKI(L),1)
       GOTO 49
-C
-C     MATRIX NORM
-C
+!
+!     MATRIX NORM
+!
    40 IF (INF) GOTO 43
-      IF (P .EQ. 1.0D0) GOTO 46
-      IF (P .NE. 2.0D0) CALL ERROR(23)
-      IF (ERR .GT. 0) RETURN
+      IF (P == 1.0D0) GOTO 46
+      IF (P /= 2.0D0) CALL ERROR(23)
+      IF (ERR > 0) RETURN
       LD = L + M*N
       L1 = LD + MIN0(M+1,N)
       L2 = L1 + N
       ERR = L2+MIN0(M,N) - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
-      CALL WSVDC(STKR(L),STKI(L),M,M,N,STKR(LD),STKI(LD),
-     $           STKR(L1),STKI(L1),T,T,1,T,T,1,STKR(L2),STKI(L2),
-     $           0,ERR)
-      IF (ERR .NE. 0) CALL ERROR(24)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
+      CALL WSVDC(STKR(L),STKI(L),M,M,N,STKR(LD),STKI(LD),&
+                 STKR(L1),STKI(L1),T,T,1,T,T,1,STKR(L2),STKI(L2),&
+                 0,ERR)
+      IF (ERR /= 0) CALL ERROR(24)
+      IF (ERR > 0) RETURN
       S = STKR(LD)
       GOTO 49
    43 S = 0.0D0
@@ -1943,76 +1943,76 @@ C
       MSTK(TOP) = 1
       NSTK(TOP) = 1
       GOTO 99
-C
-C     SVD
-C
-   50 IF (LHS .NE. 3) GOTO 52
+!
+!     SVD
+!
+   50 IF (LHS /= 3) GOTO 52
       K = M
-      IF (RHS .EQ. 2) K = MIN0(M,N)
+      IF (RHS == 2) K = MIN0(M,N)
       LU = L + M*N
       LD = LU + M*K
       LV = LD + K*N
       L1 = LV + N*N
       L2 = L1 + N
       ERR = L2+MIN0(M,N) - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       JOB = 11
-      IF (RHS .EQ. 2) JOB = 21
-      CALL WSVDC(STKR(L),STKI(L),M,M,N,STKR(LD),STKI(LD),
-     $        STKR(L1),STKI(L1),STKR(LU),STKI(LU),M,STKR(LV),STKI(LV),
-     $        N,STKR(L2),STKI(L2),JOB,ERR)
+      IF (RHS == 2) JOB = 21
+      CALL WSVDC(STKR(L),STKI(L),M,M,N,STKR(LD),STKI(LD),&
+              STKR(L1),STKI(L1),STKR(LU),STKI(LU),M,STKR(LV),STKI(LV),&
+              N,STKR(L2),STKI(L2),JOB,ERR)
       DO 51 JB = 1, N
       DO 51 I = 1, K
         J = N+1-JB
         LL = LD+I-1+(J-1)*K
-        IF (I.NE.J) STKR(LL) = 0.0D0
+        IF (I/=J) STKR(LL) = 0.0D0
         STKI(LL) = 0.0D0
         LS = LD+I-1
-        IF (I.EQ.J) STKR(LL) = STKR(LS)
+        IF (I==J) STKR(LL) = STKR(LS)
         LS = L1+I-1
-        IF (ERR.NE.0 .AND. I.EQ.J-1) STKR(LL) = STKR(LS)
+        IF (ERR/=0 .AND. I==J-1) STKR(LL) = STKR(LS)
    51 CONTINUE
-      IF (ERR .NE. 0) CALL ERROR(24)
+      IF (ERR /= 0) CALL ERROR(24)
       ERR = 0
       CALL WCOPY(M*K+K*N+N*N,STKR(LU),STKI(LU),1,STKR(L),STKI(L),1)
       MSTK(TOP) = M
       NSTK(TOP) = K
-      IF (TOP+1 .GE. BOT) CALL ERROR(18)
-      IF (ERR .GT. 0) RETURN
+      IF (TOP+1 >= BOT) CALL ERROR(18)
+      IF (ERR > 0) RETURN
       TOP = TOP+1
       LSTK(TOP) = L + M*K
       MSTK(TOP) = K
       NSTK(TOP) = N
-      IF (TOP+1 .GE. BOT) CALL ERROR(18)
-      IF (ERR .GT. 0) RETURN
+      IF (TOP+1 >= BOT) CALL ERROR(18)
+      IF (ERR > 0) RETURN
       TOP = TOP+1
       LSTK(TOP) = L + M*K + K*N
       MSTK(TOP) = N
       NSTK(TOP) = N
       GOTO 99
-C
+!
    52 LD = L + M*N
       L1 = LD + MIN0(M+1,N)
       L2 = L1 + N
       ERR = L2+MIN0(M,N) - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
-      CALL WSVDC(STKR(L),STKI(L),M,M,N,STKR(LD),STKI(LD),
-     $           STKR(L1),STKI(L1),T,T,1,T,T,1,STKR(L2),STKI(L2),
-     $           0,ERR)
-      IF (ERR .NE. 0) CALL ERROR(24)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
+      CALL WSVDC(STKR(L),STKI(L),M,M,N,STKR(LD),STKI(LD),&
+                 STKR(L1),STKI(L1),T,T,1,T,T,1,STKR(L2),STKI(L2),&
+                 0,ERR)
+      IF (ERR /= 0) CALL ERROR(24)
+      IF (ERR > 0) RETURN
       K = MIN0(M,N)
       CALL WCOPY(K,STKR(LD),STKI(LD),1,STKR(L),STKI(L),1)
       MSTK(TOP) = K
       NSTK(TOP) = 1
       GOTO 99
-C
-C     PINV AND RANK
-C
+!
+!     PINV AND RANK
+!
    70 TOL = -1.0D0
-      IF (RHS .NE. 2) GOTO 71
+      IF (RHS /= 2) GOTO 71
       TOL = STKR(L)
       TOP = TOP-1
       L = LSTK(TOP)
@@ -2020,34 +2020,34 @@ C
       N = NSTK(TOP)
    71 LU = L + M*N
       LD = LU + M*M
-      IF (FIN .EQ. 5) LD = L + M*N
+      IF (FIN == 5) LD = L + M*N
       LV = LD + M*N
       L1 = LV + N*N
-      IF (FIN .EQ. 5) L1 = LD + N
+      IF (FIN == 5) L1 = LD + N
       L2 = L1 + N
       ERR = L2+MIN0(M,N) - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
-      IF (FIN .EQ. 2) JOB = 11
-      IF (FIN .EQ. 5) JOB = 0
-      CALL WSVDC(STKR(L),STKI(L),M,M,N,STKR(LD),STKI(LD),
-     $        STKR(L1),STKI(L1),STKR(LU),STKI(LU),M,STKR(LV),STKI(LV),
-     $        N,STKR(L2),STKI(L2),JOB,ERR)
-      IF (ERR .NE. 0) CALL ERROR(24)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
+      IF (FIN == 2) JOB = 11
+      IF (FIN == 5) JOB = 0
+      CALL WSVDC(STKR(L),STKI(L),M,M,N,STKR(LD),STKI(LD),&
+              STKR(L1),STKI(L1),STKR(LU),STKI(LU),M,STKR(LV),STKI(LV),&
+              N,STKR(L2),STKI(L2),JOB,ERR)
+      IF (ERR /= 0) CALL ERROR(24)
+      IF (ERR > 0) RETURN
       EPS = STKR(VSIZE-4)
-      IF (TOL .LT. 0.0D0) TOL = FLOP(DFLOAT(MAX0(M,N))*EPS*STKR(LD))
+      IF (TOL < 0.0D0) TOL = FLOP(DFLOAT(MAX0(M,N))*EPS*STKR(LD))
       MN = MIN0(M,N)
       K = 0
       DO 72 J = 1, MN
         LS = LD+J-1
         S = STKR(LS)
-        IF (S .LE. TOL) GOTO 73
+        IF (S <= TOL) GOTO 73
         K = J
         LL = LV+(J-1)*N
-        IF (FIN .EQ. 2) CALL WRSCAL(N,1.0D0/S,STKR(LL),STKI(LL),1)
+        IF (FIN == 2) CALL WRSCAL(N,1.0D0/S,STKR(LL),STKI(LL),1)
    72 CONTINUE
-   73 IF (FIN .EQ. 5) GOTO 78
+   73 IF (FIN == 5) GOTO 78
       DO 76 J = 1, M
       DO 76 I = 1, N
         LL = L+I-1+(J-1)*N
@@ -2064,15 +2064,15 @@ C
       MSTK(TOP) = 1
       NSTK(TOP) = 1
       GOTO 99
-C
+!
    99 RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE MATFN4
-C
-C     EVALUATE FUNCTIONS INVOLVING QR DECOMPOSITION (LEAST SQUARES)
-C
+!
+!     EVALUATE FUNCTIONS INVOLVING QR DECOMPOSITION (LEAST SQUARES)
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
@@ -2084,26 +2084,26 @@ C
       INTEGER QUOTE
       DATA QUOTE/49/
       save quote
-C
-      IF (DDT .EQ. 1) WRITE(WTE,100) FIN
+!
+      IF (DDT == 1) WRITE(WTE,100) FIN
   100 FORMAT(1X,'MATFN4',I4)
-C
+!
       L = LSTK(TOP)
       M = MSTK(TOP)
       N = NSTK(TOP)
-      IF (FIN .EQ. -1) GOTO 10
-      IF (FIN .EQ. -2) GOTO 20
+      IF (FIN == -1) GOTO 10
+      IF (FIN == -2) GOTO 20
       GOTO 40
-C
-C     RECTANGULAR MATRIX RIGHT DIVISION, A/A2
+!
+!     RECTANGULAR MATRIX RIGHT DIVISION, A/A2
    10 L2 = LSTK(TOP+1)
       M2 = MSTK(TOP+1)
       N2 = NSTK(TOP+1)
       TOP = TOP + 1
-      IF (N.GT.1 .AND. N.NE.N2) CALL ERROR(11)
-      IF (ERR .GT. 0) RETURN
+      IF (N>1 .AND. N/=N2) CALL ERROR(11)
+      IF (ERR > 0) RETURN
       CALL STACK1(QUOTE)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       LL = L2+M2*N2
       CALL WCOPY(M*N,STKR(L),STKI(L),1,STKR(LL),STKI(LL),1)
       CALL WCOPY(M*N+M2*N2,STKR(L2),STKI(L2),1,STKR(L),STKI(L),1)
@@ -2111,33 +2111,33 @@ C     RECTANGULAR MATRIX RIGHT DIVISION, A/A2
       MSTK(TOP) = M
       NSTK(TOP) = N
       CALL STACK1(QUOTE)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       TOP = TOP - 1
       M = N2
       N = M2
       GOTO 20
-C
-C     RECTANGULAR MATRIX LEFT DIVISION A BACKSLASH A2
-C
+!
+!     RECTANGULAR MATRIX LEFT DIVISION A BACKSLASH A2
+!
    20 L2 = LSTK(TOP+1)
       M2 = MSTK(TOP+1)
       N2 = NSTK(TOP+1)
-      IF (M2*N2 .GT. 1) GOTO 21
+      IF (M2*N2 > 1) GOTO 21
         M2 = M
         N2 = M
         ERR = L2+M*M - LSTK(BOT)
-        IF (ERR .GT. 0) CALL ERROR(17)
-        IF (ERR .GT. 0) RETURN
+        IF (ERR > 0) CALL ERROR(17)
+        IF (ERR > 0) RETURN
         CALL WSET(M*M-1,0.0D0,0.0D0,STKR(L2+1),STKI(L2+1),1)
         CALL WCOPY(M,STKR(L2),STKI(L2),0,STKR(L2),STKI(L2),M+1)
-   21 IF (M2 .NE. M) CALL ERROR(12)
-      IF (ERR .GT. 0) RETURN
+   21 IF (M2 /= M) CALL ERROR(12)
+      IF (ERR > 0) RETURN
       L3 = L2 + MAX0(M,N)*N2
       L4 = L3 + N
       ERR = L4 + N - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
-      IF (M .GT. N) GOTO 23
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
+      IF (M > N) GOTO 23
       DO 22 JB = 1, N2
         J = N+1-JB
         LS = L2 + (J-1)*M
@@ -2147,8 +2147,8 @@ C
    23 DO 24 J = 1, N
         BUF(J) = 0
    24 CONTINUE
-      CALL WQRDC(STKR(L),STKI(L),M,M,N,STKR(L4),STKI(L4),
-     $           BUF,STKR(L3),STKI(L3),1)
+      CALL WQRDC(STKR(L),STKI(L),M,M,N,STKR(L4),STKI(L4),&
+                 BUF,STKR(L3),STKI(L3),1)
       K = 0
       EPS = STKR(VSIZE-4)
       T = DABS(STKR(L))+DABS(STKI(L))
@@ -2157,17 +2157,17 @@ C
       DO 27 J = 1, MN
         LS = L+J-1+(J-1)*M
         T = DABS(STKR(LS)) + DABS(STKI(LS))
-        IF (T .GT. TOL) K = J
+        IF (T > TOL) K = J
    27 CONTINUE
-      IF (K .LT. MN) WRITE(WTE,28) K,TOL
-      IF (K.LT.MN .AND. WIO.NE.0) WRITE(WIO,28) K,TOL
+      IF (K < MN) WRITE(WTE,28) K,TOL
+      IF (K<MN .AND. WIO/=0) WRITE(WIO,28) K,TOL
    28 FORMAT(1X,'RANK DEFICIENT,  RANK =',I4,',  TOL =',1PD13.4)
       MN = MAX0(M,N)
       DO 29 J = 1, N2
         LS = L2+(J-1)*MN
-        CALL WQRSL(STKR(L),STKI(L),M,M,K,STKR(L4),STKI(L4),
-     $             STKR(LS),STKI(LS),T,T,STKR(LS),STKI(LS),
-     $             STKR(LS),STKI(LS),T,T,T,T,100,INFO)
+        CALL WQRSL(STKR(L),STKI(L),M,M,K,STKR(L4),STKI(L4),&
+                   STKR(LS),STKI(LS),T,T,STKR(LS),STKI(LS),&
+                   STKR(LS),STKI(LS),T,T,T,T,100,INFO)
         LL = LS+K
         CALL WSET(N-K,0.0D0,0.0D0,STKR(LL),STKI(LL),1)
    29 CONTINUE
@@ -2175,11 +2175,11 @@ C
         BUF(J) = -BUF(J)
    31 CONTINUE
       DO 35 J = 1, N
-        IF (BUF(J) .GT. 0) GOTO 35
+        IF (BUF(J) > 0) GOTO 35
         K = -BUF(J)
         BUF(J) = K
    33   CONTINUE
-          IF (K .EQ. J) GOTO 34
+          IF (K == J) GOTO 34
           LS = L2+J-1
           LL = L2+K-1
           CALL WSWAP(N2,STKR(LS),STKI(LS),MN,STKR(LL),STKI(LL),MN)
@@ -2195,70 +2195,70 @@ C
    36 CONTINUE
       MSTK(TOP) = N
       NSTK(TOP) = N2
-      IF (FIN .EQ. -1) CALL STACK1(QUOTE)
-      IF (ERR .GT. 0) RETURN
+      IF (FIN == -1) CALL STACK1(QUOTE)
+      IF (ERR > 0) RETURN
       GOTO 99
-C
-C     QR
-C
+!
+!     QR
+!
    40 MM = MAX0(M,N)
       LS = L + MM*MM
-      IF (LHS.EQ.1 .AND. FIN.EQ.1) LS = L
+      IF (LHS==1 .AND. FIN==1) LS = L
       LE = LS + M*N
       L4 = LE + MM
       ERR = L4+MM - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
-      IF (LS.NE.L) CALL WCOPY(M*N,STKR(L),STKI(L),1,STKR(LS),STKI(LS),1)
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
+      IF (LS/=L) CALL WCOPY(M*N,STKR(L),STKI(L),1,STKR(LS),STKI(LS),1)
       JOB = 1
-      IF (LHS.LT.3) JOB = 0
+      IF (LHS<3) JOB = 0
       DO 42 J = 1, N
         BUF(J) = 0
    42 CONTINUE
-      CALL WQRDC(STKR(LS),STKI(LS),M,M,N,STKR(L4),STKI(L4),
-     $            BUF,STKR(LE),STKI(LE),JOB)
-      IF (LHS.EQ.1 .AND. FIN.EQ.1) GOTO 99
+      CALL WQRDC(STKR(LS),STKI(LS),M,M,N,STKR(L4),STKI(L4),&
+                  BUF,STKR(LE),STKI(LE),JOB)
+      IF (LHS==1 .AND. FIN==1) GOTO 99
       CALL WSET(M*M,0.0D0,0.0D0,STKR(L),STKI(L),1)
       CALL WSET(M,1.0D0,0.0D0,STKR(L),STKI(L),M+1)
       DO 43 J = 1, M
         LL = L+(J-1)*M
-        CALL WQRSL(STKR(LS),STKI(LS),M,M,N,STKR(L4),STKI(L4),
-     $             STKR(LL),STKI(LL),STKR(LL),STKI(LL),T,T,
-     $             T,T,T,T,T,T,10000,INFO)
+        CALL WQRSL(STKR(LS),STKI(LS),M,M,N,STKR(L4),STKI(L4),&
+                   STKR(LL),STKI(LL),STKR(LL),STKI(LL),T,T,&
+                   T,T,T,T,T,T,10000,INFO)
    43 CONTINUE
-      IF (FIN .EQ. 2) GOTO 99
+      IF (FIN == 2) GOTO 99
       NSTK(TOP) = M
       DO 45 J = 1, N
         LL = LS+J+(J-1)*M
         CALL WSET(M-J,0.0D0,0.0D0,STKR(LL),STKI(LL),1)
    45 CONTINUE
-      IF (TOP+1 .GE. BOT) CALL ERROR(18)
-      IF (ERR .GT. 0) RETURN
+      IF (TOP+1 >= BOT) CALL ERROR(18)
+      IF (ERR > 0) RETURN
       TOP = TOP+1
       LSTK(TOP) = LS
       MSTK(TOP) = M
       NSTK(TOP) = N
-      IF (LHS .EQ. 2) GOTO 99
+      IF (LHS == 2) GOTO 99
       CALL WSET(N*N,0.0D0,0.0D0,STKR(LE),STKI(LE),1)
       DO 47 J = 1, N
         LL = LE+BUF(J)-1+(J-1)*N
         STKR(LL) = 1.0D0
    47 CONTINUE
-      IF (TOP+1 .GE. BOT) CALL ERROR(18)
-      IF (ERR .GT. 0) RETURN
+      IF (TOP+1 >= BOT) CALL ERROR(18)
+      IF (ERR > 0) RETURN
       TOP = TOP+1
       LSTK(TOP) = LE
       MSTK(TOP) = N
       NSTK(TOP) = N
       GOTO 99
-C
+!
    99 RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE MATFN5
-C
-C     FILE HANDLING AND OTHER I/O
-C
+!
+!     FILE HANDLING AND OTHER I/O
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER ALFA(52),ALFB(52),ALFL,CASE
@@ -2277,44 +2277,44 @@ C
       DATA EOL/99/,BLANK/36/,PLUS/41/,MINUS/42/,QUOTE/49/,SEMI/39/
       DATA LRAT/5/,MRAT/100/
       SAVE EOL,BLANK,PLUS,MINUS,QUOTE,SEMI,LRAT,MRAT
-C
-      IF (DDT .EQ. 1) WRITE(WTE,100) FIN
+!
+      IF (DDT == 1) WRITE(WTE,100) FIN
   100 FORMAT(1X,'MATFN5',I4)
-C     FUNCTIONS/FIN
-C     EXEC SAVE LOAD PRIN DIAR DISP BASE LINE CHAR PLOT RAT  DEBU
-C      1    2    3    4    5    6    7    8    9   10   11   12
+!     FUNCTIONS/FIN
+!     EXEC SAVE LOAD PRIN DIAR DISP BASE LINE CHAR PLOT RAT  DEBU
+!      1    2    3    4    5    6    7    8    9   10   11   12
       L = LSTK(TOP)
       M = MSTK(TOP)
       N = NSTK(TOP)
-      IF (FIN .GT. 5) GOTO 15
-C
-C     CONVERT FILE NAME
+      IF (FIN > 5) GOTO 15
+!
+!     CONVERT FILE NAME
       MN = M*N
       FLAG = 3
-      IF (SYM .EQ. SEMI) FLAG = 0
-      IF (RHS .LT. 2) GOTO 12
+      IF (SYM == SEMI) FLAG = 0
+      IF (RHS < 2) GOTO 12
          FLAG = IDINT(STKR(L))
          TOP2 = TOP
          TOP = TOP-1
          L = LSTK(TOP)
          MN = MSTK(TOP)*NSTK(TOP)
    12 LUN = -1
-      IF (MN.EQ.1 .AND. STKR(L).LT.10.0D0) LUN = IDINT(STKR(L))
-      IF (LUN .GE. 0) GOTO 15
+      IF (MN==1 .AND. STKR(L)<10.0D0) LUN = IDINT(STKR(L))
+      IF (LUN >= 0) GOTO 15
       DO 14 J = 1, 32
          LS = L+J-1
-         IF (J .LE. MN) CH = IDINT(STKR(LS))
-         IF (J .GT. MN) CH = BLANK
-         IF (CH.LT.0 .OR. CH.GE.ALFL) CALL ERROR(38)
-         IF (ERR .GT. 0) RETURN
-         IF (CASE .EQ. 0) BUF(J) = ALFA(CH+1)
-         IF (CASE .EQ. 1) BUF(J) = ALFB(CH+1)
+         IF (J <= MN) CH = IDINT(STKR(LS))
+         IF (J > MN) CH = BLANK
+         IF (CH<0 .OR. CH>=ALFL) CALL ERROR(38)
+         IF (ERR > 0) RETURN
+         IF (CASE == 0) BUF(J) = ALFA(CH+1)
+         IF (CASE == 1) BUF(J) = ALFB(CH+1)
    14 CONTINUE
-C
+!
    15 GOTO (20,30,35,25,27,60,65,70,50,80,40,95),FIN
-C
-C     EXEC
-   20 IF (LUN .EQ. 0) GOTO 23
+!
+!     EXEC
+   20 IF (LUN == 0) GOTO 23
       K = LPT(6)
       LIN(K+1) = LPT(1)
       LIN(K+2) = LPT(3)
@@ -2325,49 +2325,49 @@ C     EXEC
       LPT(1) = K + 7
       LCT(4) = FLAG
       PTZ = PT - 4
-      IF (RIO .EQ. RTE) RIO = 12
+      IF (RIO == RTE) RIO = 12
       RIO = RIO + 1
-      IF (LUN .GT. 0) RIO = LUN
-      IF (LUN .LT. 0) CALL FILES(RIO,BUF)
-      IF (FLAG .GE. 4) WRITE(WTE,22)
+      IF (LUN > 0) RIO = LUN
+      IF (LUN < 0) CALL FILES(RIO,BUF)
+      IF (FLAG >= 4) WRITE(WTE,22)
    22 FORMAT(1X,'PAUSE MODE. ENTER BLANK LINES.')
       SYM = EOL
       MSTK(TOP) = 0
       GOTO 99
-C
-C     EXEC(0)
+!
+!     EXEC(0)
    23 RIO = RTE
       ERR = 99
       GOTO 99
-C
-C     PRINT
+!
+!     PRINT
    25 K = WTE
       WTE = LUN
-      IF (LUN .LT. 0) WTE = 7
-      IF (LUN .LT. 0) CALL FILES(WTE,BUF)
+      IF (LUN < 0) WTE = 7
+      IF (LUN < 0) CALL FILES(WTE,BUF)
       L = LCT(2)
       LCT(2) = 9999
-      IF (RHS .GT. 1) CALL PRINT(SYN,TOP2)
+      IF (RHS > 1) CALL PRINT(SYN,TOP2)
       LCT(2) = L
       WTE = K
       MSTK(TOP) = 0
       GOTO 99
-C
-C     DIARY
+!
+!     DIARY
    27 WIO = LUN
-      IF (LUN .LT. 0) WIO = 8
-      IF (LUN .LT. 0) CALL FILES(WIO,BUF)
+      IF (LUN < 0) WIO = 8
+      IF (LUN < 0) CALL FILES(WIO,BUF)
       MSTK(TOP) = 0
       GOTO 99
-C
-C     SAVE
-   30 IF (LUN .LT. 0) LUNIT = 1
-      IF (LUN .LT. 0) CALL FILES(LUNIT,BUF)
-      IF (LUN .GT. 0) LUNIT = LUN
+!
+!     SAVE
+   30 IF (LUN < 0) LUNIT = 1
+      IF (LUN < 0) CALL FILES(LUNIT,BUF)
+      IF (LUN > 0) LUNIT = LUN
       K = LSIZE-4
-      IF (K .LT. BOT) K = LSIZE
-      IF (RHS .EQ. 2) K = TOP2
-      IF (RHS .EQ. 2) CALL PUTID(IDSTK(1,K),SYN)
+      IF (K < BOT) K = LSIZE
+      IF (RHS == 2) K = TOP2
+      IF (RHS == 2) CALL PUTID(IDSTK(1,K),SYN)
    32 L = LSTK(K)
       M = MSTK(K)
       N = NSTK(K)
@@ -2376,28 +2376,28 @@ C     SAVE
          BUF(I) = ALFA(J)
    34 CONTINUE
       IMG = 0
-      IF (WASUM(M*N,STKI(L),STKI(L),1) .NE. 0.0D0) IMG = 1
-      IF(FE .EQ. 0)CALL SAVLOD(LUNIT,BUF,M,N,IMG,0,STKR(L),STKI(L))
+      IF (WASUM(M*N,STKI(L),STKI(L),1) /= 0.0D0) IMG = 1
+      IF(FE == 0)CALL SAVLOD(LUNIT,BUF,M,N,IMG,0,STKR(L),STKI(L))
       K = K-1
-      IF (K .GE. BOT) GOTO 32
+      IF (K >= BOT) GOTO 32
       CALL FILES(-LUNIT,BUF)
       MSTK(TOP) = 0
       GOTO 99
-C
-C     LOAD
-   35 IF (LUN .LT. 0) LUNIT = 2
-      IF (LUN .LT. 0) CALL FILES(LUNIT,BUF)
-      IF (LUN .GT. 0) LUNIT = LUN
+!
+!     LOAD
+   35 IF (LUN < 0) LUNIT = 2
+      IF (LUN < 0) CALL FILES(LUNIT,BUF)
+      IF (LUN > 0) LUNIT = LUN
    36 JOB = LSTK(BOT) - L
-      IF(FE .EQ. 0)
-     +CALL SAVLOD(LUNIT,ID,MSTK(TOP),NSTK(TOP),IMG,JOB,STKR(L),STKI(L))
+      IF(FE == 0)&
+      CALL SAVLOD(LUNIT,ID,MSTK(TOP),NSTK(TOP),IMG,JOB,STKR(L),STKI(L))
       MN = MSTK(TOP)*NSTK(TOP)
-      IF (MN .EQ. 0) GOTO 39
-      IF (IMG .EQ. 0) CALL RSET(MN,0.0D0,STKI(L),1)
+      IF (MN == 0) GOTO 39
+      IF (IMG == 0) CALL RSET(MN,0.0D0,STKI(L),1)
       DO 38 I = 1, 4
          J = 0
    37    J = J+1
-         IF (ID(I).NE.ALFA(J) .AND. J.LE.BLANK) GOTO 37
+         IF (ID(I)/=ALFA(J) .AND. J<=BLANK) GOTO 37
          ID(I) = J-1
    38 CONTINUE
       SYM = SEMI
@@ -2408,17 +2408,17 @@ C     LOAD
    39 CALL FILES(-LUNIT,BUF)
       MSTK(TOP) = 0
       GOTO 99
-C
-C     RAT
-   40 IF (RHS .EQ. 2) GOTO 44
+!
+!     RAT
+   40 IF (RHS == 2) GOTO 44
       MN = M*N
       L2 = L
-      IF (LHS .EQ. 2) L2 = L + MN
+      IF (LHS == 2) L2 = L + MN
       LW = L2 + MN
       ERR = LW + LRAT - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
-      IF (LHS .EQ. 2) TOP = TOP + 1
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
+      IF (LHS == 2) TOP = TOP + 1
       LSTK(TOP) = L2
       MSTK(TOP) = M
       NSTK(TOP) = N
@@ -2427,7 +2427,7 @@ C     RAT
          CALL RAT(STKR(L),LRAT,MRAT,S,T,STKR(LW))
          STKR(L) = S
          STKR(L2) = T
-         IF (LHS .EQ. 1) STKR(L) = FLOP(S/T)
+         IF (LHS == 1) STKR(L) = FLOP(S/T)
          L = L + 1
          L2 = L2 + 1
    42 CONTINUE
@@ -2437,54 +2437,54 @@ C     RAT
       TOP = TOP - 1
       MSTK(TOP) = 0
       GOTO 99
-C
-C     CHAR
+!
+!     CHAR
    50 K = IABS(IDINT(STKR(L)))
-      IF (M*N.NE.1 .OR. K.GE.ALFL) CALL ERROR(36)
-      IF (ERR .GT. 0) RETURN
+      IF (M*N/=1 .OR. K>=ALFL) CALL ERROR(36)
+      IF (ERR > 0) RETURN
       CH = ALFA(K+1)
-      IF (STKR(L) .LT. 0.0D0) CH = ALFB(K+1)
+      IF (STKR(L) < 0.0D0) CH = ALFB(K+1)
       WRITE(WTE,51) CH
    51 FORMAT(1X,'REPLACE CHARACTER ',A1)
       READ(RTE,52) CH
    52 FORMAT(A1)
-      IF (STKR(L) .GE. 0.0D0) ALFA(K+1) = CH
-      IF (STKR(L) .LT. 0.0D0) ALFB(K+1) = CH
+      IF (STKR(L) >= 0.0D0) ALFA(K+1) = CH
+      IF (STKR(L) < 0.0D0) ALFB(K+1) = CH
       MSTK(TOP) = 0
       GOTO 99
-C
-C     DISP
+!
+!     DISP
    60 WRITE(WTE,61)
-      IF (WIO .NE. 0) WRITE(WIO,61)
+      IF (WIO /= 0) WRITE(WIO,61)
    61 FORMAT(1X,80A1)
-      IF (RHS .EQ. 2) GOTO 65
+      IF (RHS == 2) GOTO 65
       MN = M*N
       TEXT = .TRUE.
       DO 62 I = 1, MN
         LS = L+I-1
         CH = IDINT(STKR(LS))
-        TEXT = TEXT .AND. (CH.GE.0) .AND. (CH.LT.ALFL)
-        TEXT = TEXT .AND. (DFLOAT(CH).EQ.STKR(LS))
+        TEXT = TEXT .AND. (CH>=0) .AND. (CH<ALFL)
+        TEXT = TEXT .AND. (DFLOAT(CH)==STKR(LS))
    62 CONTINUE
       DO 64 I = 1, M
       DO 63 J = 1, N
         LS = L+I-1+(J-1)*M
-        IF (STKR(LS) .EQ. 0.0D0) CH = BLANK
-        IF (STKR(LS) .GT. 0.0D0) CH = PLUS
-        IF (STKR(LS) .LT. 0.0D0) CH = MINUS
+        IF (STKR(LS) == 0.0D0) CH = BLANK
+        IF (STKR(LS) > 0.0D0) CH = PLUS
+        IF (STKR(LS) < 0.0D0) CH = MINUS
         IF (TEXT) CH = IDINT(STKR(LS))
         BUF(J) = ALFA(CH+1)
    63 CONTINUE
       WRITE(WTE,61) (BUF(J),J=1,N)
-      IF (WIO .NE. 0) WRITE(WIO,61) (BUF(J),J=1,N)
+      IF (WIO /= 0) WRITE(WIO,61) (BUF(J),J=1,N)
    64 CONTINUE
       MSTK(TOP) = 0
       GOTO 99
-C
-C     BASE
-   65 IF (RHS .NE. 2) CALL ERROR(39)
-      IF (STKR(L) .LE. 1.0D0) CALL ERROR(36)
-      IF (ERR .GT. 0) RETURN
+!
+!     BASE
+   65 IF (RHS /= 2) CALL ERROR(39)
+      IF (STKR(L) <= 1.0D0) CALL ERROR(36)
+      IF (ERR > 0) RETURN
       B = STKR(L)
       L2 = L
       TOP = TOP-1
@@ -2502,54 +2502,54 @@ C     BASE
       MSTK(TOP) = N
       NSTK(TOP) = M
       CALL STACK1(QUOTE)
-      IF (FIN .EQ. 6) GOTO 60
+      IF (FIN == 6) GOTO 60
       GOTO 99
-C
-C     LINES
+!
+!     LINES
    70 LCT(2) = IDINT(STKR(L))
       MSTK(TOP) = 0
       GOTO 99
-C
-C     PLOT
-   80 IF (RHS .GE. 2) GOTO 82
+!
+!     PLOT
+   80 IF (RHS >= 2) GOTO 82
       N = M*N
       DO 81 I = 1, N
          LL = L+I-1
          STKI(LL) = DFLOAT(I)
    81 CONTINUE
       CALL PLOT(WTE,STKI(L),STKR(L),N,T,0)
-      IF (WIO .NE. 0) CALL PLOT(WIO,STKI(L),STKR(L),N,T,0)
+      IF (WIO /= 0) CALL PLOT(WIO,STKI(L),STKR(L),N,T,0)
       MSTK(TOP) = 0
       GOTO 99
-   82 IF (RHS .EQ. 2) K = 0
-      IF (RHS .EQ. 3) K = M*N
-      IF (RHS .GT. 3) K = RHS - 2
+   82 IF (RHS == 2) K = 0
+      IF (RHS == 3) K = M*N
+      IF (RHS > 3) K = RHS - 2
       TOP = TOP - (RHS - 1)
       N = MSTK(TOP)*NSTK(TOP)
-      IF (MSTK(TOP+1)*NSTK(TOP+1) .NE. N) CALL ERROR(5)
-      IF (ERR .GT. 0) RETURN
+      IF (MSTK(TOP+1)*NSTK(TOP+1) /= N) CALL ERROR(5)
+      IF (ERR > 0) RETURN
       LX = LSTK(TOP)
       LY = LSTK(TOP+1)
-      IF (RHS .GT. 3) L = LSTK(TOP+2)
+      IF (RHS > 3) L = LSTK(TOP+2)
       CALL PLOT(WTE,STKR(LX),STKR(LY),N,STKR(L),K)
-      IF (WIO .NE. 0) CALL PLOT(WIO,STKR(LX),STKR(LY),N,STKR(L),K)
+      IF (WIO /= 0) CALL PLOT(WIO,STKR(LX),STKR(LY),N,STKR(L),K)
       MSTK(TOP) = 0
       GOTO 99
-C
-C     DEBUG
+!
+!     DEBUG
    95 DDT = IDINT(STKR(L))
       WRITE(WTE,96) DDT
    96 FORMAT(1X,'DEBUG ',I4)
       MSTK(TOP) = 0
       GOTO 99
-C
+!
    99 RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE MATFN6
-C
-C     EVALUATE UTILITY FUNCTIONS
-C
+!
+!     EVALUATE UTILITY FUNCTIONS
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
@@ -2564,20 +2564,20 @@ C
       DATA SEMI/39/
       DATA UNIFOR/30,23,18,15/,NORMAL/23,24,27,22/,SEED/28,14,14,13/
       save semi,unifor,normal,seed
-C
-      IF (DDT .EQ. 1) WRITE(WTE,100) FIN
+!
+      IF (DDT == 1) WRITE(WTE,100) FIN
   100 FORMAT(1X,'MATFN6',I4)
-C     FUNCTIONS/FIN
-C     MAGI DIAG SUM  PROD USER EYE  RAND ONES CHOP SIZE KRON  TRIL TRIU
-C       1    2    3    4    5    6    7    8    9   10  11-13  14   15
+!     FUNCTIONS/FIN
+!     MAGI DIAG SUM  PROD USER EYE  RAND ONES CHOP SIZE KRON  TRIL TRIU
+!       1    2    3    4    5    6    7    8    9   10  11-13  14   15
       L = LSTK(TOP)
       M = MSTK(TOP)
       N = NSTK(TOP)
       GOTO (75,80,65,67,70,90,90,90,60,77,50,50,50,80,80),FIN
-C
-C     KRONECKER PRODUCT
-   50 IF (RHS .NE. 2) CALL ERROR(39)
-      IF (ERR .GT. 0) RETURN
+!
+!     KRONECKER PRODUCT
+   50 IF (RHS /= 2) CALL ERROR(39)
+      IF (ERR > 0) RETURN
       TOP = TOP - 1
       L = LSTK(TOP)
       MA = MSTK(TOP)
@@ -2585,27 +2585,27 @@ C     KRONECKER PRODUCT
       LA = L + MAX0(M*N*MA*NA,M*N+MA*NA)
       LB = LA + MA*NA
       ERR = LB + M*N - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
-C     MOVE A AND B ABOVE RESULT
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
+!     MOVE A AND B ABOVE RESULT
       CALL WCOPY(MA*NA+M*N,STKR(L),STKI(L),1,STKR(LA),STKI(LA),1)
       DO 54 JA = 1, NA
         DO 53 J = 1, N
           LJ = LB + (J-1)*M
           DO 52 IA = 1, MA
-C           GET J-TH COLUMN OF B
+!           GET J-TH COLUMN OF B
             CALL WCOPY(M,STKR(LJ),STKI(LJ),1,STKR(L),STKI(L),1)
-C           ADDRESS OF A(IA,JA)
+!           ADDRESS OF A(IA,JA)
             LS = LA + IA-1 + (JA-1)*MA
             DO 51 I = 1, M
-C             A(IA,JA) OP B(I,J)
-              IF (FIN .EQ. 11) CALL WMUL(STKR(LS),STKI(LS),
-     $           STKR(L),STKI(L),STKR(L),STKI(L))
-              IF (FIN .EQ. 12) CALL WDIV(STKR(LS),STKI(LS),
-     $           STKR(L),STKI(L),STKR(L),STKI(L))
-              IF (FIN .EQ. 13) CALL WDIV(STKR(L),STKI(L),
-     $           STKR(LS),STKI(LS),STKR(L),STKI(L))
-              IF (ERR .GT. 0) RETURN
+!             A(IA,JA) OP B(I,J)
+              IF (FIN == 11) CALL WMUL(STKR(LS),STKI(LS),&
+                 STKR(L),STKI(L),STKR(L),STKI(L))
+              IF (FIN == 12) CALL WDIV(STKR(LS),STKI(LS),&
+                 STKR(L),STKI(L),STKR(L),STKI(L))
+              IF (FIN == 13) CALL WDIV(STKR(L),STKI(L),&
+                 STKR(LS),STKI(LS),STKR(L),STKI(L))
+              IF (ERR > 0) RETURN
               L = L + 1
    51       CONTINUE
    52     CONTINUE
@@ -2614,27 +2614,27 @@ C             A(IA,JA) OP B(I,J)
       MSTK(TOP) = M*MA
       NSTK(TOP) = N*NA
       GOTO 99
-C
-C     CHOP
+!
+!     CHOP
    60 EPS0 = 1.0D0
    61 EPS0 = EPS0/2.0D0
       T = FLOP(1.0D0 + EPS0)
-      IF (T .GT. 1.0D0) GOTO 61
+      IF (T > 1.0D0) GOTO 61
       EPS0 = 2.0D0*EPS0
       FLP(2) = IDINT(STKR(L))
-      IF (SYM .NE. SEMI) WRITE(WTE,62) FLP(2)
+      IF (SYM /= SEMI) WRITE(WTE,62) FLP(2)
    62 FORMAT(/1X,'CHOP ',I2,' PLACES.')
       EPS = 1.0D0
    63 EPS = EPS/2.0D0
       T = FLOP(1.0D0 + EPS)
-      IF (T .GT. 1.0D0) GOTO 63
+      IF (T > 1.0D0) GOTO 63
       EPS = 2.0D0*EPS
       T = STKR(VSIZE-4)
-      IF (T.LT.EPS .OR. T.EQ.EPS0) STKR(VSIZE-4) = EPS
+      IF (T<EPS .OR. T==EPS0) STKR(VSIZE-4) = EPS
       MSTK(TOP) = 0
       GOTO 99
-C
-C     SUM
+!
+!     SUM
    65 SR = 0.0D0
       SI = 0.0D0
       MN = M*N
@@ -2644,8 +2644,8 @@ C     SUM
          SI = FLOP(SI+STKI(LS))
    66 CONTINUE
       GOTO 69
-C
-C     PROD
+!
+!     PROD
    67 SR = 1.0D0
       SI = 0.0D0
       MN = M*N
@@ -2658,12 +2658,12 @@ C     PROD
       MSTK(TOP) = 1
       NSTK(TOP) = 1
       GOTO 99
-C
-C     USER
+!
+!     USER
    70 S = 0.0D0
       T = 0.0D0
-      IF (RHS .LT. 2) GOTO 72
-      IF (RHS .LT. 3) GOTO 71
+      IF (RHS < 2) GOTO 72
+      IF (RHS < 3) GOTO 71
       T = STKR(L)
       TOP = TOP-1
       L = LSTK(TOP)
@@ -2679,49 +2679,49 @@ C     USER
       MSTK(TOP) = M
       NSTK(TOP) = N
       GOTO 99
-C
-C     MAGIC
+!
+!     MAGIC
    75 N = MAX0(IDINT(STKR(L)),0)
-      IF (N .EQ. 2) N = 0
-      IF (N .GT. 0) CALL MAGIC(STKR(L),N,N)
+      IF (N == 2) N = 0
+      IF (N > 0) CALL MAGIC(STKR(L),N,N)
       CALL RSET(N*N,0.0D0,STKI(L),1)
       MSTK(TOP) = N
       NSTK(TOP) = N
       GOTO 99
-C
-C     SIZE
+!
+!     SIZE
    77 STKR(L) = M
       STKR(L+1) = N
       STKI(L) = 0.0D0
       STKI(L+1) = 0.0D0
       MSTK(TOP) = 1
       NSTK(TOP) = 2
-      IF (LHS .EQ. 1) GOTO 99
+      IF (LHS == 1) GOTO 99
       NSTK(TOP) = 1
       TOP = TOP + 1
       LSTK(TOP) = L+1
       MSTK(TOP) = 1
       NSTK(TOP) = 1
       GOTO 99
-C
-C     DIAG, TRIU, TRIL
+!
+!     DIAG, TRIU, TRIL
    80 K = 0
-      IF (RHS .NE. 2) GOTO 81
+      IF (RHS /= 2) GOTO 81
          K = IDINT(STKR(L))
          TOP = TOP-1
          L = LSTK(TOP)
          M = MSTK(TOP)
          N = NSTK(TOP)
-   81 IF (FIN .GE. 14) GOTO 85
-      IF (M .EQ. 1 .OR. N .EQ. 1) GOTO 83
-      IF (K.GE.0) MN=MIN0(M,N-K)
-      IF (K.LT.0) MN=MIN0(M+K,N)
+   81 IF (FIN >= 14) GOTO 85
+      IF (M == 1 .OR. N == 1) GOTO 83
+      IF (K>=0) MN=MIN0(M,N-K)
+      IF (K<0) MN=MIN0(M+K,N)
       MSTK(TOP) = MAX0(MN,0)
       NSTK(TOP) = 1
-      IF (MN .LE. 0) GOTO 99
+      IF (MN <= 0) GOTO 99
       DO 82 I = 1, MN
-         IF (K.GE.0) LS = L+(I-1)+(I+K-1)*M
-         IF (K.LT.0) LS = L+(I-K-1)+(I-1)*M
+         IF (K>=0) LS = L+(I-1)+(I+K-1)*M
+         IF (K<0) LS = L+(I-K-1)+(I-1)*M
          LL = L+I-1
          STKR(LL) = STKR(LS)
          STKI(LL) = STKI(LS)
@@ -2729,8 +2729,8 @@ C     DIAG, TRIU, TRIL
       GOTO 99
    83 N = MAX0(M,N)+IABS(K)
       ERR = L+N*N - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       MSTK(TOP) = N
       NSTK(TOP) = N
       DO 84 JB = 1, N
@@ -2739,88 +2739,88 @@ C     DIAG, TRIU, TRIL
          I = N+1-IB
          SR = 0.0D0
          SI = 0.0D0
-         IF (K.GE.0) LS = L+I-1
-         IF (K.LT.0) LS = L+J-1
+         IF (K>=0) LS = L+I-1
+         IF (K<0) LS = L+J-1
          LL = L+I-1+(J-1)*N
-         IF (J-I .EQ. K) SR = STKR(LS)
-         IF (J-I .EQ. K) SI = STKI(LS)
+         IF (J-I == K) SR = STKR(LS)
+         IF (J-I == K) SI = STKI(LS)
          STKR(LL) = SR
          STKI(LL) = SI
    84 CONTINUE
       GOTO 99
-C
-C     TRIL, TRIU
+!
+!     TRIL, TRIU
    85 DO 87 J = 1, N
          LD = L + J - K - 1 + (J-1)*M
-         IF (FIN .EQ. 14) LL = J - K - 1
-         IF (FIN .EQ. 14) LS = LD - LL
-         IF (FIN .EQ. 15) LL = M - J + K
-         IF (FIN .EQ. 15) LS = LD + 1
-         IF (LL .GT. 0) CALL WSET(LL,0.0D0,0.0D0,STKR(LS),STKI(LS),1)
+         IF (FIN == 14) LL = J - K - 1
+         IF (FIN == 14) LS = LD - LL
+         IF (FIN == 15) LL = M - J + K
+         IF (FIN == 15) LS = LD + 1
+         IF (LL > 0) CALL WSET(LL,0.0D0,0.0D0,STKR(LS),STKI(LS),1)
    87 CONTINUE
       GOTO 99
-C
-C     EYE, RAND, ONES
-   90 IF (M.GT.1 .OR. RHS.EQ.0) GOTO 94
-      IF (RHS .NE. 2) GOTO 91
+!
+!     EYE, RAND, ONES
+   90 IF (M>1 .OR. RHS==0) GOTO 94
+      IF (RHS /= 2) GOTO 91
         NN = IDINT(STKR(L))
         TOP = TOP-1
         L = LSTK(TOP)
         N = NSTK(TOP)
-   91 IF (FIN.NE.7 .OR. N.LT.4) GOTO 93
+   91 IF (FIN/=7 .OR. N<4) GOTO 93
       DO 92 I = 1, 4
         LS = L+I-1
         ID(I) = IDINT(STKR(LS))
    92 CONTINUE
       IF (EQID(ID,UNIFOR).OR.EQID(ID,NORMAL)) GOTO 97
       IF (EQID(ID,SEED)) GOTO 98
-   93 IF (N .GT. 1) GOTO 94
+   93 IF (N > 1) GOTO 94
       M = MAX0(IDINT(STKR(L)),0)
-      IF (RHS .EQ. 2) N = MAX0(NN,0)
-      IF (RHS .NE. 2) N = M
+      IF (RHS == 2) N = MAX0(NN,0)
+      IF (RHS /= 2) N = M
       ERR = L+M*N - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       MSTK(TOP) = M
       NSTK(TOP) = N
-      IF (M*N .EQ. 0) GOTO 99
+      IF (M*N == 0) GOTO 99
    94 DO 96 J = 1, N
       DO 96 I = 1, M
         LL = L+I-1+(J-1)*M
         STKR(LL) = 0.0D0
         STKI(LL) = 0.0D0
-        IF (I.EQ.J .OR. FIN.EQ.8) STKR(LL) = 1.0D0
-        IF (FIN.EQ.7 .AND. RAN(2).EQ.0) STKR(LL) = FLOP(URAND(RAN(1)))
-        IF (FIN.NE.7 .OR. RAN(2).EQ.0) GOTO 96
+        IF (I==J .OR. FIN==8) STKR(LL) = 1.0D0
+        IF (FIN==7 .AND. RAN(2)==0) STKR(LL) = FLOP(URAND(RAN(1)))
+        IF (FIN/=7 .OR. RAN(2)==0) GOTO 96
    95      SR = 2.0D0*URAND(RAN(1))-1.0D0
            SI = 2.0D0*URAND(RAN(1))-1.0D0
            T = SR*SR + SI*SI
-           IF (T .GT. 1.0D0) GOTO 95
+           IF (T > 1.0D0) GOTO 95
         STKR(LL) = FLOP(SR*DSQRT((-(2.0D0*DLOG(T)))/T))
    96 CONTINUE
       GOTO 99
-C
-C     SWITCH UNIFORM AND NORMAL
+!
+!     SWITCH UNIFORM AND NORMAL
    97 RAN(2) = ID(1) - UNIFOR(1)
       MSTK(TOP) = 0
       GOTO 99
-C
-C     SEED
-   98 IF (RHS .EQ. 2) RAN(1) = NN
+!
+!     SEED
+   98 IF (RHS == 2) RAN(1) = NN
       STKR(L) = RAN(1)
       MSTK(TOP) = 1
-      IF (RHS .EQ. 2) MSTK(TOP) = 0
+      IF (RHS == 2) MSTK(TOP) = 0
       NSTK(TOP) = 1
       GOTO 99
-C
+!
    99 RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE MATLAB(INIT)
-C     INIT = 0 FOR ORDINARY FIRST ENTRY
-C          = POSITIVE FOR SUBSEQUENT ENTRIES
-C          = NEGATIVE FOR SILENT INITIALIZATION (SEE MATZ)
-C
+!     INIT = 0 FOR ORDINARY FIRST ENTRY
+!          = POSITIVE FOR SUBSEQUENT ENTRIES
+!          = NEGATIVE FOR SILENT INITIALIZATION (SEE MATZ)
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER ALFA(52),ALFB(52),ALFL,CASE
@@ -2832,87 +2832,87 @@ C
       COMMON /RECU/ IDS,PSTK,RSTK,PSIZE,PT,PTZ
       COMMON /IOP/ DDT,ERR,FMT,LCT,LIN,LPT,HIO,RIO,WIO,RTE,WTE,FE
       COMMON /COM/ SYM,SYN,BUF,CHRA,FLP,FIN,FUN,LHS,RHS,RAN
-C
+!
       DOUBLE PRECISION S,T
       INTEGER EPS(4),FLOPS(4),EYE(4),RAND(4)
-C
-C     CHARACTER SET
-C            0       10       20       30       40       50
-C
-C     0      0        A        K        U   COLON  :  LESS   <
-C     1      1        B        L        V   PLUS   +  GREAT  >
-C     2      2        C        M        W   MINUS  -
-C     3      3        D        N        X   STAR   *
-C     4      4        E        O        Y   SLASH  /
-C     5      5        F        P        Z   BSLASH \
-C     6      6        G        Q  BLANK     EQUAL  =
-C     7      7        H        R  LPAREN (  DOT    .
-C     8      8        I        S  RPAREN )  COMMA  ,
-C     9      9        J        T  SEMI   ;  QUOTE  '
-C-----------------------------------------------------------------------
+!
+!     CHARACTER SET
+!            0       10       20       30       40       50
+!
+!     0      0        A        K        U   COLON  :  LESS   <
+!     1      1        B        L        V   PLUS   +  GREAT  >
+!     2      2        C        M        W   MINUS  -
+!     3      3        D        N        X   STAR   *
+!     4      4        E        O        Y   SLASH  /
+!     5      5        F        P        Z   BSLASH \
+!     6      6        G        Q  BLANK     EQUAL  =
+!     7      7        H        R  LPAREN (  DOT    .
+!     8      8        I        S  RPAREN )  COMMA  ,
+!     9      9        J        T  SEMI   ;  QUOTE  '
+!-----------------------------------------------------------------------
       CHARACTER SETA*52,SETB*52
       DATA SETA/'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ ();:+-*/\=.,''<>'/
-C     ALTERNATE CHARACTER SET
+!     ALTERNATE CHARACTER SET
       DATA SETB/'0123456789abcdefghijklmnopqrstuvwxyz ();|+-*/$=.,"[]'/
       SAVE SETB, SETA
-C
-C-----------------------------------------------------------------------
+!
+!-----------------------------------------------------------------------
       INTEGER ALPHA(52),ALPHB(52)
-      DATA ALPHA /1H0,1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9,
-     $    1HA,1HB,1HC,1HD,1HE,1HF,1HG,1HH,1HI,1HJ,
-     $    1HK,1HL,1HM,1HN,1HO,1HP,1HQ,1HR,1HS,1HT,
-     $    1HU,1HV,1HW,1HX,1HY,1HZ,1H ,1H(,1H),1H;,
-     $    1H:,1H+,1H-,1H*,1H/,1H\,1H=,1H.,1H,,1H',
-     $    1H<,1H>/
-C     ALTERNATE CHARACTER SET
-      DATA ALPHB /1H0,1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9,
-     $    1Ha,1Hb,1Hc,1Hd,1He,1Hf,1Hg,1Hh,1Hi,1Hj,
-     $    1Hk,1Hl,1Hm,1Hn,1Ho,1Hp,1Hq,1Hr,1Hs,1Ht,
-     $    1Hu,1Hv,1Hw,1Hx,1Hy,1Hz,1H ,1H(,1H),1H;,
-     $    1H|,1H+,1H-,1H*,1H/,1H$,1H=,1H.,1H,,1H",
-     $    1H[,1H]/
-C
+      DATA ALPHA /1H0,1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9,&
+          1HA,1HB,1HC,1HD,1HE,1HF,1HG,1HH,1HI,1HJ,&
+          1HK,1HL,1HM,1HN,1HO,1HP,1HQ,1HR,1HS,1HT,&
+          1HU,1HV,1HW,1HX,1HY,1HZ,1H ,1H(,1H),1H;,&
+          1H:,1H+,1H-,1H*,1H/,1H\,1H=,1H.,1H,,1H',&
+          1H<,1H>/
+!     ALTERNATE CHARACTER SET
+      DATA ALPHB /1H0,1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9,&
+          1Ha,1Hb,1Hc,1Hd,1He,1Hf,1Hg,1Hh,1Hi,1Hj,&
+          1Hk,1Hl,1Hm,1Hn,1Ho,1Hp,1Hq,1Hr,1Hs,1Ht,&
+          1Hu,1Hv,1Hw,1Hx,1Hy,1Hz,1H ,1H(,1H),1H;,&
+          1H|,1H+,1H-,1H*,1H/,1H$,1H=,1H.,1H,,1H",&
+          1H[,1H]/
+!
       SAVE ALPHB, ALPHA
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       DATA EPS/14,25,28,36/,FLOPS/15,21,24,25/
       DATA EYE/14,34,14,36/,RAND/27,10,23,13/
       SAVE EPS, EYE, FLOPS, RAND
-C-----------------------------------------------------------------------
-      IF (INIT .GT. 0) GOTO 90
-C
-C     RTE = UNIT NUMBER FOR TERMINAL INPUT
+!-----------------------------------------------------------------------
+      IF (INIT > 0) GOTO 90
+!
+!     RTE = UNIT NUMBER FOR TERMINAL INPUT
       RTE = 5
       CALL FILES(RTE,BUF)
       RIO = RTE
-C
-C     WTE = UNIT NUMBER FOR TERMINAL OUTPUT
+!
+!     WTE = UNIT NUMBER FOR TERMINAL OUTPUT
       WTE = 6
       CALL FILES(WTE,BUF)
       WIO = 0
-C
-      IF (INIT .GE. 0) WRITE(WTE,100)
+!
+      IF (INIT >= 0) WRITE(WTE,100)
   100 FORMAT(//1X,'     < M A T L A B >',/,1X,'   Version of 05/25/82')
-C
-C     HIO = UNIT NUMBER FOR HELP FILE
+!
+!     HIO = UNIT NUMBER FOR HELP FILE
       HIO = 11
       CALL FILES(HIO,BUF)
-C
-C     RANDOM NUMBER SEED
+!
+!     RANDOM NUMBER SEED
       RAN(1) = 0
-C
-C     INITIAL LINE LIMIT
+!
+!     INITIAL LINE LIMIT
       LCT(2) = 25
-C
+!
       ALFL = 52
       CASE = 0
-C     CASE = 1 for file names in lower case
+!     CASE = 1 for file names in lower case
       DO 20 I = 1, ALFL
          ALFA(I) = ALPHA(I)
          ALFB(I) = ALPHB(I)
 !	 READ(SETA(I:I),'(A1)')I_ALFA ! convert character to hollerith
 !	 READ(SETB(I:I),'(A1)')I_ALFB ! convert character to hollerith
    20 CONTINUE
-C
+!
       VSIZE = 50505
       LSIZE = 48
       PSIZE = 32
@@ -2925,7 +2925,7 @@ C
       S = 1.0D0
    30 S = S/2.0D0
       T = 1.0D0 + S
-      IF (T .GT. 1.0D0) GOTO 30
+      IF (T > 1.0D0) GOTO 30
       STKR(VSIZE-4) = 2.0D0*S
       CALL PUTID(IDSTK(1,LSIZE-2),FLOPS)
       LSTK(LSIZE-2) = VSIZE-3
@@ -2948,20 +2948,20 @@ C
       PTZ = 0
       PT = PTZ
       ERR = 0
-      IF (INIT .LT. 0) RETURN
-C
+      IF (INIT < 0) RETURN
+!
    90 CALL PARSE
-      IF (FUN .EQ. 1) CALL MATFN1
-      IF (FUN .EQ. 2) CALL MATFN2
-      IF (FUN .EQ. 3) CALL MATFN3
-      IF (FUN .EQ. 4) CALL MATFN4
-      IF (FUN .EQ. 5) CALL MATFN5
-      IF (FUN .EQ. 6) CALL MATFN6
-      IF (FUN .EQ. 21) CALL MATFN1
-      IF (FUN .NE. 99) GOTO 90
+      IF (FUN == 1) CALL MATFN1
+      IF (FUN == 2) CALL MATFN2
+      IF (FUN == 3) CALL MATFN3
+      IF (FUN == 4) CALL MATFN4
+      IF (FUN == 5) CALL MATFN5
+      IF (FUN == 6) CALL MATFN6
+      IF (FUN == 21) CALL MATFN1
+      IF (FUN /= 99) GOTO 90
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 
       SUBROUTINE PARSE
       DOUBLE PRECISION STKR(50505),STKI(50505)
@@ -2982,64 +2982,64 @@ C-----------------------------------------------------------------------
       save BLANK,SEMI,EQUAL,EOL,COMMA,COLON
       save LPAREN,RPAREN,LESS,GREAT,NAME,ALFL
       save ANS,ENND,ELSE
-C
+!
    01 R = 0
-      IF (ERR .GT. 0) PTZ = 0
-      IF (ERR.LE.0 .AND. PT.GT.PTZ) R = RSTK(PT)
-      IF (DDT .EQ. 1) WRITE(WTE,100) PT,R,PTZ,ERR
+      IF (ERR > 0) PTZ = 0
+      IF (ERR<=0 .AND. PT>PTZ) R = RSTK(PT)
+      IF (DDT == 1) WRITE(WTE,100) PT,R,PTZ,ERR
   100 FORMAT(1X,'PARSE ',4I4)
-      IF (R.EQ.15) GOTO 93
-      IF (R.EQ.16 .OR. R.EQ.17) GOTO 94
+      IF (R==15) GOTO 93
+      IF (R==16 .OR. R==17) GOTO 94
       SYM = EOL
       TOP = 0
-      IF (RIO .NE. RTE) CALL FILES(-RIO,BUF)
+      IF (RIO /= RTE) CALL FILES(-RIO,BUF)
       RIO = RTE
       LCT(3) = 0
       LCT(4) = 2
       LPT(1) = 1
-   10 IF (SYM.EQ.EOL .AND. MOD(LCT(4)/2,2).EQ.1) CALL PROMPT(LCT(4)/4)
-      IF (SYM .EQ. EOL) CALL GETLIN
+   10 IF (SYM==EOL .AND. MOD(LCT(4)/2,2)==1) CALL PROMPT(LCT(4)/4)
+      IF (SYM == EOL) CALL GETLIN
       ERR = 0
       PT = PTZ
    15 EXCNT = 0
-      IF (DDT .EQ. 1) WRITE(WTE,115) PT,TOP
+      IF (DDT == 1) WRITE(WTE,115) PT,TOP
   115 FORMAT(1X,'STATE ',2I4)
       LHS = 1
       CALL PUTID(ID,ANS)
       CALL GETSYM
-      IF (SYM.EQ.COLON .AND. CHRA.EQ.EOL) DDT = 1-DDT
-      IF (SYM .EQ. COLON) CALL GETSYM
-      IF (SYM.EQ.SEMI .OR. SYM.EQ.COMMA .OR. SYM.EQ.EOL) GOTO 80
-      IF (SYM .EQ. NAME) GOTO 20
-      IF (SYM .EQ. LESS) GOTO 40
-      IF (SYM .EQ. GREAT) GOTO 45
+      IF (SYM==COLON .AND. CHRA==EOL) DDT = 1-DDT
+      IF (SYM == COLON) CALL GETSYM
+      IF (SYM==SEMI .OR. SYM==COMMA .OR. SYM==EOL) GOTO 80
+      IF (SYM == NAME) GOTO 20
+      IF (SYM == LESS) GOTO 40
+      IF (SYM == GREAT) GOTO 45
       GOTO 50
-C
-C     LHS BEGINS WITH NAME
+!
+!     LHS BEGINS WITH NAME
    20 CALL COMAND(SYN)
-      IF (ERR .GT. 0) GOTO 01
-      IF (FUN .EQ. 99) GOTO 95
-      IF (FIN .EQ. -15) GOTO 80
-      IF (FIN .LT. 0) GOTO 91
-      IF (FIN .GT. 0) GOTO 70
-C     IF NAME IS A FUNCTION, MUST BE RHS
+      IF (ERR > 0) GOTO 01
+      IF (FUN == 99) GOTO 95
+      IF (FIN == -15) GOTO 80
+      IF (FIN < 0) GOTO 91
+      IF (FIN > 0) GOTO 70
+!     IF NAME IS A FUNCTION, MUST BE RHS
       RHS = 0
       CALL FUNS(SYN)
-      IF (FIN .NE. 0) GOTO 50
-C     PEEK ONE CHARACTER AHEAD
-      IF (CHRA.EQ.SEMI .OR. CHRA.EQ.COMMA .OR. CHRA.EQ.EOL)
-     $      CALL PUTID(ID,SYN)
-      IF (CHRA .EQ. EQUAL) GOTO 25
-      IF (CHRA .EQ. LPAREN) GOTO 30
+      IF (FIN /= 0) GOTO 50
+!     PEEK ONE CHARACTER AHEAD
+      IF (CHRA==SEMI .OR. CHRA==COMMA .OR. CHRA==EOL)&
+            CALL PUTID(ID,SYN)
+      IF (CHRA == EQUAL) GOTO 25
+      IF (CHRA == LPAREN) GOTO 30
       GOTO 50
-C
-C     LHS IS SIMPLE VARIABLE
+!
+!     LHS IS SIMPLE VARIABLE
    25 CALL PUTID(ID,SYN)
       CALL GETSYM
       CALL GETSYM
       GOTO 50
-C
-C     LHS IS NAME(...)
+!
+!     LHS IS NAME(...)
    30 LPT(5) = LPT(4)
       CALL PUTID(ID,SYN)
       CALL GETSYM
@@ -3049,18 +3049,18 @@ C     LHS IS NAME(...)
       CALL PUTID(IDS(1,PT), ID)
       PSTK(PT) = EXCNT
       RSTK(PT) = 1
-C     *CALL* EXPR
+!     *CALL* EXPR
       GOTO 92
    35 CALL PUTID(ID,IDS(1,PT))
       EXCNT = PSTK(PT)
       PT = PT-1
-      IF (SYM .EQ. COMMA) GOTO 32
-      IF (SYM .NE. RPAREN) CALL ERROR(3)
-      IF (ERR .GT. 0) GOTO 01
-      IF (ERR .GT. 0) RETURN
-      IF (SYM .EQ. RPAREN) CALL GETSYM
-      IF (SYM .EQ. EQUAL) GOTO 50
-C     LHS IS REALLY RHS, FORGET SCAN JUST DONE
+      IF (SYM == COMMA) GOTO 32
+      IF (SYM /= RPAREN) CALL ERROR(3)
+      IF (ERR > 0) GOTO 01
+      IF (ERR > 0) RETURN
+      IF (SYM == RPAREN) CALL GETSYM
+      IF (SYM == EQUAL) GOTO 50
+!     LHS IS REALLY RHS, FORGET SCAN JUST DONE
       TOP = TOP - EXCNT
       LPT(4) = LPT(5)
       CHRA = LPAREN
@@ -3069,23 +3069,23 @@ C     LHS IS REALLY RHS, FORGET SCAN JUST DONE
       CALL PUTID(ID,ANS)
       EXCNT = 0
       GOTO 50
-C
-C     MULTIPLE LHS
+!
+!     MULTIPLE LHS
    40 LPT(5) = LPT(4)
       PTS = PT
       CALL GETSYM
-   41 IF (SYM .NE. NAME) GOTO 43
+   41 IF (SYM /= NAME) GOTO 43
       CALL PUTID(ID,SYN)
       CALL GETSYM
-      IF (SYM .EQ. GREAT) GOTO 42
-      IF (SYM .EQ. COMMA) CALL GETSYM
+      IF (SYM == GREAT) GOTO 42
+      IF (SYM == COMMA) CALL GETSYM
       PT = PT+1
       LHS = LHS+1
       PSTK(PT) = 0
       CALL PUTID(IDS(1,PT),ID)
       GOTO 41
    42 CALL GETSYM
-      IF (SYM .EQ. EQUAL) GOTO 50
+      IF (SYM == EQUAL) GOTO 50
    43 LPT(4) = LPT(5)
       PT = PTS
       LHS = 1
@@ -3094,37 +3094,37 @@ C     MULTIPLE LHS
       CHRA = LIN(CHRA)
       CALL PUTID(ID,ANS)
       GOTO 50
-C
-C     MACRO STRING
+!
+!     MACRO STRING
    45 CALL GETSYM
-      IF (DDT .EQ. 1) WRITE(WTE,145) PT,TOP
+      IF (DDT == 1) WRITE(WTE,145) PT,TOP
   145 FORMAT(1X,'MACRO ',2I4)
-      IF (SYM.EQ.LESS .AND. CHRA.EQ.EOL) CALL ERROR(28)
-      IF (ERR .GT. 0) GOTO 01
+      IF (SYM==LESS .AND. CHRA==EOL) CALL ERROR(28)
+      IF (ERR > 0) GOTO 01
       PT = PT+1
       RSTK(PT) = 20
-C     *CALL* EXPR
+!     *CALL* EXPR
       GOTO 92
    46 PT = PT-1
-      IF (SYM.NE.LESS .AND. SYM.NE.EOL) CALL ERROR(37)
-      IF (ERR .GT. 0) GOTO 01
-      IF (SYM .EQ. LESS) CALL GETSYM
+      IF (SYM/=LESS .AND. SYM/=EOL) CALL ERROR(37)
+      IF (ERR > 0) GOTO 01
+      IF (SYM == LESS) CALL GETSYM
       K = LPT(6)
       LIN(K+1) = LPT(1)
       LIN(K+2) = LPT(2)
       LIN(K+3) = LPT(6)
       LPT(1) = K + 4
-C     TRANSFER STACK TO INPUT LINE
+!     TRANSFER STACK TO INPUT LINE
       K = LPT(1)
       L = LSTK(TOP)
       N = MSTK(TOP)*NSTK(TOP)
       DO 48 J = 1, N
          LS = L + J-1
          LIN(K) = IDINT(STKR(LS))
-         IF (LIN(K).LT.0 .OR. LIN(K).GE.ALFL) CALL ERROR(37)
-         IF (ERR .GT. 0) RETURN
-         IF (K.LT.1024) K = K+1
-         IF (K.EQ.1024) WRITE(WTE,47) K
+         IF (LIN(K)<0 .OR. LIN(K)>=ALFL) CALL ERROR(37)
+         IF (ERR > 0) RETURN
+         IF (K<1024) K = K+1
+         IF (K==1024) WRITE(WTE,47) K
    47    FORMAT(1X,'INPUT BUFFER LIMIT IS ',I4,' CHARACTERS.')
    48 CONTINUE
       TOP = TOP-1
@@ -3138,10 +3138,10 @@ C     TRANSFER STACK TO INPUT LINE
       PT = PT+1
       PSTK(PT) = LPT(1)
       RSTK(PT) = 21
-C     *CALL* PARSE
+!     *CALL* PARSE
       GOTO 15
    49 PT = PT-1
-      IF (DDT .EQ. 1) WRITE(WTE,149) PT,TOP
+      IF (DDT == 1) WRITE(WTE,149) PT,TOP
   149 FORMAT(1X,'MACEND',2I4)
       K = LPT(1) - 4
       LPT(1) = LIN(K+1)
@@ -3150,114 +3150,114 @@ C     *CALL* PARSE
       CHRA = BLANK
       CALL GETSYM
       GOTO 80
-C
-C     LHS FINISHED, START RHS
-   50 IF (SYM .EQ. EQUAL) CALL GETSYM
+!
+!     LHS FINISHED, START RHS
+   50 IF (SYM == EQUAL) CALL GETSYM
       PT = PT+1
       CALL PUTID(IDS(1,PT),ID)
       PSTK(PT) = EXCNT
       RSTK(PT) = 2
-C     *CALL* EXPR
+!     *CALL* EXPR
       GOTO 92
-   55 IF (SYM.EQ.SEMI .OR. SYM.EQ.COMMA .OR. SYM.EQ.EOL) GOTO 60
-      IF (SYM.EQ.NAME .AND. EQID(SYN,ELSE)) GOTO 60
-      IF (SYM.EQ.NAME .AND. EQID(SYN,ENND)) GOTO 60
+   55 IF (SYM==SEMI .OR. SYM==COMMA .OR. SYM==EOL) GOTO 60
+      IF (SYM==NAME .AND. EQID(SYN,ELSE)) GOTO 60
+      IF (SYM==NAME .AND. EQID(SYN,ENND)) GOTO 60
       CALL ERROR(40)
-      IF (ERR .GT. 0) GOTO 01
-C
-C     STORE RESULTS
+      IF (ERR > 0) GOTO 01
+!
+!     STORE RESULTS
    60 RHS = PSTK(PT)
       CALL STACKP(IDS(1,PT))
-      IF (ERR .GT. 0) GOTO 01
+      IF (ERR > 0) GOTO 01
       PT = PT-1
       LHS = LHS-1
-      IF (LHS .GT. 0) GOTO 60
+      IF (LHS > 0) GOTO 60
       GOTO 70
-C
-C     UPDATE AND POSSIBLY PRINT OPERATION COUNTS
+!
+!     UPDATE AND POSSIBLY PRINT OPERATION COUNTS
    70 K = FLP(1)
-      IF (K .NE. 0) STKR(VSIZE-3) = DFLOAT(K)
+      IF (K /= 0) STKR(VSIZE-3) = DFLOAT(K)
       STKR(VSIZE-2) = STKR(VSIZE-2) + DFLOAT(K)
       FLP(1) = 0
-      IF (.NOT.(CHRA.EQ.COMMA .OR. (SYM.EQ.COMMA .AND. CHRA.EQ.EOL)))
-     $       GOTO 80
+      IF (.NOT.(CHRA==COMMA .OR. (SYM==COMMA .AND. CHRA==EOL)))&
+             GOTO 80
       CALL GETSYM
       I5 = 10**5
       LUNIT = WTE
-   71 IF (K .EQ. 0) WRITE(LUNIT,171)
+   71 IF (K == 0) WRITE(LUNIT,171)
   171 FORMAT(/1X,'   no flops')
-      IF (K .EQ. 1) WRITE(LUNIT,172)
+      IF (K == 1) WRITE(LUNIT,172)
   172 FORMAT(/1X,'    1 flop')
-      IF (1.LT.K .AND. K.LT.100000) WRITE(LUNIT,173) K
+      IF (1<K .AND. K<100000) WRITE(LUNIT,173) K
   173 FORMAT(/1X,I5,' flops')
-      IF (100000 .LE. K) WRITE(LUNIT,174) K
+      IF (100000 <= K) WRITE(LUNIT,174) K
   174 FORMAT(/1X,I9,' flops')
-      IF (LUNIT.EQ.WIO .OR. WIO.EQ.0) GOTO 80
+      IF (LUNIT==WIO .OR. WIO==0) GOTO 80
       LUNIT = WIO
       GOTO 71
-C
-C     FINISH STATEMENT
+!
+!     FINISH STATEMENT
    80 FIN = 0
       P = 0
       R = 0
-      IF (PT .GT. 0) P = PSTK(PT)
-      IF (PT .GT. 0) R = RSTK(PT)
-      IF (DDT .EQ. 1) WRITE(WTE,180) PT,PTZ,P,R,LPT(1)
+      IF (PT > 0) P = PSTK(PT)
+      IF (PT > 0) R = RSTK(PT)
+      IF (DDT == 1) WRITE(WTE,180) PT,PTZ,P,R,LPT(1)
   180 FORMAT(1X,'FINISH',5I4)
-      IF (SYM.EQ.COMMA .OR. SYM.EQ.SEMI) GOTO 15
-      IF (R.EQ.21 .AND. P.EQ.LPT(1)) GOTO 49
-      IF (PT .GT. PTZ) GOTO 91
+      IF (SYM==COMMA .OR. SYM==SEMI) GOTO 15
+      IF (R==21 .AND. P==LPT(1)) GOTO 49
+      IF (PT > PTZ) GOTO 91
       GOTO 10
-C
-C     SIMULATE RECURSION
+!
+!     SIMULATE RECURSION
    91 CALL CLAUSE
-      IF (ERR .GT. 0) GOTO 01
-      IF (PT .LE. PTZ) GOTO 15
+      IF (ERR > 0) GOTO 01
+      IF (PT <= PTZ) GOTO 15
       R = RSTK(PT)
-      IF (R .EQ. 21) GOTO 49
+      IF (R == 21) GOTO 49
       GOTO (99,99,92,92,92,99,99,99,99,99,99,99,15,15,99,99,99,99,99),R
-C
+!
    92 CALL EXPR
-      IF (ERR .GT. 0) GOTO 01
+      IF (ERR > 0) GOTO 01
       R = RSTK(PT)
-      GOTO (35,55,91,91,91,93,93,99,99,94,94,99,99,99,99,99,99,94,94,
-     $       46),R
-C
+      GOTO (35,55,91,91,91,93,93,99,99,94,94,99,99,99,99,99,99,94,94,&
+             46),R
+!
    93 CALL TERM
-      IF (ERR .GT. 0) GOTO 01
+      IF (ERR > 0) GOTO 01
       R = RSTK(PT)
       GOTO (99,99,99,99,99,92,92,94,94,99,99,99,99,99,95,99,99,99,99),R
-C
+!
    94 CALL FACTOR
-      IF (ERR .GT. 0) GOTO 01
+      IF (ERR > 0) GOTO 01
       R = RSTK(PT)
       GOTO (99,99,99,99,99,99,99,93,93,92,92,94,99,99,99,95,95,92,92),R
-C
-C     CALL MATFNS BY RETURNING TO MATLAB
-   95 IF (FIN.GT.0 .AND. MSTK(TOP).LT.0) CALL ERROR(14)
-      IF (ERR .GT. 0) GOTO 01
+!
+!     CALL MATFNS BY RETURNING TO MATLAB
+   95 IF (FIN>0 .AND. MSTK(TOP)<0) CALL ERROR(14)
+      IF (ERR > 0) GOTO 01
       RETURN
-C
+!
    99 CALL ERROR(22)
       GOTO 01
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE PLOT(LUNIT,X,Y,N,P,K)
       DOUBLE PRECISION X(N),Y(N),P(1)
       CHARACTER BUF*79
-C
-C     PLOT X VS. Y ON LUNIT
-C     IF K IS NONZERO, THEN P(1),...,P(K) ARE EXTRA PARAMETERS
-C     BUF IS WORK SPACE
-C
+!
+!     PLOT X VS. Y ON LUNIT
+!     IF K IS NONZERO, THEN P(1),...,P(K) ARE EXTRA PARAMETERS
+!     BUF IS WORK SPACE
+!
       DOUBLE PRECISION XMIN,YMIN,XMAX,YMAX,DY,DX,Y1,Y0
-C
+!
       INTEGER H,W
       parameter(H=20,W=79)
-C     H = HEIGHT, W = WIDTH
-C
-      IF (K .GT. 0) WRITE(LUNIT,01) (P(I), I=1,K)
+!     H = HEIGHT, W = WIDTH
+!
+      IF (K > 0) WRITE(LUNIT,01) (P(I), I=1,K)
    01 FORMAT('Extra parameters',10f5.1)
       XMIN = X(1)
       XMAX = X(1)
@@ -3270,7 +3270,7 @@ C
          YMAX = DMAX1(YMAX,Y(I))
    10 CONTINUE
       DX = XMAX - XMIN
-      IF (DX .EQ. 0.0D0) DX = 1.0D0
+      IF (DX == 0.0D0) DX = 1.0D0
       DY = YMAX - YMIN
       WRITE(LUNIT,'(80X)')
       DO 40 L = 1, H
@@ -3279,8 +3279,8 @@ C
          Y0 = YMIN + (H-L)*DY/H
          JMAX = 1
          DO 30 I = 1, N
-            IF (Y(I) .GT. Y1) GOTO 30
-            IF (L.NE.H .AND. Y(I).LE.Y0) GOTO 30
+            IF (Y(I) > Y1) GOTO 30
+            IF (L/=H .AND. Y(I)<=Y0) GOTO 30
             J = 1 + (W-1)*(X(I) - XMIN)/DX
             BUF(J:J) = '*'
             JMAX = MAX0(JMAX,J)
@@ -3289,10 +3289,10 @@ C
    40 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 
       SUBROUTINE PRINT(ID,K)
-C     PRIMARY OUTPUT ROUTINE
+!     PRIMARY OUTPUT ROUTINE
       INTEGER ID(4),K
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
@@ -3306,15 +3306,15 @@ C     PRIMARY OUTPUT ROUTINE
       DOUBLE PRECISION S,TR,TI,PR(12),PI(12),ROUND
       INTEGER FNO(11),FNL(11),SIG(12),PLUS,MINUS,BLANK,TYP,F
       DATA PLUS/41/,MINUS/42/,BLANK/36/
-C     FORMAT NUMBERS AND LENGTHS
+!     FORMAT NUMBERS AND LENGTHS
       DATA FNO /11,12,21,22,23,24,31,32,33,34,-1/
       DATA FNL /12, 6, 8, 4, 6, 3, 4, 2, 3, 1, 1/
       save fno, fnl
-C     FMT   1       2       3       4       5
-C         SHORT   LONG   SHORT E  LONG E    Z
-C     TYP   1       2       3
-C         INTEGER  REAL   COMPLEX
-      IF (LCT(1) .LT. 0) GOTO 99
+!     FMT   1       2       3       4       5
+!         SHORT   LONG   SHORT E  LONG E    Z
+!     TYP   1       2       3
+!         INTEGER  REAL   COMPLEX
+      IF (LCT(1) < 0) GOTO 99
       L = LSTK(K)
       M = MSTK(K)
       N = NSTK(K)
@@ -3326,48 +3326,48 @@ C         INTEGER  REAL   COMPLEX
         TR = STKR(LS)
         TI = STKI(LS)
         S = DMAX1(S,DABS(TR),DABS(TI))
-        IF (ROUND(TR) .NE. TR) TYP = MAX0(2,TYP)
-        IF (TI .NE. 0.0D0) TYP = 3
+        IF (ROUND(TR) /= TR) TYP = MAX0(2,TYP)
+        IF (TI /= 0.0D0) TYP = 3
    10 CONTINUE
-      IF (S .NE. 0.0D0) S = DLOG10(S)
+      IF (S /= 0.0D0) S = DLOG10(S)
       KS = IDINT(S)
-      IF (-2 .LE. KS .AND. KS .LE. 1) KS = 0
-      IF (KS .EQ. 2 .AND. FMT .EQ. 1 .AND. TYP .EQ. 2) KS = 0
+      IF (-2 <= KS .AND. KS <= 1) KS = 0
+      IF (KS == 2 .AND. FMT == 1 .AND. TYP == 2) KS = 0
 
-      IF (TYP .EQ. 1 .AND. KS .LE. 2) F = 1
-      IF (TYP .EQ. 1 .AND. KS .GT. 2) F = 2
+      IF (TYP == 1 .AND. KS <= 2) F = 1
+      IF (TYP == 1 .AND. KS > 2) F = 2
 
-      IF (TYP .EQ. 1 .AND. KS .GT. 9) TYP = 2
-      IF (TYP .EQ. 2) F = FMT + 2
-      IF (TYP .EQ. 3) F = FMT + 6
-      IF (MN.EQ.1 .AND. KS.NE.0 .AND. FMT.LT.3 .AND. TYP.NE.1) F = F+2
-      IF (FMT .EQ. 5) F = 11
+      IF (TYP == 1 .AND. KS > 9) TYP = 2
+      IF (TYP == 2) F = FMT + 2
+      IF (TYP == 3) F = FMT + 6
+      IF (MN==1 .AND. KS/=0 .AND. FMT<3 .AND. TYP/=1) F = F+2
+      IF (FMT == 5) F = 11
 
       JINC = FNL(F)
       F = FNO(F)
       S = 1.0D0
-      IF (F.EQ.21 .OR. F.EQ.22 .OR. F.EQ.31 .OR. F.EQ.32) S = 10.0D0**KS
+      IF (F==21 .OR. F==22 .OR. F==31 .OR. F==32) S = 10.0D0**KS
       LS = ((N-1)/JINC+1)*M + 2
-      IF (LCT(1) + LS .LE. LCT(2)) GOTO 20
+      IF (LCT(1) + LS <= LCT(2)) GOTO 20
          LCT(1) = 0
          WRITE(WTE,43) LS
          READ(RTE,44,END=19) LS
-CDC..    IF (EOF(RTE).NE.0) GOTO 19
-         IF (LS .EQ. ALFA(BLANK+1)) GOTO 20
+!DC..    IF (EOF(RTE)/=0) GOTO 19
+         IF (LS == ALFA(BLANK+1)) GOTO 20
          LCT(1) = -1
          GOTO 99
    19    CALL FILES(-RTE,BUF)
    20 CONTINUE
       WRITE(WTE,44)
-      IF (WIO .NE. 0) WRITE(WIO,44)
+      IF (WIO /= 0) WRITE(WIO,44)
       CALL PRNTID(ID,-1)
       LCT(1) = LCT(1)+2
       LUNIT = WTE
-   50 IF (S .NE. 1.0D0) WRITE(LUNIT,41) S
+   50 IF (S /= 1.0D0) WRITE(LUNIT,41) S
       DO 80 J1 = 1, N, JINC
         J2 = MIN0(N, J1+JINC-1)
         WRITE(LUNIT,44)
-        IF (N .GT. JINC) WRITE(LUNIT,42) J1,J2
+        IF (N > JINC) WRITE(LUNIT,42) J1,J2
         DO 70 I = 1, M
           JM = J2-J1+1
           DO 60 J = 1, JM
@@ -3375,28 +3375,28 @@ CDC..    IF (EOF(RTE).NE.0) GOTO 19
              PR(J) = STKR(LS)/S
              PI(J) = DABS(STKI(LS)/S)
              SIG(J) = ALFA(PLUS+1)
-             IF (STKI(LS) .LT. 0.0D0) SIG(J) = ALFA(MINUS+1)
+             IF (STKI(LS) < 0.0D0) SIG(J) = ALFA(MINUS+1)
    60     CONTINUE
-          IF (F .EQ. 11) WRITE(LUNIT,11)(PR(J),J=1,JM)
-          IF (F .EQ. 12) WRITE(LUNIT,12)(PR(J),J=1,JM)
-          IF (F .EQ. 21) WRITE(LUNIT,21)(PR(J),J=1,JM)
-          IF (F .EQ. 22) WRITE(LUNIT,22)(PR(J),J=1,JM)
-          IF (F .EQ. 23) WRITE(LUNIT,23)(PR(J),J=1,JM)
-          IF (F .EQ. 24) WRITE(LUNIT,24)(PR(J),J=1,JM)
-          IF (F .EQ. 31) WRITE(LUNIT,31)(PR(J),SIG(J),PI(J),J=1,JM)
-          IF (F .EQ. 32) WRITE(LUNIT,32)(PR(J),SIG(J),PI(J),J=1,JM)
-          IF (F .EQ. 33) WRITE(LUNIT,33)(PR(J),SIG(J),PI(J),J=1,JM)
-          IF (F .EQ. 34) WRITE(LUNIT,34)(PR(J),SIG(J),PI(J),J=1,JM)
-          IF (F .EQ. -1) CALL FORMZ(LUNIT,STKR(LS),STKI(LS))
+          IF (F == 11) WRITE(LUNIT,11)(PR(J),J=1,JM)
+          IF (F == 12) WRITE(LUNIT,12)(PR(J),J=1,JM)
+          IF (F == 21) WRITE(LUNIT,21)(PR(J),J=1,JM)
+          IF (F == 22) WRITE(LUNIT,22)(PR(J),J=1,JM)
+          IF (F == 23) WRITE(LUNIT,23)(PR(J),J=1,JM)
+          IF (F == 24) WRITE(LUNIT,24)(PR(J),J=1,JM)
+          IF (F == 31) WRITE(LUNIT,31)(PR(J),SIG(J),PI(J),J=1,JM)
+          IF (F == 32) WRITE(LUNIT,32)(PR(J),SIG(J),PI(J),J=1,JM)
+          IF (F == 33) WRITE(LUNIT,33)(PR(J),SIG(J),PI(J),J=1,JM)
+          IF (F == 34) WRITE(LUNIT,34)(PR(J),SIG(J),PI(J),J=1,JM)
+          IF (F == -1) CALL FORMZ(LUNIT,STKR(LS),STKI(LS))
           LCT(1) = LCT(1)+1
    70   CONTINUE
    80 CONTINUE
-      IF (LUNIT.EQ.WIO .OR. WIO.EQ.0) GOTO 99
+      IF (LUNIT==WIO .OR. WIO==0) GOTO 99
       LUNIT = WIO
       GOTO 50
-   99 CONTINUE 
+   99 CONTINUE
       RETURN
-C
+!
    11 FORMAT(1X,12F6.0)
    12 FORMAT(1X,6F12.0)
    21 FORMAT(1X,F9.4,7F10.4)
@@ -3409,15 +3409,15 @@ C
    34 FORMAT(1X,1PD24.15,' ',A1,1PD21.15,'i')
    41 FORMAT(/1X,' ',1PD9.1,2H *)
    42 FORMAT(1X,'    COLUMNS',I3,' THRU',I3)
-   43 FORMAT(/1X,'AT LEAST ',I5,' MORE LINES.',
-     $       '  ENTER BLANK LINE TO CONTINUE OUTPUT.')
+   43 FORMAT(/1X,'AT LEAST ',I5,' MORE LINES.',&
+             '  ENTER BLANK LINE TO CONTINUE OUTPUT.')
    44 FORMAT(A1)
-C
+!
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE PRNTID(ID,ARGCNT)
-C     PRINT VARIABLE NAMES
+!     PRINT VARIABLE NAMES
       INTEGER ID(4,1),ARGCNT
       INTEGER ALFA(52),ALFB(52),ALFL,CASE
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
@@ -3437,28 +3437,28 @@ C     PRINT VARIABLE NAMES
       L = L+1
       BUF(L) = ALFA(K)
    15 CONTINUE
-      IF (ARGCNT .EQ. -1) L=L+1
-      IF (ARGCNT .EQ. -1) BUF(L) = ALFA(EQUAL+1)
+      IF (ARGCNT == -1) L=L+1
+      IF (ARGCNT == -1) BUF(L) = ALFA(EQUAL+1)
       WRITE(WTE,20) (BUF(I),I=1,L)
-      IF (WIO .NE. 0) WRITE(WIO,20) (BUF(I),I=1,L)
+      IF (WIO /= 0) WRITE(WIO,20) (BUF(I),I=1,L)
    20 FORMAT(1X,8(4A1,2H  ))
       J1 = J1+8
-      IF (J1 .LE. IABS(ARGCNT)) GOTO 10
+      IF (J1 <= IABS(ARGCNT)) GOTO 10
       RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE PROMPT(PAUSE)
       INTEGER PAUSE
-C
-C     ISSUE MATLAB PROMPT WITH OPTIONAL PAUSE
-C
+!
+!     ISSUE MATLAB PROMPT WITH OPTIONAL PAUSE
+!
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
       COMMON /IOP/ DDT,ERR,FMT,LCT,LIN,LPT,HIO,RIO,WIO,RTE,WTE,FE
       WRITE(WTE,10)
-      IF (WIO .NE. 0) WRITE(WIO,10)
+      IF (WIO /= 0) WRITE(WIO,10)
    10 FORMAT(/1X,'<>',$)
-      IF (PAUSE .EQ. 1) READ(RTE,20) DUMMY
+      IF (PAUSE == 1) READ(RTE,20) DUMMY
    20 FORMAT(A1)
       RETURN
       END
@@ -3470,30 +3470,30 @@ C
       DOUBLE PRECISION P,Q,R,S,T
       P = DMAX1(DABS(A),DABS(B))
       Q = DMIN1(DABS(A),DABS(B))
-      IF (Q .EQ. 0.0D0) GOTO 20
-      IF (DDT .EQ. 25) WRITE(WTE,1)
-      IF (DDT .EQ. 25) WRITE(WTE,2) P,Q
+      IF (Q == 0.0D0) GOTO 20
+      IF (DDT == 25) WRITE(WTE,1)
+      IF (DDT == 25) WRITE(WTE,2) P,Q
     1 FORMAT(1X,'PYTHAG',1P2D23.15)
     2 FORMAT(1X,1P2D23.15)
    10 R = (Q/P)**2
       T = 4.0D0 + R
-      IF (T .EQ. 4.0D0) GOTO 20
+      IF (T == 4.0D0) GOTO 20
       S = R/T
       P = P + 2.0D0*P*S
       Q = Q*S
-      IF (DDT .EQ. 25) WRITE(WTE,2) P,Q
+      IF (DDT == 25) WRITE(WTE,2) P,Q
       GOTO 10
    20 PYTHAG = P
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE RAT(X,LEN,MAXD,A,B,D)
       INTEGER LEN,MAXD
       DOUBLE PRECISION X,A,B,D(LEN)
-C
-C     A/B = CONTINUED FRACTION APPROXIMATION TO X
-C           USING  LEN  TERMS EACH LESS THAN MAXD
-C
+!
+!     A/B = CONTINUED FRACTION APPROXIMATION TO X
+!           USING  LEN  TERMS EACH LESS THAN MAXD
+!
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
       COMMON /IOP/ DDT,ERR,FMT,LCT,LIN,LPT,HIO,RIO,WIO,RTE,WTE,FE
       DOUBLE PRECISION S,T,Z,ROUND
@@ -3502,78 +3502,78 @@ C
          K = I
          D(K) = ROUND(Z)
          Z = Z - D(K)
-         IF (DABS(Z)*DFLOAT(MAXD) .LE. 1.0D0) GOTO 20
+         IF (DABS(Z)*DFLOAT(MAXD) <= 1.0D0) GOTO 20
          Z = 1.0D0/Z
    10 CONTINUE
    20 T = D(K)
       S = 1.0D0
-      IF (K .LT. 2) GOTO 40
+      IF (K < 2) GOTO 40
       DO 30 IB = 2, K
          I = K+1-IB
          Z = T
          T = D(I)*T + S
          S = Z
    30 CONTINUE
-   40 IF (S .LT. 0.0D0) T = -T
-      IF (S .LT. 0.0D0) S = -S
-      IF (DDT .EQ. 27) WRITE(WTE,50) X,T,S,(D(I),I=1,K)
+   40 IF (S < 0.0D0) T = -T
+      IF (S < 0.0D0) S = -S
+      IF (DDT == 27) WRITE(WTE,50) X,T,S,(D(I),I=1,K)
    50 FORMAT(/1X,1PD23.15,0PF8.0,' /',F8.0,4X,6F5.0/(1X,45X,6F5.0))
       A = T
       B = S
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE SAVLOD(LUNIT,ID,M,N,IMG,JOB,XREAL,XIMAG)
       INTEGER LUNIT,ID(4),M,N,IMG,JOB
       DOUBLE PRECISION XREAL(1),XIMAG(1)
-C
-C     IMPLEMENT SAVE AND LOAD
-C     LUNIT = LOGICAL UNIT NUMBER
-C     ID = NAME, FORMAT 4A1
-C     M, N = DIMENSIONS
-C     IMG = NONZERO IF XIMAG IS NONZERO
-C     JOB = 0     FOR SAVE
-C         = SPACE AVAILABLE FOR LOAD
-C     XREAL, XIMAG = REAL AND OPTIONAL IMAGINARY PARTS
-C
-C     SYSTEM DEPENDENT FORMATS
+!
+!     IMPLEMENT SAVE AND LOAD
+!     LUNIT = LOGICAL UNIT NUMBER
+!     ID = NAME, FORMAT 4A1
+!     M, N = DIMENSIONS
+!     IMG = NONZERO IF XIMAG IS NONZERO
+!     JOB = 0     FOR SAVE
+!         = SPACE AVAILABLE FOR LOAD
+!     XREAL, XIMAG = REAL AND OPTIONAL IMAGINARY PARTS
+!
+!     SYSTEM DEPENDENT FORMATS
   101 FORMAT(4A1,3I4)
   102 FORMAT(4Z18)
-C
-      IF (JOB .GT. 0) GOTO 20
-C
-C     SAVE
+!
+      IF (JOB > 0) GOTO 20
+!
+!     SAVE
    10 WRITE(LUNIT,101) ID,M,N,IMG
       DO 15 J = 1, N
          K = (J-1)*M+1
          L = J*M
          WRITE(LUNIT,102) (XREAL(I),I=K,L)
-         IF (IMG .NE. 0) WRITE(LUNIT,102) (XIMAG(I),I=K,L)
+         IF (IMG /= 0) WRITE(LUNIT,102) (XIMAG(I),I=K,L)
    15 CONTINUE
       RETURN
-C
-C     LOAD
+!
+!     LOAD
    20 READ(LUNIT,101,END=30) ID,M,N,IMG
-      IF (M*N .GT. JOB) GOTO 30
+      IF (M*N > JOB) GOTO 30
       DO 25 J = 1, N
          K = (J-1)*M+1
          L = J*M
          READ(LUNIT,102,END=30) (XREAL(I),I=K,L)
-         IF (IMG .NE. 0) READ(LUNIT,102,END=30) (XIMAG(I),I=K,L)
+         IF (IMG /= 0) READ(LUNIT,102,END=30) (XIMAG(I),I=K,L)
    25 CONTINUE
       RETURN
-C
-C     END OF FILE
+!
+!     END OF FILE
    30 M = 0
       N = 0
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE STACK1(OP)
       INTEGER OP
-C
-C     UNARY OPERATIONS
-C
+!
+!     UNARY OPERATIONS
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
@@ -3584,24 +3584,24 @@ C
       INTEGER QUOTE
       DATA QUOTE/49/
       save quote
-      IF (DDT .EQ. 1) WRITE(WTE,100) OP
+      IF (DDT == 1) WRITE(WTE,100) OP
   100 FORMAT(1X,'STACK1',I4)
       L = LSTK(TOP)
       M = MSTK(TOP)
       N = NSTK(TOP)
       MN = M*N
-      IF (MN .EQ. 0) GOTO 99
-      IF (OP .EQ. QUOTE) GOTO 30
-C
-C     UNARY MINUS
+      IF (MN == 0) GOTO 99
+      IF (OP == QUOTE) GOTO 30
+!
+!     UNARY MINUS
       CALL WRSCAL(MN,-1.0D0,STKR(L),STKI(L),1)
       GOTO 99
-C
-C     TRANSPOSE
+!
+!     TRANSPOSE
    30 LL = L + MN
       ERR = LL+MN - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       CALL WCOPY(MN,STKR(L),STKI(L),1,STKR(LL),STKI(LL),1)
       M = NSTK(TOP)
       N = MSTK(TOP)
@@ -3617,12 +3617,12 @@ C     TRANSPOSE
       GOTO 99
    99 RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE STACK2(OP)
       INTEGER OP
-C
-C     BINARY AND TERNARY OPERATIONS
-C
+!
+!     BINARY AND TERNARY OPERATIONS
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER IDS(4,32),PSTK(32),RSTK(32),PSIZE,PT,PTZ
@@ -3638,8 +3638,8 @@ C
       DATA PLUS/41/,MINUS/42/,STAR/43/,DSTAR/54/,SLASH/44/
       DATA BSLASH/45/,DOT/47/,COLON/40/
       SAVE PLUS,MINUS,STAR,DSTAR,SLASH,BSLASH,DOT,COLON
-C
-      IF (DDT .EQ. 1) WRITE(WTE,100) OP
+!
+      IF (DDT == 1) WRITE(WTE,100) OP
   100 FORMAT(1X,'STACK2',I4)
       L2 = LSTK(TOP)
       M2 = MSTK(TOP)
@@ -3649,49 +3649,49 @@ C
       M = MSTK(TOP)
       N = NSTK(TOP)
       FUN = 0
-      IF (OP .EQ. PLUS) GOTO 01
-      IF (OP .EQ. MINUS) GOTO 03
-      IF (OP .EQ. STAR) GOTO 05
-      IF (OP .EQ. DSTAR) GOTO 30
-      IF (OP .EQ. SLASH) GOTO 20
-      IF (OP .EQ. BSLASH) GOTO 25
-      IF (OP .EQ. COLON) GOTO 60
-      IF (OP .GT. 2*DOT) GOTO 80
-      IF (OP .GT. DOT) GOTO 70
-C
-C     ADDITION
-   01 IF (M .LT. 0) GOTO 50
-      IF (M2 .LT. 0) GOTO 52
-      IF (M .NE. M2) CALL ERROR(8)
-      IF (ERR .GT. 0) RETURN
-      IF (N .NE. N2) CALL ERROR(8)
-      IF (ERR .GT. 0) RETURN
-      CALL WAXPY(M*N,1.0D0,0.0D0,STKR(L2),STKI(L2),1,
-     $            STKR(L),STKI(L),1)
+      IF (OP == PLUS) GOTO 01
+      IF (OP == MINUS) GOTO 03
+      IF (OP == STAR) GOTO 05
+      IF (OP == DSTAR) GOTO 30
+      IF (OP == SLASH) GOTO 20
+      IF (OP == BSLASH) GOTO 25
+      IF (OP == COLON) GOTO 60
+      IF (OP > 2*DOT) GOTO 80
+      IF (OP > DOT) GOTO 70
+!
+!     ADDITION
+   01 IF (M < 0) GOTO 50
+      IF (M2 < 0) GOTO 52
+      IF (M /= M2) CALL ERROR(8)
+      IF (ERR > 0) RETURN
+      IF (N /= N2) CALL ERROR(8)
+      IF (ERR > 0) RETURN
+      CALL WAXPY(M*N,1.0D0,0.0D0,STKR(L2),STKI(L2),1,&
+                  STKR(L),STKI(L),1)
       GOTO 99
-C
-C     SUBTRACTION
-   03 IF (M .LT. 0) GOTO 54
-      IF (M2 .LT. 0) GOTO 56
-      IF (M .NE. M2) CALL ERROR(9)
-      IF (ERR .GT. 0) RETURN
-      IF (N .NE. N2) CALL ERROR(9)
-      IF (ERR .GT. 0) RETURN
-      CALL WAXPY(M*N,-1.0D0,0.0D0,STKR(L2),STKI(L2),1,
-     $            STKR(L),STKI(L),1)
+!
+!     SUBTRACTION
+   03 IF (M < 0) GOTO 54
+      IF (M2 < 0) GOTO 56
+      IF (M /= M2) CALL ERROR(9)
+      IF (ERR > 0) RETURN
+      IF (N /= N2) CALL ERROR(9)
+      IF (ERR > 0) RETURN
+      CALL WAXPY(M*N,-1.0D0,0.0D0,STKR(L2),STKI(L2),1,&
+                  STKR(L),STKI(L),1)
       GOTO 99
-C
-C     MULTIPLICATION
-   05 IF (M2*M2*N2 .EQ. 1) GOTO 10
-      IF (M*N .EQ. 1) GOTO 11
-      IF (M2*N2 .EQ. 1) GOTO 10
-      IF (N .NE. M2) CALL ERROR(10)
-      IF (ERR .GT. 0) RETURN
+!
+!     MULTIPLICATION
+   05 IF (M2*M2*N2 == 1) GOTO 10
+      IF (M*N == 1) GOTO 11
+      IF (M2*N2 == 1) GOTO 10
+      IF (N /= M2) CALL ERROR(10)
+      IF (ERR > 0) RETURN
       MN = M*N2
       LL = L + MN
       ERR = LL+M*N+M2*N2 - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       CALL WCOPY(M*N+M2*N2,STKR(L),STKI(L),-1,STKR(LL),STKI(LL),-1)
       DO 08 J = 1, N2
       DO 08 I = 1, M
@@ -3703,8 +3703,8 @@ C     MULTIPLICATION
    08 CONTINUE
       NSTK(TOP) = N2
       GOTO 99
-C
-C     MULTIPLICATION BY SCALAR
+!
+!     MULTIPLICATION BY SCALAR
    10 SR = STKR(L2)
       SI = STKI(L2)
       L1 = L
@@ -3716,14 +3716,14 @@ C     MULTIPLICATION BY SCALAR
       NSTK(TOP) = N2
    13 MN = MSTK(TOP)*NSTK(TOP)
       CALL WSCAL(MN,SR,SI,STKR(L1),STKI(L1),1)
-      IF (L1.NE.L)
-     $   CALL WCOPY(MN,STKR(L1),STKI(L1),1,STKR(L),STKI(L),1)
+      IF (L1/=L)&
+         CALL WCOPY(MN,STKR(L1),STKI(L1),1,STKR(L),STKI(L),1)
       GOTO 99
-C
-C     RIGHT DIVISION
-   20 IF (M2*N2 .EQ. 1) GOTO 21
-      IF (M2 .EQ. N2) FUN = 1
-      IF (M2 .NE. N2) FUN = 4
+!
+!     RIGHT DIVISION
+   20 IF (M2*N2 == 1) GOTO 21
+      IF (M2 == N2) FUN = 1
+      IF (M2 /= N2) FUN = 4
       FIN = -1
       RHS = 2
       GOTO 99
@@ -3733,14 +3733,14 @@ C     RIGHT DIVISION
       DO 22 I = 1, MN
          LL = L+I-1
          CALL WDIV(STKR(LL),STKI(LL),SR,SI,STKR(LL),STKI(LL))
-         IF (ERR .GT. 0) RETURN
+         IF (ERR > 0) RETURN
    22 CONTINUE
       GOTO 99
-C
-C     LEFT DIVISION
-   25 IF (M*N .EQ. 1) GOTO 26
-      IF (M .EQ. N) FUN = 1
-      IF (M .NE. N) FUN = 4
+!
+!     LEFT DIVISION
+   25 IF (M*N == 1) GOTO 26
+      IF (M == N) FUN = 1
+      IF (M /= N) FUN = 4
       FIN = -2
       RHS = 2
       GOTO 99
@@ -3752,23 +3752,23 @@ C     LEFT DIVISION
       DO 27 I = 1, MN
          LL = L+I-1
          CALL WDIV(STKR(LL+1),STKI(LL+1),SR,SI,STKR(LL),STKI(LL))
-         IF (ERR .GT. 0) RETURN
+         IF (ERR > 0) RETURN
    27 CONTINUE
       GOTO 99
-C
-C     POWER
-   30 IF (M2*N2 .NE. 1) CALL ERROR(30)
-      IF (ERR .GT. 0) RETURN
-      IF (M .NE. N) CALL ERROR(20)
-      IF (ERR .GT. 0) RETURN
+!
+!     POWER
+   30 IF (M2*N2 /= 1) CALL ERROR(30)
+      IF (ERR > 0) RETURN
+      IF (M /= N) CALL ERROR(20)
+      IF (ERR > 0) RETURN
       NEXP = IDINT(STKR(L2))
-      IF (STKR(L2) .NE. DFLOAT(NEXP)) GOTO 39
-      IF (STKI(L2) .NE. 0.0D0) GOTO 39
-      IF (NEXP .LT. 2) GOTO 39
+      IF (STKR(L2) /= DFLOAT(NEXP)) GOTO 39
+      IF (STKI(L2) /= 0.0D0) GOTO 39
+      IF (NEXP < 2) GOTO 39
       MN = M*N
       ERR = L2+MN+N - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       CALL WCOPY(MN,STKR(L),STKI(L),1,STKR(L2),STKI(L2),1)
       L3 = L2+MN
       DO 36 KEXP = 2, NEXP
@@ -3784,15 +3784,15 @@ C     POWER
    35   CONTINUE
    36 CONTINUE
       GOTO 99
-C
-C     NONINTEGER OR NONPOSITIVE POWER, USE EIGENVECTORS
+!
+!     NONINTEGER OR NONPOSITIVE POWER, USE EIGENVECTORS
    39 FUN = 2
       FIN = 0
       GOTO 99
-C
-C     ADD OR SUBTRACT SCALAR
-   50 IF (M2 .NE. N2) CALL ERROR(8)
-      IF (ERR .GT. 0) RETURN
+!
+!     ADD OR SUBTRACT SCALAR
+   50 IF (M2 /= N2) CALL ERROR(8)
+      IF (ERR > 0) RETURN
       M = M2
       N = N2
       MSTK(TOP) = M
@@ -3801,13 +3801,13 @@ C     ADD OR SUBTRACT SCALAR
       SI = STKI(L)
       CALL WCOPY(M*N,STKR(L+1),STKI(L+1),1,STKR(L),STKI(L),1)
       GOTO 58
-   52 IF (M .NE. N) CALL ERROR(8)
-      IF (ERR .GT. 0) RETURN
+   52 IF (M /= N) CALL ERROR(8)
+      IF (ERR > 0) RETURN
       SR = STKR(L2)
       SI = STKI(L2)
       GOTO 58
-   54 IF (M2 .NE. N2) CALL ERROR(9)
-      IF (ERR .GT. 0) RETURN
+   54 IF (M2 /= N2) CALL ERROR(9)
+      IF (ERR > 0) RETURN
       M = M2
       N = N2
       MSTK(TOP) = M
@@ -3817,8 +3817,8 @@ C     ADD OR SUBTRACT SCALAR
       CALL WCOPY(M*N,STKR(L+1),STKI(L+1),1,STKR(L),STKI(L),1)
       CALL WRSCAL(M*N,-1.0D0,STKR(L),STKI(L),1)
       GOTO 58
-   56 IF (M .NE. N) CALL ERROR(9)
-      IF (ERR .GT. 0) RETURN
+   56 IF (M /= N) CALL ERROR(9)
+      IF (ERR > 0) RETURN
       SR = -STKR(L2)
       SI = -STKI(L2)
       GOTO 58
@@ -3828,24 +3828,24 @@ C     ADD OR SUBTRACT SCALAR
          STKI(LL) = FLOP(STKI(LL)+SI)
    59 CONTINUE
       GOTO 99
-C
-C     COLON
+!
+!     COLON
    60 E2 = STKR(L2)
       ST = 1.0D0
       N = 0
-      IF (RHS .LT. 3) GOTO 61
+      IF (RHS < 3) GOTO 61
       ST = STKR(L)
       TOP = TOP-1
       L = LSTK(TOP)
-      IF (ST .EQ. 0.0D0) GOTO 63
+      IF (ST == 0.0D0) GOTO 63
    61 E1 = STKR(L)
-C     CHECK FOR CLAUSE
-      IF (RSTK(PT) .EQ. 3) GOTO 64
+!     CHECK FOR CLAUSE
+      IF (RSTK(PT) == 3) GOTO 64
       ERR = L + MAX0(3,IDINT((E2-E1)/ST)) - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
-   62 IF (ST .GT. 0.0D0 .AND. STKR(L) .GT. E2) GOTO 63
-      IF (ST .LT. 0.0D0 .AND. STKR(L) .LT. E2) GOTO 63
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
+   62 IF (ST > 0.0D0 .AND. STKR(L) > E2) GOTO 63
+      IF (ST < 0.0D0 .AND. STKR(L) < E2) GOTO 63
         N = N+1
         L = L+1
         STKR(L) = E1 + DFLOAT(N)*ST
@@ -3853,51 +3853,51 @@ C     CHECK FOR CLAUSE
         GOTO 62
    63 NSTK(TOP) = N
       MSTK(TOP) = 1
-      IF (N .EQ. 0) MSTK(TOP) = 0
+      IF (N == 0) MSTK(TOP) = 0
       GOTO 99
-C
-C     FOR CLAUSE
+!
+!     FOR CLAUSE
    64 STKR(L) = E1
       STKR(L+1) = ST
       STKR(L+2) = E2
       MSTK(TOP) = -3
       NSTK(TOP) = -1
       GOTO 99
-C
-C     ELEMENTWISE OPERATIONS
+!
+!     ELEMENTWISE OPERATIONS
    70 OP = OP - DOT
-      IF (M.NE.M2 .OR. N.NE.N2) CALL ERROR(10)
-      IF (ERR .GT. 0) RETURN
+      IF (M/=M2 .OR. N/=N2) CALL ERROR(10)
+      IF (ERR > 0) RETURN
       MN = M*N
       DO 72 I = 1, MN
          J = L+I-1
          K = L2+I-1
-         IF (OP .EQ. STAR)
-     $      CALL WMUL(STKR(J),STKI(J),STKR(K),STKI(K),STKR(J),STKI(J))
-         IF (OP .EQ. SLASH)
-     $      CALL WDIV(STKR(J),STKI(J),STKR(K),STKI(K),STKR(J),STKI(J))
-         IF (OP .EQ. BSLASH)
-     $      CALL WDIV(STKR(K),STKI(K),STKR(J),STKI(J),STKR(J),STKI(J))
-         IF (ERR .GT. 0) RETURN
+         IF (OP == STAR)&
+            CALL WMUL(STKR(J),STKI(J),STKR(K),STKI(K),STKR(J),STKI(J))
+         IF (OP == SLASH)&
+            CALL WDIV(STKR(J),STKI(J),STKR(K),STKI(K),STKR(J),STKI(J))
+         IF (OP == BSLASH)&
+            CALL WDIV(STKR(K),STKI(K),STKR(J),STKI(J),STKR(J),STKI(J))
+         IF (ERR > 0) RETURN
    72 CONTINUE
       GOTO 99
-C
-C     KRONECKER
+!
+!     KRONECKER
    80 FIN = OP - 2*DOT - STAR + 11
       FUN = 6
       TOP = TOP + 1
       RHS = 2
       GOTO 99
-C
+!
    99 RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE STACKG(ID)
       INTEGER ID(4)
-C
-C     GET VARIABLES FROM STORAGE
-C
+!
+!     GET VARIABLES FROM STORAGE
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
@@ -3906,81 +3906,81 @@ C
       COMMON /IOP/ DDT,ERR,FMT,LCT,LIN,LPT,HIO,RIO,WIO,RTE,WTE,FE
       COMMON /COM/ SYM,SYN,BUF,CHRA,FLP,FIN,FUN,LHS,RHS,RAN
       LOGICAL EQID
-      IF (DDT .EQ. 1) WRITE(WTE,100) ID
+      IF (DDT == 1) WRITE(WTE,100) ID
   100 FORMAT(1X,'STACKG',4I4)
       CALL PUTID(IDSTK(1,BOT-1), ID)
       K = LSIZE+1
    10 K = K-1
       IF (.NOT.EQID(IDSTK(1,K), ID)) GOTO 10
-      IF (K .GE. LSIZE-1 .AND. RHS .GT. 0) GOTO 98
-      IF (K .EQ. BOT-1) GOTO 98
+      IF (K >= LSIZE-1 .AND. RHS > 0) GOTO 98
+      IF (K == BOT-1) GOTO 98
       LK = LSTK(K)
-      IF (RHS .EQ. 1) GOTO 40
-      IF (RHS .EQ. 2) GOTO 60
-      IF (RHS .GT. 2) CALL ERROR(21)
-      IF (ERR .GT. 0) RETURN
+      IF (RHS == 1) GOTO 40
+      IF (RHS == 2) GOTO 60
+      IF (RHS > 2) CALL ERROR(21)
+      IF (ERR > 0) RETURN
       L = 1
-      IF (TOP .GT. 0) L = LSTK(TOP) + MSTK(TOP)*NSTK(TOP)
-      IF (TOP+1 .GE. BOT) CALL ERROR(18)
-      IF (ERR .GT. 0) RETURN
+      IF (TOP > 0) L = LSTK(TOP) + MSTK(TOP)*NSTK(TOP)
+      IF (TOP+1 >= BOT) CALL ERROR(18)
+      IF (ERR > 0) RETURN
       TOP = TOP+1
-C
-C     LOAD VARIABLE TO TOP OF STACK
+!
+!     LOAD VARIABLE TO TOP OF STACK
       LSTK(TOP) = L
       MSTK(TOP) = MSTK(K)
       NSTK(TOP) = NSTK(K)
       MN = MSTK(K)*NSTK(K)
       ERR = L+MN - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
-C     IF RAND, MATFN6 GENERATES RANDOM NUMBER
-      IF (K .EQ. LSIZE) GOTO 97
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
+!     IF RAND, MATFN6 GENERATES RANDOM NUMBER
+      IF (K == LSIZE) GOTO 97
       CALL WCOPY(MN,STKR(LK),STKI(LK),1,STKR(L),STKI(L),1)
       GOTO 99
-C
-C     VECT(ARG)
-   40 IF (MSTK(TOP) .EQ. 0) GOTO 99
+!
+!     VECT(ARG)
+   40 IF (MSTK(TOP) == 0) GOTO 99
       L = LSTK(TOP)
       MN = MSTK(TOP)*NSTK(TOP)
       MNK = MSTK(K)*NSTK(K)
-      IF (MSTK(TOP) .LT. 0) MN = MNK
+      IF (MSTK(TOP) < 0) MN = MNK
       DO 50 I = 1, MN
         LL = L+I-1
         LS = LK+I-1
-        IF (MSTK(TOP) .GT. 0) LS = LK + IDINT(STKR(LL)) - 1
-        IF (LS .LT. LK .OR. LS .GE. LK+MNK) CALL ERROR(21)
-        IF (ERR .GT. 0) RETURN
+        IF (MSTK(TOP) > 0) LS = LK + IDINT(STKR(LL)) - 1
+        IF (LS < LK .OR. LS >= LK+MNK) CALL ERROR(21)
+        IF (ERR > 0) RETURN
         STKR(LL) = STKR(LS)
         STKI(LL) = STKI(LS)
    50 CONTINUE
       MSTK(TOP) = 1
       NSTK(TOP) = 1
-      IF (MSTK(K) .GT. 1) MSTK(TOP) = MN
-      IF (MSTK(K) .EQ. 1) NSTK(TOP) = MN
+      IF (MSTK(K) > 1) MSTK(TOP) = MN
+      IF (MSTK(K) == 1) NSTK(TOP) = MN
       GOTO 99
-C
-C     MATRIX(ARG,ARG)
+!
+!     MATRIX(ARG,ARG)
    60 TOP = TOP-1
       L = LSTK(TOP)
-      IF (MSTK(TOP+1) .EQ. 0) MSTK(TOP) = 0
-      IF (MSTK(TOP) .EQ. 0) GOTO 99
+      IF (MSTK(TOP+1) == 0) MSTK(TOP) = 0
+      IF (MSTK(TOP) == 0) GOTO 99
       L2 = LSTK(TOP+1)
       M = MSTK(TOP)*NSTK(TOP)
-      IF (MSTK(TOP) .LT. 0) M = MSTK(K)
+      IF (MSTK(TOP) < 0) M = MSTK(K)
       N = MSTK(TOP+1)*NSTK(TOP+1)
-      IF (MSTK(TOP+1) .LT. 0) N = NSTK(K)
+      IF (MSTK(TOP+1) < 0) N = NSTK(K)
       L3 = L2 + N
       MK = MSTK(K)
       MNK = MSTK(K)*NSTK(K)
       DO 70 J = 1, N
       DO 70 I = 1, M
         LI = L+I-1
-        IF (MSTK(TOP) .GT. 0) LI = L + IDINT(STKR(LI)) - 1
+        IF (MSTK(TOP) > 0) LI = L + IDINT(STKR(LI)) - 1
         LJ = L2+J-1
-        IF (MSTK(TOP+1) .GT. 0) LJ = L2 + IDINT(STKR(LJ)) - 1
+        IF (MSTK(TOP+1) > 0) LJ = L2 + IDINT(STKR(LJ)) - 1
         LS = LK + LI-L + (LJ-L2)*MK
-        IF (LS.LT.LK .OR. LS.GE.LK+MNK) CALL ERROR(21)
-        IF (ERR .GT. 0) RETURN
+        IF (LS<LK .OR. LS>=LK+MNK) CALL ERROR(21)
+        IF (ERR > 0) RETURN
         LL = L3 + I-1 + (J-1)*M
         STKR(LL) = STKR(LS)
         STKI(LL) = STKI(LS)
@@ -4000,12 +4000,12 @@ C     MATRIX(ARG,ARG)
       RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE STACKP(ID)
       INTEGER ID(4)
-C
-C     PUT VARIABLES INTO STORAGE
-C
+!
+!     PUT VARIABLES INTO STORAGE
+!
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
@@ -4017,19 +4017,19 @@ C
       INTEGER SEMI
       DATA SEMI/39/
       save semi
-      IF (DDT .EQ. 1) WRITE(WTE,100) ID
+      IF (DDT == 1) WRITE(WTE,100) ID
   100 FORMAT(1X,'STACKP',4I4)
-      IF (TOP .LE. 0) CALL ERROR(1)
-      IF (ERR .GT. 0) RETURN
+      IF (TOP <= 0) CALL ERROR(1)
+      IF (ERR > 0) RETURN
       CALL FUNS(ID)
-      IF (FIN .NE. 0) CALL ERROR(25)
-      IF (ERR .GT. 0) RETURN
+      IF (FIN /= 0) CALL ERROR(25)
+      IF (ERR > 0) RETURN
       M = MSTK(TOP)
       N = NSTK(TOP)
-      IF (M .GT. 0) L = LSTK(TOP)
-      IF (M .LT. 0) CALL ERROR(14)
-      IF (ERR .GT. 0) RETURN
-      IF (M .EQ. 0 .AND. N .NE. 0) GOTO 99
+      IF (M > 0) L = LSTK(TOP)
+      IF (M < 0) CALL ERROR(14)
+      IF (ERR > 0) RETURN
+      IF (M == 0 .AND. N /= 0) GOTO 99
       MN = M*N
       LK = 0
       MK = 1
@@ -4037,35 +4037,35 @@ C
       LT = 0
       MT = 0
       NT = 0
-C
-C     DOES VARIABLE ALREADY EXIST
+!
+!     DOES VARIABLE ALREADY EXIST
       CALL PUTID(IDSTK(1,BOT-1),ID)
       K = LSIZE+1
    05 K = K-1
       IF (.NOT.EQID(IDSTK(1,K),ID)) GOTO 05
-      IF (K .EQ. BOT-1) GOTO 30
+      IF (K == BOT-1) GOTO 30
       LK = LSTK(K)
       MK = MSTK(K)
       NK = NSTK(K)
       MNK = MK*NK
-      IF (RHS .EQ. 0) GOTO 20
-      IF (RHS .GT. 2) CALL ERROR(15)
-      IF (ERR .GT. 0) RETURN
+      IF (RHS == 0) GOTO 20
+      IF (RHS > 2) CALL ERROR(15)
+      IF (ERR > 0) RETURN
       MT = MK
       NT = NK
       LT = L + MN
       ERR = LT + MNK - LSTK(BOT)
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       CALL WCOPY(MNK,STKR(LK),STKI(LK),1,STKR(LT),STKI(LT),1)
-C
-C     DOES IT FIT
-   20 IF (RHS.EQ.0 .AND. MN.EQ.MNK) GOTO 40
-      IF (K .GE. LSIZE-3) CALL ERROR(13)
-      IF (ERR .GT. 0) RETURN
-C
-C     SHIFT STORAGE
-      IF (K .EQ. BOT) GOTO 25
+!
+!     DOES IT FIT
+   20 IF (RHS==0 .AND. MN==MNK) GOTO 40
+      IF (K >= LSIZE-3) CALL ERROR(13)
+      IF (ERR > 0) RETURN
+!
+!     SHIFT STORAGE
+      IF (K == BOT) GOTO 25
       LS = LSTK(BOT)
       LL = LS + MNK
       CALL WCOPY(LK-LS,STKR(LS),STKI(LS),-1,STKR(LL),STKI(LL),-1)
@@ -4077,94 +4077,94 @@ C     SHIFT STORAGE
         NSTK(I+1) = NSTK(I)
         LSTK(I+1) = LSTK(I)+MNK
    24 CONTINUE
-C
-C     DESTROY OLD VARIABLE
+!
+!     DESTROY OLD VARIABLE
    25 BOT = BOT+1
-C
-C     CREATE NEW VARIABLE
-   30 IF (MN .EQ. 0) GOTO 99
-      IF (BOT-2 .LE. TOP) CALL ERROR(18)
-      IF (ERR .GT. 0) RETURN
+!
+!     CREATE NEW VARIABLE
+   30 IF (MN == 0) GOTO 99
+      IF (BOT-2 <= TOP) CALL ERROR(18)
+      IF (ERR > 0) RETURN
       K = BOT-1
       CALL PUTID(IDSTK(1,K), ID)
-      IF (RHS .EQ. 1) GOTO 50
-      IF (RHS .EQ. 2) GOTO 55
-C
-C     STORE
-   40 IF (K .LT. LSIZE) LSTK(K) = LSTK(K+1) - MN
+      IF (RHS == 1) GOTO 50
+      IF (RHS == 2) GOTO 55
+!
+!     STORE
+   40 IF (K < LSIZE) LSTK(K) = LSTK(K+1) - MN
       MSTK(K) = M
       NSTK(K) = N
       LK = LSTK(K)
       CALL WCOPY(MN,STKR(L),STKI(L),-1,STKR(LK),STKI(LK),-1)
       GOTO 90
-C
-C     VECT(ARG)
-   50 IF (MSTK(TOP-1) .LT. 0) GOTO 59
+!
+!     VECT(ARG)
+   50 IF (MSTK(TOP-1) < 0) GOTO 59
       MN1 = 1
       MN2 = 1
       L1 = 0
       L2 = 0
-      IF (N.NE.1 .OR. NK.NE.1) GOTO 52
+      IF (N/=1 .OR. NK/=1) GOTO 52
       L1 = LSTK(TOP-1)
       M1 = MSTK(TOP-1)
       MN1 = M1*NSTK(TOP-1)
       M2 = -1
       GOTO 60
-   52 IF (M.NE.1 .OR. MK.NE.1) CALL ERROR(15)
-      IF (ERR .GT. 0) RETURN
+   52 IF (M/=1 .OR. MK/=1) CALL ERROR(15)
+      IF (ERR > 0) RETURN
       L2 = LSTK(TOP-1)
       M2 = MSTK(TOP-1)
       MN2 = M2*NSTK(TOP-1)
       M1 = -1
       GOTO 60
-C
-C     MATRIX(ARG,ARG)
-   55 IF (MSTK(TOP-1).LT.0 .AND. MSTK(TOP-2).LT.0) GOTO 59
+!
+!     MATRIX(ARG,ARG)
+   55 IF (MSTK(TOP-1)<0 .AND. MSTK(TOP-2)<0) GOTO 59
       L2 = LSTK(TOP-1)
       M2 = MSTK(TOP-1)
       MN2 = M2*NSTK(TOP-1)
-      IF (M2 .LT. 0) MN2 = N
+      IF (M2 < 0) MN2 = N
       L1 = LSTK(TOP-2)
       M1 = MSTK(TOP-2)
       MN1 = M1*NSTK(TOP-2)
-      IF (M1 .LT. 0) MN1 = M
+      IF (M1 < 0) MN1 = M
       GOTO 60
-C
-   59 IF (MN .NE. MNK) CALL ERROR(15)
-      IF (ERR .GT. 0) RETURN
+!
+   59 IF (MN /= MNK) CALL ERROR(15)
+      IF (ERR > 0) RETURN
       LK = LSTK(K)
       CALL WCOPY(MN,STKR(L),STKI(L),-1,STKR(LK),STKI(LK),-1)
       GOTO 90
-C
-   60 IF (MN1.NE.M .OR. MN2.NE.N) CALL ERROR(15)
-      IF (ERR .GT. 0) RETURN
+!
+   60 IF (MN1/=M .OR. MN2/=N) CALL ERROR(15)
+      IF (ERR > 0) RETURN
       LL = 1
-      IF (M1 .LT. 0) GOTO 62
+      IF (M1 < 0) GOTO 62
       DO 61 I = 1, MN1
          LS = L1+I-1
          MK = MAX0(MK,IDINT(STKR(LS)))
          LL = MIN0(LL,IDINT(STKR(LS)))
    61 CONTINUE
    62 MK = MAX0(MK,M)
-      IF (M2 .LT. 0) GOTO 64
+      IF (M2 < 0) GOTO 64
       DO 63 I = 1, MN2
          LS = L2+I-1
          NK = MAX0(NK,IDINT(STKR(LS)))
          LL = MIN0(LL,IDINT(STKR(LS)))
    63 CONTINUE
    64 NK = MAX0(NK,N)
-      IF (LL .LT. 1) CALL ERROR(21)
-      IF (ERR .GT. 0) RETURN
+      IF (LL < 1) CALL ERROR(21)
+      IF (ERR > 0) RETURN
       MNK = MK*NK
       LK = LSTK(K+1) - MNK
       ERR = LT + MT*NT - LK
-      IF (ERR .GT. 0) CALL ERROR(17)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) CALL ERROR(17)
+      IF (ERR > 0) RETURN
       LSTK(K) = LK
       MSTK(K) = MK
       NSTK(K) = NK
       CALL WSET(MNK,0.0D0,0.0D0,STKR(LK),STKI(LK),1)
-      IF (NT .LT. 1) GOTO 67
+      IF (NT < 1) GOTO 67
       DO 66 J = 1, NT
          LS = LT+(J-1)*MT
          LL = LK+(J-1)*MK
@@ -4173,26 +4173,26 @@ C
    67 DO 68 J = 1, N
       DO 68 I = 1, M
         LI = L1+I-1
-        IF (M1 .GT. 0) LI = L1 + IDINT(STKR(LI)) - 1
+        IF (M1 > 0) LI = L1 + IDINT(STKR(LI)) - 1
         LJ = L2+J-1
-        IF (M2 .GT. 0) LJ = L2 + IDINT(STKR(LJ)) - 1
+        IF (M2 > 0) LJ = L2 + IDINT(STKR(LJ)) - 1
         LL = LK+LI-L1+(LJ-L2)*MK
         LS = L+I-1+(J-1)*M
         STKR(LL) = STKR(LS)
         STKI(LL) = STKI(LS)
    68 CONTINUE
       GOTO 90
-C
-C     PRINT IF DESIRED AND POP STACK
-   90 IF (SYM.NE.SEMI .AND. LCT(3).EQ.0) CALL PRINT(ID,K)
-      IF (SYM.EQ.SEMI .AND. LCT(3).EQ.1) CALL PRINT(ID,K)
-      IF (K .EQ. BOT-1) BOT = BOT-1
-   99 IF (M .NE. 0) TOP = TOP - 1 - RHS
-      IF (M .EQ. 0) TOP = TOP - 1
+!
+!     PRINT IF DESIRED AND POP STACK
+   90 IF (SYM/=SEMI .AND. LCT(3)==0) CALL PRINT(ID,K)
+      IF (SYM==SEMI .AND. LCT(3)==1) CALL PRINT(ID,K)
+      IF (K == BOT-1) BOT = BOT-1
+   99 IF (M /= 0) TOP = TOP - 1 - RHS
+      IF (M == 0) TOP = TOP - 1
       RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE TERM
       DOUBLE PRECISION STKR(50505),STKI(50505)
       INTEGER IDSTK(4,48),LSTK(48),MSTK(48),NSTK(48),VSIZE,LSIZE,BOT,TOP
@@ -4206,54 +4206,54 @@ C-----------------------------------------------------------------------
       INTEGER R,OP,BSLASH,STAR,SLASH,DOT
       DATA BSLASH/45/,STAR/43/,SLASH/44/,DOT/47/
       save bslash,star,slash,dot
-      IF (DDT .EQ. 1) WRITE(WTE,100) PT,RSTK(PT)
+      IF (DDT == 1) WRITE(WTE,100) PT,RSTK(PT)
   100 FORMAT(1X,'TERM  ',2I4)
       R = RSTK(PT)
       GOTO (99,99,99,99,99,01,01,05,25,99,99,99,99,99,35,99,99,99,99),R
    01 PT = PT+1
       RSTK(PT) = 8
-C     *CALL* FACTOR
+!     *CALL* FACTOR
       RETURN
    05 PT = PT-1
    10 OP = 0
-      IF (SYM .EQ. DOT) OP = DOT
-      IF (SYM .EQ. DOT) CALL GETSYM
-      IF (SYM.EQ.STAR .OR. SYM.EQ.SLASH .OR. SYM.EQ.BSLASH) GOTO 20
+      IF (SYM == DOT) OP = DOT
+      IF (SYM == DOT) CALL GETSYM
+      IF (SYM==STAR .OR. SYM==SLASH .OR. SYM==BSLASH) GOTO 20
       RETURN
    20 OP = OP + SYM
       CALL GETSYM
-      IF (SYM .EQ. DOT) OP = OP + SYM
-      IF (SYM .EQ. DOT) CALL GETSYM
+      IF (SYM == DOT) OP = OP + SYM
+      IF (SYM == DOT) CALL GETSYM
       PT = PT+1
       PSTK(PT) = OP
       RSTK(PT) = 9
-C     *CALL* FACTOR
+!     *CALL* FACTOR
       RETURN
    25 OP = PSTK(PT)
       PT = PT-1
       CALL STACK2(OP)
-      IF (ERR .GT. 0) RETURN
-C     SOME BINARY OPS DONE IN MATFNS
-      IF (FUN .EQ. 0) GOTO 10
+      IF (ERR > 0) RETURN
+!     SOME BINARY OPS DONE IN MATFNS
+      IF (FUN == 0) GOTO 10
       PT = PT+1
       RSTK(PT) = 15
-C     *CALL* MATFN
+!     *CALL* MATFN
       RETURN
    35 PT = PT-1
       GOTO 10
    99 CALL ERROR(22)
-      IF (ERR .GT. 0) RETURN
+      IF (ERR > 0) RETURN
       RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE USER(A,M,N,S,T)
       DOUBLE PRECISION A(M,N),S,T
-C
+!
       INTEGER A3(9)
       DATA A3 /-149,537,-27,-50,180,-9,-154,546,-25/
       save a3
-      IF (A(1,1) .NE. 3.0D0) RETURN
+      IF (A(1,1) /= 3.0D0) RETURN
       DO 10 I = 1, 9
          A(I,1) = DFLOAT(A3(I))
    10 CONTINUE
@@ -4262,116 +4262,116 @@ C
       RETURN
       END
 
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE XCHAR(BUF,K)
       INTEGER BUF(*),K
-C     SYSTEM DEPENDENT ROUTINE TO HANDLE SPECIAL CHARACTERS
+!     SYSTEM DEPENDENT ROUTINE TO HANDLE SPECIAL CHARACTERS
       INTEGER BACK,MASK
       DATA BACK/Z'20202008'/,MASK/Z'000000FF'/
       save back, mask
-C
-      IF (BUF(1) .EQ. BACK) K = -1
+!
+      IF (BUF(1) == BACK) K = -1
       !L = BUF(1) .AND. MASK
-      !IF(BUF(1).LT.30.OR.BUF(1).GT.70)
+      !IF(BUF(1)<30.OR.BUF(1)>70)
       L = IAND(BUF(1),MASK)
-      IF (K .NE. -1) WRITE(6,10) BUF(1),L
+      IF (K /= -1) WRITE(6,10) BUF(1),L
    10 FORMAT(1X,1H',A1,4H' = ,Z2,' hex is not a MATLAB character.')
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WGECO(AR,AI,LDA,N,IPVT,RCOND,ZR,ZI)
       INTEGER LDA,N,IPVT(1)
       DOUBLE PRECISION AR(LDA,1),AI(LDA,1),ZR(1),ZI(1)
       DOUBLE PRECISION RCOND
-C
-C     WGECO FACTORS A DOUBLE-COMPLEX MATRIX BY GAUSSIAN ELIMINATION
-C     AND ESTIMATES THE CONDITION OF THE MATRIX.
-C
-C     IF  RCOND  IS NOT NEEDED, WGEFA IS SLIGHTLY FASTER.
-C     TO SOLVE  A*X = B , FOLLOW WGECO BY WGESL.
-C     TO COMPUTE  INVERSE(A)*C , FOLLOW WGECO BY WGESL.
-C     TO COMPUTE  DETERMINANT(A) , FOLLOW WGECO BY WGEDI.
-C     TO COMPUTE  INVERSE(A) , FOLLOW WGECO BY WGEDI.
-C
-C     ON ENTRY
-C
-C        A       DOUBLE-COMPLEX(LDA, N)
-C                THE MATRIX TO BE FACTORED.
-C
-C        LDA     INTEGER
-C                THE LEADING DIMENSION OF THE ARRAY  A .
-C
-C        N       INTEGER
-C                THE ORDER OF THE MATRIX  A .
-C
-C     ON RETURN
-C
-C        A       AN UPPER TRIANGULAR MATRIX AND THE MULTIPLIERS
-C                WHICH WERE USED TO OBTAIN IT.
-C                THE FACTORIZATION CAN BE WRITTEN  A = L*U  WHERE
-C                L  IS A PRODUCT OF PERMUTATION AND UNIT LOWER
-C                TRIANGULAR MATRICES AND  U  IS UPPER TRIANGULAR.
-C
-C        IPVT    INTEGER(N)
-C                AN INTEGER VECTOR OF PIVOT INDICES.
-C
-C        RCOND   DOUBLE PRECISION
-C                AN ESTIMATE OF THE RECIPROCAL CONDITION OF  A .
-C                FOR THE SYSTEM  A*X = B , RELATIVE PERTURBATIONS
-C                IN  A  AND  B  OF SIZE  EPSILON  MAY CAUSE
-C                RELATIVE PERTURBATIONS IN  X  OF SIZE  EPSILON/RCOND .
-C                IF  RCOND  IS SO SMALL THAT THE LOGICAL EXPRESSION
-C        1.0 + RCOND .EQ. 1.0
-C                IS TRUE, THEN  A  MAY BE SINGULAR TO WORKING
-C                PRECISION.  IN PARTICULAR,  RCOND  IS ZERO  IF
-C                EXACT SINGULARITY IS DETECTED OR THE ESTIMATE
-C                UNDERFLOWS.
-C
-C        Z       DOUBLE-COMPLEX(N)
-C                A WORK VECTOR WHOSE CONTENTS ARE USUALLY UNIMPORTANT.
-C                IF  A  IS CLOSE TO A SINGULAR MATRIX, THEN  Z  IS
-C                AN APPROXIMATE NULL VECTOR IN THE SENSE THAT
-C                NORM(A*Z) = RCOND*NORM(A)*NORM(Z) .
-C
-C     LINPACK. THIS VERSION DATED 07/01/79 .
-C     CLEVE MOLER, UNIVERSITY OF NEW MEXICO, ARGONNE NATIONAL LAB.
-C
-C     SUBROUTINES AND FUNCTIONS
-C
-C     LINPACK WGEFA
-C     BLAS WAXPY,WDOTC,WASUM
-C     FORTRAN DABS,DMAX1
-C
-C     INTERNAL VARIABLES
-C
+!
+!     WGECO FACTORS A DOUBLE-COMPLEX MATRIX BY GAUSSIAN ELIMINATION
+!     AND ESTIMATES THE CONDITION OF THE MATRIX.
+!
+!     IF  RCOND  IS NOT NEEDED, WGEFA IS SLIGHTLY FASTER.
+!     TO SOLVE  A*X = B , FOLLOW WGECO BY WGESL.
+!     TO COMPUTE  INVERSE(A)*C , FOLLOW WGECO BY WGESL.
+!     TO COMPUTE  DETERMINANT(A) , FOLLOW WGECO BY WGEDI.
+!     TO COMPUTE  INVERSE(A) , FOLLOW WGECO BY WGEDI.
+!
+!     ON ENTRY
+!
+!        A       DOUBLE-COMPLEX(LDA, N)
+!                THE MATRIX TO BE FACTORED.
+!
+!        LDA     INTEGER
+!                THE LEADING DIMENSION OF THE ARRAY  A .
+!
+!        N       INTEGER
+!                THE ORDER OF THE MATRIX  A .
+!
+!     ON RETURN
+!
+!        A       AN UPPER TRIANGULAR MATRIX AND THE MULTIPLIERS
+!                WHICH WERE USED TO OBTAIN IT.
+!                THE FACTORIZATION CAN BE WRITTEN  A = L*U  WHERE
+!                L  IS A PRODUCT OF PERMUTATION AND UNIT LOWER
+!                TRIANGULAR MATRICES AND  U  IS UPPER TRIANGULAR.
+!
+!        IPVT    INTEGER(N)
+!                AN INTEGER VECTOR OF PIVOT INDICES.
+!
+!        RCOND   DOUBLE PRECISION
+!                AN ESTIMATE OF THE RECIPROCAL CONDITION OF  A .
+!                FOR THE SYSTEM  A*X = B , RELATIVE PERTURBATIONS
+!                IN  A  AND  B  OF SIZE  EPSILON  MAY CAUSE
+!                RELATIVE PERTURBATIONS IN  X  OF SIZE  EPSILON/RCOND .
+!                IF  RCOND  IS SO SMALL THAT THE LOGICAL EXPRESSION
+!        1.0 + RCOND == 1.0
+!                IS TRUE, THEN  A  MAY BE SINGULAR TO WORKING
+!                PRECISION.  IN PARTICULAR,  RCOND  IS ZERO  IF
+!                EXACT SINGULARITY IS DETECTED OR THE ESTIMATE
+!                UNDERFLOWS.
+!
+!        Z       DOUBLE-COMPLEX(N)
+!                A WORK VECTOR WHOSE CONTENTS ARE USUALLY UNIMPORTANT.
+!                IF  A  IS CLOSE TO A SINGULAR MATRIX, THEN  Z  IS
+!                AN APPROXIMATE NULL VECTOR IN THE SENSE THAT
+!                NORM(A*Z) = RCOND*NORM(A)*NORM(Z) .
+!
+!     LINPACK. THIS VERSION DATED 07/01/79 .
+!     CLEVE MOLER, UNIVERSITY OF NEW MEXICO, ARGONNE NATIONAL LAB.
+!
+!     SUBROUTINES AND FUNCTIONS
+!
+!     LINPACK WGEFA
+!     BLAS WAXPY,WDOTC,WASUM
+!     FORTRAN DABS,DMAX1
+!
+!     INTERNAL VARIABLES
+!
       DOUBLE PRECISION WDOTCR,WDOTCI,EKR,EKI,TR,TI,WKR,WKI,WKMR,WKMI
       DOUBLE PRECISION ANORM,S,WASUM,SM,YNORM,FLOP
       INTEGER INFO,J,K,KB,KP1,L
-C
+!
       DOUBLE PRECISION ZDUMR,ZDUMI
       DOUBLE PRECISION CABS1
       CABS1(ZDUMR,ZDUMI) = DABS(ZDUMR) + DABS(ZDUMI)
-C
-C     COMPUTE 1-NORM OF A
-C
+!
+!     COMPUTE 1-NORM OF A
+!
       ANORM = 0.0D0
       DO 10 J = 1, N
          ANORM = DMAX1(ANORM,WASUM(N,AR(1,J),AI(1,J),1))
    10 CONTINUE
-C
-C     FACTOR
-C
+!
+!     FACTOR
+!
       CALL WGEFA(AR,AI,LDA,N,IPVT,INFO)
-C
-C     RCOND = 1/(NORM(A)*(ESTIMATE OF NORM(INVERSE(A)))) .
-C     ESTIMATE = NORM(Z)/NORM(Y) WHERE  A*Z = Y  AND  CTRANS(A)*Y = E .
-C     CTRANS(A)  IS THE CONJUGATE TRANSPOSE OF A .
-C     THE COMPONENTS OF  E  ARE CHOSEN TO CAUSE MAXIMUM LOCAL
-C     GROWTH IN THE ELEMENTS OF W  WHERE  CTRANS(U)*W = E .
-C     THE VECTORS ARE FREQUENTLY RESCALED TO AVOID OVERFLOW.
-C
-C     SOLVE CTRANS(U)*W = E
-C
+!
+!     RCOND = 1/(NORM(A)*(ESTIMATE OF NORM(INVERSE(A)))) .
+!     ESTIMATE = NORM(Z)/NORM(Y) WHERE  A*Z = Y  AND  CTRANS(A)*Y = E .
+!     CTRANS(A)  IS THE CONJUGATE TRANSPOSE OF A .
+!     THE COMPONENTS OF  E  ARE CHOSEN TO CAUSE MAXIMUM LOCAL
+!     GROWTH IN THE ELEMENTS OF W  WHERE  CTRANS(U)*W = E .
+!     THE VECTORS ARE FREQUENTLY RESCALED TO AVOID OVERFLOW.
+!
+!     SOLVE CTRANS(U)*W = E
+!
       EKR = 1.0D0
       EKI = 0.0D0
       DO 20 J = 1, N
@@ -4380,10 +4380,10 @@ C
    20 CONTINUE
       DO 110 K = 1, N
          CALL WSIGN(EKR,EKI,-ZR(K),-ZI(K),EKR,EKI)
-         IF (CABS1(EKR-ZR(K),EKI-ZI(K))
-     *       .LE. CABS1(AR(K,K),AI(K,K))) GOTO 40
-            S = CABS1(AR(K,K),AI(K,K))
-     *          /CABS1(EKR-ZR(K),EKI-ZI(K))
+         IF (CABS1(EKR-ZR(K),EKI-ZI(K))&
+             <= CABS1(AR(K,K),AI(K,K))) GOTO 40
+            S = CABS1(AR(K,K),AI(K,K))&
+                /CABS1(EKR-ZR(K),EKI-ZI(K))
             CALL WRSCAL(N,S,ZR,ZI,1)
             EKR = S*EKR
             EKI = S*EKI
@@ -4394,7 +4394,7 @@ C
          WKMI = -EKI - ZI(K)
          S = CABS1(WKR,WKI)
          SM = CABS1(WKMR,WKMI)
-         IF (CABS1(AR(K,K),AI(K,K)) .EQ. 0.0D0) GOTO 50
+         IF (CABS1(AR(K,K),AI(K,K)) == 0.0D0) GOTO 50
             CALL WDIV(WKR,WKI,AR(K,K),-AI(K,K),WKR,WKI)
             CALL WDIV(WKMR,WKMI,AR(K,K),-AI(K,K),WKMR,WKMI)
          GOTO 60
@@ -4405,22 +4405,22 @@ C
             WKMI = 0.0D0
    60    CONTINUE
          KP1 = K + 1
-         IF (KP1 .GT. N) GOTO 100
+         IF (KP1 > N) GOTO 100
             DO 70 J = KP1, N
                CALL WMUL(WKMR,WKMI,AR(K,J),-AI(K,J),TR,TI)
                SM = FLOP(SM + CABS1(ZR(J)+TR,ZI(J)+TI))
-               CALL WAXPY(1,WKR,WKI,AR(K,J),-AI(K,J),1,
-     $ ZR(J),ZI(J),1)
+               CALL WAXPY(1,WKR,WKI,AR(K,J),-AI(K,J),1,&
+       ZR(J),ZI(J),1)
                S = FLOP(S + CABS1(ZR(J),ZI(J)))
    70       CONTINUE
-            IF (S .GE. SM) GOTO 90
+            IF (S >= SM) GOTO 90
                TR = WKMR - WKR
                TI = WKMI - WKI
                WKR = WKMR
                WKI = WKMI
                DO 80 J = KP1, N
-                  CALL WAXPY(1,TR,TI,AR(K,J),-AI(K,J),1,
-     $    ZR(J),ZI(J),1)
+                  CALL WAXPY(1,TR,TI,AR(K,J),-AI(K,J),1,&
+          ZR(J),ZI(J),1)
    80          CONTINUE
    90       CONTINUE
   100    CONTINUE
@@ -4429,18 +4429,18 @@ C
   110 CONTINUE
       S = 1.0D0/WASUM(N,ZR,ZI,1)
       CALL WRSCAL(N,S,ZR,ZI,1)
-C
-C     SOLVE CTRANS(L)*Y = W
-C
+!
+!     SOLVE CTRANS(L)*Y = W
+!
       DO 140 KB = 1, N
          K = N + 1 - KB
-         IF (K .GE. N) GOTO 120
-            ZR(K) = ZR(K)
-     *            + WDOTCR(N-K,AR(K+1,K),AI(K+1,K),1,ZR(K+1),ZI(K+1),1)
-            ZI(K) = ZI(K)
-     *            + WDOTCI(N-K,AR(K+1,K),AI(K+1,K),1,ZR(K+1),ZI(K+1),1)
+         IF (K >= N) GOTO 120
+            ZR(K) = ZR(K)&
+                  + WDOTCR(N-K,AR(K+1,K),AI(K+1,K),1,ZR(K+1),ZI(K+1),1)
+            ZI(K) = ZI(K)&
+                  + WDOTCI(N-K,AR(K+1,K),AI(K+1,K),1,ZR(K+1),ZI(K+1),1)
   120    CONTINUE
-         IF (CABS1(ZR(K),ZI(K)) .LE. 1.0D0) GOTO 130
+         IF (CABS1(ZR(K),ZI(K)) <= 1.0D0) GOTO 130
             S = 1.0D0/CABS1(ZR(K),ZI(K))
             CALL WRSCAL(N,S,ZR,ZI,1)
   130    CONTINUE
@@ -4454,11 +4454,11 @@ C
   140 CONTINUE
       S = 1.0D0/WASUM(N,ZR,ZI,1)
       CALL WRSCAL(N,S,ZR,ZI,1)
-C
+!
       YNORM = 1.0D0
-C
-C     SOLVE L*V = Y
-C
+!
+!     SOLVE L*V = Y
+!
       DO 160 K = 1, N
          L = IPVT(K)
          TR = ZR(L)
@@ -4467,10 +4467,10 @@ C
          ZI(L) = ZI(K)
          ZR(K) = TR
          ZI(K) = TI
-         IF (K .LT. N)
-     *      CALL WAXPY(N-K,TR,TI,AR(K+1,K),AI(K+1,K),1,ZR(K+1),ZI(K+1),
-     *                 1)
-         IF (CABS1(ZR(K),ZI(K)) .LE. 1.0D0) GOTO 150
+         IF (K < N)&
+            CALL WAXPY(N-K,TR,TI,AR(K+1,K),AI(K+1,K),1,ZR(K+1),ZI(K+1),&
+                       1)
+         IF (CABS1(ZR(K),ZI(K)) <= 1.0D0) GOTO 150
             S = 1.0D0/CABS1(ZR(K),ZI(K))
             CALL WRSCAL(N,S,ZR,ZI,1)
             YNORM = S*YNORM
@@ -4479,22 +4479,22 @@ C
       S = 1.0D0/WASUM(N,ZR,ZI,1)
       CALL WRSCAL(N,S,ZR,ZI,1)
       YNORM = S*YNORM
-C
-C     SOLVE  U*Z = V
-C
+!
+!     SOLVE  U*Z = V
+!
       DO 200 KB = 1, N
          K = N + 1 - KB
-         IF (CABS1(ZR(K),ZI(K))
-     *       .LE. CABS1(AR(K,K),AI(K,K))) GOTO 170
-            S = CABS1(AR(K,K),AI(K,K))
-     *          /CABS1(ZR(K),ZI(K))
+         IF (CABS1(ZR(K),ZI(K))&
+             <= CABS1(AR(K,K),AI(K,K))) GOTO 170
+            S = CABS1(AR(K,K),AI(K,K))&
+                /CABS1(ZR(K),ZI(K))
             CALL WRSCAL(N,S,ZR,ZI,1)
             YNORM = S*YNORM
   170    CONTINUE
-         IF (CABS1(AR(K,K),AI(K,K)) .EQ. 0.0D0) GOTO 180
+         IF (CABS1(AR(K,K),AI(K,K)) == 0.0D0) GOTO 180
             CALL WDIV(ZR(K),ZI(K),AR(K,K),AI(K,K),ZR(K),ZI(K))
   180    CONTINUE
-         IF (CABS1(AR(K,K),AI(K,K)) .NE. 0.0D0) GOTO 190
+         IF (CABS1(AR(K,K),AI(K,K)) /= 0.0D0) GOTO 190
             ZR(K) = 1.0D0
             ZI(K) = 0.0D0
   190    CONTINUE
@@ -4502,93 +4502,93 @@ C
          TI = -ZI(K)
          CALL WAXPY(K-1,TR,TI,AR(1,K),AI(1,K),1,ZR(1),ZI(1),1)
   200 CONTINUE
-C     MAKE ZNORM = 1.0
+!     MAKE ZNORM = 1.0
       S = 1.0D0/WASUM(N,ZR,ZI,1)
       CALL WRSCAL(N,S,ZR,ZI,1)
       YNORM = S*YNORM
-C
-      IF (ANORM .NE. 0.0D0) RCOND = YNORM/ANORM
-      IF (ANORM .EQ. 0.0D0) RCOND = 0.0D0
+!
+      IF (ANORM /= 0.0D0) RCOND = YNORM/ANORM
+      IF (ANORM == 0.0D0) RCOND = 0.0D0
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WGEFA(AR,AI,LDA,N,IPVT,INFO)
       INTEGER LDA,N,IPVT(1),INFO
       DOUBLE PRECISION AR(LDA,1),AI(LDA,1)
-C
-C     WGEFA FACTORS A DOUBLE-COMPLEX MATRIX BY GAUSSIAN ELIMINATION.
-C
-C     WGEFA IS USUALLY CALLED BY WGECO, BUT IT CAN BE CALLED
-C     DIRECTLY WITH A SAVING IN TIME IF  RCOND  IS NOT NEEDED.
-C     (TIME FOR WGECO) = (1 + 9/N)*(TIME FOR WGEFA) .
-C
-C     ON ENTRY
-C
-C        A       DOUBLE-COMPLEX(LDA, N)
-C                THE MATRIX TO BE FACTORED.
-C
-C        LDA     INTEGER
-C                THE LEADING DIMENSION OF THE ARRAY  A .
-C
-C        N       INTEGER
-C                THE ORDER OF THE MATRIX  A .
-C
-C     ON RETURN
-C
-C        A       AN UPPER TRIANGULAR MATRIX AND THE MULTIPLIERS
-C                WHICH WERE USED TO OBTAIN IT.
-C                THE FACTORIZATION CAN BE WRITTEN  A = L*U  WHERE
-C                L  IS A PRODUCT OF PERMUTATION AND UNIT LOWER
-C                TRIANGULAR MATRICES AND  U  IS UPPER TRIANGULAR.
-C
-C        IPVT    INTEGER(N)
-C                AN INTEGER VECTOR OF PIVOT INDICES.
-C
-C        INFO    INTEGER
-C                = 0  NORMAL VALUE.
-C                = K  IF  U(K,K) .EQ. 0.0 .  THIS IS NOT AN ERROR
-C  CONDITION FOR THIS SUBROUTINE, BUT IT DOES
-C  INDICATE THAT WGESL OR WGEDI WILL DIVIDE BY ZERO
-C  IF CALLED.  USE  RCOND  IN WGECO FOR A RELIABLE
-C  INDICATION OF SINGULARITY.
-C
-C     LINPACK. THIS VERSION DATED 07/01/79 .
-C     CLEVE MOLER, UNIVERSITY OF NEW MEXICO, ARGONNE NATIONAL LAB.
-C
-C     SUBROUTINES AND FUNCTIONS
-C
-C     BLAS WAXPY,WSCAL,IWAMAX
-C     FORTRAN DABS
-C
-C     INTERNAL VARIABLES
-C
+!
+!     WGEFA FACTORS A DOUBLE-COMPLEX MATRIX BY GAUSSIAN ELIMINATION.
+!
+!     WGEFA IS USUALLY CALLED BY WGECO, BUT IT CAN BE CALLED
+!     DIRECTLY WITH A SAVING IN TIME IF  RCOND  IS NOT NEEDED.
+!     (TIME FOR WGECO) = (1 + 9/N)*(TIME FOR WGEFA) .
+!
+!     ON ENTRY
+!
+!        A       DOUBLE-COMPLEX(LDA, N)
+!                THE MATRIX TO BE FACTORED.
+!
+!        LDA     INTEGER
+!                THE LEADING DIMENSION OF THE ARRAY  A .
+!
+!        N       INTEGER
+!                THE ORDER OF THE MATRIX  A .
+!
+!     ON RETURN
+!
+!        A       AN UPPER TRIANGULAR MATRIX AND THE MULTIPLIERS
+!                WHICH WERE USED TO OBTAIN IT.
+!                THE FACTORIZATION CAN BE WRITTEN  A = L*U  WHERE
+!                L  IS A PRODUCT OF PERMUTATION AND UNIT LOWER
+!                TRIANGULAR MATRICES AND  U  IS UPPER TRIANGULAR.
+!
+!        IPVT    INTEGER(N)
+!                AN INTEGER VECTOR OF PIVOT INDICES.
+!
+!        INFO    INTEGER
+!                = 0  NORMAL VALUE.
+!                = K  IF  U(K,K) == 0.0 .  THIS IS NOT AN ERROR
+!  CONDITION FOR THIS SUBROUTINE, BUT IT DOES
+!  INDICATE THAT WGESL OR WGEDI WILL DIVIDE BY ZERO
+!  IF CALLED.  USE  RCOND  IN WGECO FOR A RELIABLE
+!  INDICATION OF SINGULARITY.
+!
+!     LINPACK. THIS VERSION DATED 07/01/79 .
+!     CLEVE MOLER, UNIVERSITY OF NEW MEXICO, ARGONNE NATIONAL LAB.
+!
+!     SUBROUTINES AND FUNCTIONS
+!
+!     BLAS WAXPY,WSCAL,IWAMAX
+!     FORTRAN DABS
+!
+!     INTERNAL VARIABLES
+!
       DOUBLE PRECISION TR,TI
       INTEGER IWAMAX,J,K,KP1,L,NM1
-C
+!
       DOUBLE PRECISION ZDUMR,ZDUMI
       DOUBLE PRECISION CABS1
       CABS1(ZDUMR,ZDUMI) = DABS(ZDUMR) + DABS(ZDUMI)
-C
-C     GAUSSIAN ELIMINATION WITH PARTIAL PIVOTING
-C
+!
+!     GAUSSIAN ELIMINATION WITH PARTIAL PIVOTING
+!
       INFO = 0
       NM1 = N - 1
-      IF (NM1 .LT. 1) GOTO 70
+      IF (NM1 < 1) GOTO 70
       DO 60 K = 1, NM1
          KP1 = K + 1
-C
-C        FIND L = PIVOT INDEX
-C
+!
+!        FIND L = PIVOT INDEX
+!
          L = IWAMAX(N-K+1,AR(K,K),AI(K,K),1) + K - 1
          IPVT(K) = L
-C
-C        ZERO PIVOT IMPLIES THIS COLUMN ALREADY TRIANGULARIZED
-C
-         IF (CABS1(AR(L,K),AI(L,K)) .EQ. 0.0D0) GOTO 40
-C
-C           INTERCHANGE IF NECESSARY
-C
-            IF (L .EQ. K) GOTO 10
+!
+!        ZERO PIVOT IMPLIES THIS COLUMN ALREADY TRIANGULARIZED
+!
+         IF (CABS1(AR(L,K),AI(L,K)) == 0.0D0) GOTO 40
+!
+!           INTERCHANGE IF NECESSARY
+!
+            IF (L == K) GOTO 10
                TR = AR(L,K)
                TI = AI(L,K)
                AR(L,K) = AR(K,K)
@@ -4596,25 +4596,25 @@ C
                AR(K,K) = TR
                AI(K,K) = TI
    10       CONTINUE
-C
-C           COMPUTE MULTIPLIERS
-C
+!
+!           COMPUTE MULTIPLIERS
+!
             CALL WDIV(-1.0D0,0.0D0,AR(K,K),AI(K,K),TR,TI)
             CALL WSCAL(N-K,TR,TI,AR(K+1,K),AI(K+1,K),1)
-C
-C           ROW ELIMINATION WITH COLUMN INDEXING
-C
+!
+!           ROW ELIMINATION WITH COLUMN INDEXING
+!
             DO 30 J = KP1, N
                TR = AR(L,J)
                TI = AI(L,J)
-               IF (L .EQ. K) GOTO 20
+               IF (L == K) GOTO 20
                   AR(L,J) = AR(K,J)
                   AI(L,J) = AI(K,J)
                   AR(K,J) = TR
                   AI(K,J) = TI
    20          CONTINUE
-               CALL WAXPY(N-K,TR,TI,AR(K+1,K),AI(K+1,K),1,AR(K+1,J),
-     * AI(K+1,J),1)
+               CALL WAXPY(N-K,TR,TI,AR(K+1,K),AI(K+1,K),1,AR(K+1,J),&
+       AI(K+1,J),1)
    30       CONTINUE
          GOTO 50
    40    CONTINUE
@@ -4623,97 +4623,97 @@ C
    60 CONTINUE
    70 CONTINUE
       IPVT(N) = N
-      IF (CABS1(AR(N,N),AI(N,N)) .EQ. 0.0D0) INFO = N
+      IF (CABS1(AR(N,N),AI(N,N)) == 0.0D0) INFO = N
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WGESL(AR,AI,LDA,N,IPVT,BR,BI,JOB)
       INTEGER LDA,N,IPVT(1),JOB
       DOUBLE PRECISION AR(LDA,1),AI(LDA,1),BR(1),BI(1)
-C
-C     WGESL SOLVES THE DOUBLE-COMPLEX SYSTEM
-C     A * X = B  OR  CTRANS(A) * X = B
-C     USING THE FACTORS COMPUTED BY WGECO OR WGEFA.
-C
-C     ON ENTRY
-C
-C        A       DOUBLE-COMPLEX(LDA, N)
-C                THE OUTPUT FROM WGECO OR WGEFA.
-C
-C        LDA     INTEGER
-C                THE LEADING DIMENSION OF THE ARRAY  A .
-C
-C        N       INTEGER
-C                THE ORDER OF THE MATRIX  A .
-C
-C        IPVT    INTEGER(N)
-C                THE PIVOT VECTOR FROM WGECO OR WGEFA.
-C
-C        B       DOUBLE-COMPLEX(N)
-C                THE RIGHT HAND SIDE VECTOR.
-C
-C        JOB     INTEGER
-C                = 0         TO SOLVE  A*X = B ,
-C                = NONZERO   TO SOLVE  CTRANS(A)*X = B  WHERE
-C         CTRANS(A)  IS THE CONJUGATE TRANSPOSE.
-C
-C     ON RETURN
-C
-C        B       THE SOLUTION VECTOR  X .
-C
-C     ERROR CONDITION
-C
-C        A DIVISION BY ZERO WILL OCCUR IF THE INPUT FACTOR CONTAINS A
-C        ZERO ON THE DIAGONAL.  TECHNICALLY THIS INDICATES SINGULARITY
-C        BUT IT IS OFTEN CAUSED BY IMPROPER ARGUMENTS OR IMPROPER
-C        SETTING OF LDA .  IT WILL NOT OCCUR IF THE SUBROUTINES ARE
-C        CALLED CORRECTLY AND IF WGECO HAS SET RCOND .GT. 0.0
-C        OR WGEFA HAS SET INFO .EQ. 0 .
-C
-C     TO COMPUTE  INVERSE(A) * C  WHERE  C  IS A MATRIX
-C     WITH  P  COLUMNS
-C           CALL WGECO(A,LDA,N,IPVT,RCOND,Z)
-C           IF (RCOND IS TOO SMALL) GOTO ...
-C           DO 10 J = 1, P
-C              CALL WGESL(A,LDA,N,IPVT,C(1,J),0)
-C        10 CONTINUE
-C
-C     LINPACK. THIS VERSION DATED 07/01/79 .
-C     CLEVE MOLER, UNIVERSITY OF NEW MEXICO, ARGONNE NATIONAL LAB.
-C
-C     SUBROUTINES AND FUNCTIONS
-C
-C     BLAS WAXPY,WDOTC
-C
-C     INTERNAL VARIABLES
-C
+!
+!     WGESL SOLVES THE DOUBLE-COMPLEX SYSTEM
+!     A * X = B  OR  CTRANS(A) * X = B
+!     USING THE FACTORS COMPUTED BY WGECO OR WGEFA.
+!
+!     ON ENTRY
+!
+!        A       DOUBLE-COMPLEX(LDA, N)
+!                THE OUTPUT FROM WGECO OR WGEFA.
+!
+!        LDA     INTEGER
+!                THE LEADING DIMENSION OF THE ARRAY  A .
+!
+!        N       INTEGER
+!                THE ORDER OF THE MATRIX  A .
+!
+!        IPVT    INTEGER(N)
+!                THE PIVOT VECTOR FROM WGECO OR WGEFA.
+!
+!        B       DOUBLE-COMPLEX(N)
+!                THE RIGHT HAND SIDE VECTOR.
+!
+!        JOB     INTEGER
+!                = 0         TO SOLVE  A*X = B ,
+!                = NONZERO   TO SOLVE  CTRANS(A)*X = B  WHERE
+!         CTRANS(A)  IS THE CONJUGATE TRANSPOSE.
+!
+!     ON RETURN
+!
+!        B       THE SOLUTION VECTOR  X .
+!
+!     ERROR CONDITION
+!
+!        A DIVISION BY ZERO WILL OCCUR IF THE INPUT FACTOR CONTAINS A
+!        ZERO ON THE DIAGONAL.  TECHNICALLY THIS INDICATES SINGULARITY
+!        BUT IT IS OFTEN CAUSED BY IMPROPER ARGUMENTS OR IMPROPER
+!        SETTING OF LDA .  IT WILL NOT OCCUR IF THE SUBROUTINES ARE
+!        CALLED CORRECTLY AND IF WGECO HAS SET RCOND > 0.0
+!        OR WGEFA HAS SET INFO == 0 .
+!
+!     TO COMPUTE  INVERSE(A) * C  WHERE  C  IS A MATRIX
+!     WITH  P  COLUMNS
+!           CALL WGECO(A,LDA,N,IPVT,RCOND,Z)
+!           IF (RCOND IS TOO SMALL) GOTO ...
+!           DO 10 J = 1, P
+!              CALL WGESL(A,LDA,N,IPVT,C(1,J),0)
+!        10 CONTINUE
+!
+!     LINPACK. THIS VERSION DATED 07/01/79 .
+!     CLEVE MOLER, UNIVERSITY OF NEW MEXICO, ARGONNE NATIONAL LAB.
+!
+!     SUBROUTINES AND FUNCTIONS
+!
+!     BLAS WAXPY,WDOTC
+!
+!     INTERNAL VARIABLES
+!
       DOUBLE PRECISION WDOTCR,WDOTCI,TR,TI
       INTEGER K,KB,L,NM1
-C
+!
       NM1 = N - 1
-      IF (JOB .NE. 0) GOTO 50
-C
-C        JOB = 0 , SOLVE  A * X = B
-C        FIRST SOLVE  L*Y = B
-C
-         IF (NM1 .LT. 1) GOTO 30
+      IF (JOB /= 0) GOTO 50
+!
+!        JOB = 0 , SOLVE  A * X = B
+!        FIRST SOLVE  L*Y = B
+!
+         IF (NM1 < 1) GOTO 30
          DO 20 K = 1, NM1
             L = IPVT(K)
             TR = BR(L)
             TI = BI(L)
-            IF (L .EQ. K) GOTO 10
+            IF (L == K) GOTO 10
                BR(L) = BR(K)
                BI(L) = BI(K)
                BR(K) = TR
                BI(K) = TI
    10       CONTINUE
-            CALL WAXPY(N-K,TR,TI,AR(K+1,K),AI(K+1,K),1,BR(K+1),BI(K+1),
-     *                 1)
+            CALL WAXPY(N-K,TR,TI,AR(K+1,K),AI(K+1,K),1,BR(K+1),BI(K+1),&
+                       1)
    20    CONTINUE
    30    CONTINUE
-C
-C        NOW SOLVE  U*X = Y
-C
+!
+!        NOW SOLVE  U*X = Y
+!
          DO 40 KB = 1, N
             K = N + 1 - KB
             CALL WDIV(BR(K),BI(K),AR(K,K),AI(K,K),BR(K),BI(K))
@@ -4723,27 +4723,27 @@ C
    40    CONTINUE
       GOTO 100
    50 CONTINUE
-C
-C        JOB = NONZERO, SOLVE  CTRANS(A) * X = B
-C        FIRST SOLVE  CTRANS(U)*Y = B
-C
+!
+!        JOB = NONZERO, SOLVE  CTRANS(A) * X = B
+!        FIRST SOLVE  CTRANS(U)*Y = B
+!
          DO 60 K = 1, N
             TR = BR(K) - WDOTCR(K-1,AR(1,K),AI(1,K),1,BR(1),BI(1),1)
             TI = BI(K) - WDOTCI(K-1,AR(1,K),AI(1,K),1,BR(1),BI(1),1)
             CALL WDIV(TR,TI,AR(K,K),-AI(K,K),BR(K),BI(K))
    60    CONTINUE
-C
-C        NOW SOLVE CTRANS(L)*X = Y
-C
-         IF (NM1 .LT. 1) GOTO 90
+!
+!        NOW SOLVE CTRANS(L)*X = Y
+!
+         IF (NM1 < 1) GOTO 90
          DO 80 KB = 1, NM1
             K = N - KB
-            BR(K) = BR(K)
-     *            + WDOTCR(N-K,AR(K+1,K),AI(K+1,K),1,BR(K+1),BI(K+1),1)
-            BI(K) = BI(K)
-     *            + WDOTCI(N-K,AR(K+1,K),AI(K+1,K),1,BR(K+1),BI(K+1),1)
+            BR(K) = BR(K)&
+                  + WDOTCR(N-K,AR(K+1,K),AI(K+1,K),1,BR(K+1),BI(K+1),1)
+            BI(K) = BI(K)&
+                  + WDOTCI(N-K,AR(K+1,K),AI(K+1,K),1,BR(K+1),BI(K+1),1)
             L = IPVT(K)
-            IF (L .EQ. K) GOTO 70
+            IF (L == K) GOTO 70
                TR = BR(L)
                TI = BI(L)
                BR(L) = BR(K)
@@ -4756,100 +4756,100 @@ C
   100 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WGEDI(AR,AI,LDA,N,IPVT,DETR,DETI,WORKR,WORKI,JOB)
       INTEGER LDA,N,IPVT(1),JOB
-      DOUBLE PRECISION AR(LDA,1),AI(LDA,1),DETR(2),DETI(2),WORKR(1),
-     *                 WORKI(1)
-C
-C     WGEDI COMPUTES THE DETERMINANT AND INVERSE OF A MATRIX
-C     USING THE FACTORS COMPUTED BY WGECO OR WGEFA.
-C
-C     ON ENTRY
-C
-C        A       DOUBLE-COMPLEX(LDA, N)
-C                THE OUTPUT FROM WGECO OR WGEFA.
-C
-C        LDA     INTEGER
-C                THE LEADING DIMENSION OF THE ARRAY  A .
-C
-C        N       INTEGER
-C                THE ORDER OF THE MATRIX  A .
-C
-C        IPVT    INTEGER(N)
-C                THE PIVOT VECTOR FROM WGECO OR WGEFA.
-C
-C        WORK    DOUBLE-COMPLEX(N)
-C                WORK VECTOR.  CONTENTS DESTROYED.
-C
-C        JOB     INTEGER
-C                = 11   BOTH DETERMINANT AND INVERSE.
-C                = 01   INVERSE ONLY.
-C                = 10   DETERMINANT ONLY.
-C
-C     ON RETURN
-C
-C        A       INVERSE OF ORIGINAL MATRIX IF REQUESTED.
-C                OTHERWISE UNCHANGED.
-C
-C        DET     DOUBLE-COMPLEX(2)
-C                DETERMINANT OF ORIGINAL MATRIX IF REQUESTED.
-C                OTHERWISE NOT REFERENCED.
-C                DETERMINANT = DET(1) * 10.0**DET(2)
-C                WITH  1.0 .LE. CABS1(DET(1) .LT. 10.0
-C                OR  DET(1) .EQ. 0.0 .
-C
-C     ERROR CONDITION
-C
-C        A DIVISION BY ZERO WILL OCCUR IF THE INPUT FACTOR CONTAINS
-C        A ZERO ON THE DIAGONAL AND THE INVERSE IS REQUESTED.
-C        IT WILL NOT OCCUR IF THE SUBROUTINES ARE CALLED CORRECTLY
-C        AND IF WGECO HAS SET RCOND .GT. 0.0 OR WGEFA HAS SET
-C        INFO .EQ. 0 .
-C
-C     LINPACK. THIS VERSION DATED 07/01/79 .
-C     CLEVE MOLER, UNIVERSITY OF NEW MEXICO, ARGONNE NATIONAL LAB.
-C
-C     SUBROUTINES AND FUNCTIONS
-C
-C     BLAS WAXPY,WSCAL,WSWAP
-C     FORTRAN DABS,MOD
-C
-C     INTERNAL VARIABLES
-C
+      DOUBLE PRECISION AR(LDA,1),AI(LDA,1),DETR(2),DETI(2),WORKR(1),&
+                       WORKI(1)
+!
+!     WGEDI COMPUTES THE DETERMINANT AND INVERSE OF A MATRIX
+!     USING THE FACTORS COMPUTED BY WGECO OR WGEFA.
+!
+!     ON ENTRY
+!
+!        A       DOUBLE-COMPLEX(LDA, N)
+!                THE OUTPUT FROM WGECO OR WGEFA.
+!
+!        LDA     INTEGER
+!                THE LEADING DIMENSION OF THE ARRAY  A .
+!
+!        N       INTEGER
+!                THE ORDER OF THE MATRIX  A .
+!
+!        IPVT    INTEGER(N)
+!                THE PIVOT VECTOR FROM WGECO OR WGEFA.
+!
+!        WORK    DOUBLE-COMPLEX(N)
+!                WORK VECTOR.  CONTENTS DESTROYED.
+!
+!        JOB     INTEGER
+!                = 11   BOTH DETERMINANT AND INVERSE.
+!                = 01   INVERSE ONLY.
+!                = 10   DETERMINANT ONLY.
+!
+!     ON RETURN
+!
+!        A       INVERSE OF ORIGINAL MATRIX IF REQUESTED.
+!                OTHERWISE UNCHANGED.
+!
+!        DET     DOUBLE-COMPLEX(2)
+!                DETERMINANT OF ORIGINAL MATRIX IF REQUESTED.
+!                OTHERWISE NOT REFERENCED.
+!                DETERMINANT = DET(1) * 10.0**DET(2)
+!                WITH  1.0 <= CABS1(DET(1) < 10.0
+!                OR  DET(1) == 0.0 .
+!
+!     ERROR CONDITION
+!
+!        A DIVISION BY ZERO WILL OCCUR IF THE INPUT FACTOR CONTAINS
+!        A ZERO ON THE DIAGONAL AND THE INVERSE IS REQUESTED.
+!        IT WILL NOT OCCUR IF THE SUBROUTINES ARE CALLED CORRECTLY
+!        AND IF WGECO HAS SET RCOND > 0.0 OR WGEFA HAS SET
+!        INFO == 0 .
+!
+!     LINPACK. THIS VERSION DATED 07/01/79 .
+!     CLEVE MOLER, UNIVERSITY OF NEW MEXICO, ARGONNE NATIONAL LAB.
+!
+!     SUBROUTINES AND FUNCTIONS
+!
+!     BLAS WAXPY,WSCAL,WSWAP
+!     FORTRAN DABS,MOD
+!
+!     INTERNAL VARIABLES
+!
       DOUBLE PRECISION TR,TI
       DOUBLE PRECISION TEN
       INTEGER I,J,K,KB,KP1,L,NM1
-C
+!
       DOUBLE PRECISION ZDUMR,ZDUMI
       DOUBLE PRECISION CABS1
       CABS1(ZDUMR,ZDUMI) = DABS(ZDUMR) + DABS(ZDUMI)
-C
-C     COMPUTE DETERMINANT
-C
-      IF (JOB/10 .EQ. 0) GOTO 80
+!
+!     COMPUTE DETERMINANT
+!
+      IF (JOB/10 == 0) GOTO 80
          DETR(1) = 1.0D0
          DETI(1) = 0.0D0
          DETR(2) = 0.0D0
          DETI(2) = 0.0D0
          TEN = 10.0D0
          DO 60 I = 1, N
-            IF (IPVT(I) .EQ. I) GOTO 10
+            IF (IPVT(I) == I) GOTO 10
                DETR(1) = -DETR(1)
                DETI(1) = -DETI(1)
    10       CONTINUE
             CALL WMUL(AR(I,I),AI(I,I),DETR(1),DETI(1),DETR(1),DETI(1))
-C           ...EXIT
-C        ...EXIT
-            IF (CABS1(DETR(1),DETI(1)) .EQ. 0.0D0) GOTO 70
-   20       IF (CABS1(DETR(1),DETI(1)) .GE. 1.0D0) GOTO 30
+!           ...EXIT
+!        ...EXIT
+            IF (CABS1(DETR(1),DETI(1)) == 0.0D0) GOTO 70
+   20       IF (CABS1(DETR(1),DETI(1)) >= 1.0D0) GOTO 30
                DETR(1) = TEN*DETR(1)
                DETI(1) = TEN*DETI(1)
                DETR(2) = DETR(2) - 1.0D0
                DETI(2) = DETI(2) - 0.0D0
             GOTO 20
    30       CONTINUE
-   40       IF (CABS1(DETR(1),DETI(1)) .LT. TEN) GOTO 50
+   40       IF (CABS1(DETR(1),DETI(1)) < TEN) GOTO 50
                DETR(1) = DETR(1)/TEN
                DETI(1) = DETI(1)/TEN
                DETR(2) = DETR(2) + 1.0D0
@@ -4859,17 +4859,17 @@ C        ...EXIT
    60    CONTINUE
    70    CONTINUE
    80 CONTINUE
-C
-C     COMPUTE INVERSE(U)
-C
-      IF (MOD(JOB,10) .EQ. 0) GOTO 160
+!
+!     COMPUTE INVERSE(U)
+!
+      IF (MOD(JOB,10) == 0) GOTO 160
          DO 110 K = 1, N
             CALL WDIV(1.0D0,0.0D0,AR(K,K),AI(K,K),AR(K,K),AI(K,K))
             TR = -AR(K,K)
             TI = -AI(K,K)
             CALL WSCAL(K-1,TR,TI,AR(1,K),AI(1,K),1)
             KP1 = K + 1
-            IF (N .LT. KP1) GOTO 100
+            IF (N < KP1) GOTO 100
             DO 90 J = KP1, N
                TR = AR(K,J)
                TI = AI(K,J)
@@ -4879,11 +4879,11 @@ C
    90       CONTINUE
   100       CONTINUE
   110    CONTINUE
-C
-C        FORM INVERSE(U)*INVERSE(L)
-C
+!
+!        FORM INVERSE(U)*INVERSE(L)
+!
          NM1 = N - 1
-         IF (NM1 .LT. 1) GOTO 150
+         IF (NM1 < 1) GOTO 150
          DO 140 KB = 1, NM1
             K = N - KB
             KP1 = K + 1
@@ -4899,14 +4899,14 @@ C
                CALL WAXPY(N,TR,TI,AR(1,J),AI(1,J),1,AR(1,K),AI(1,K),1)
   130       CONTINUE
             L = IPVT(K)
-            IF (L .NE. K)
-     *         CALL WSWAP(N,AR(1,K),AI(1,K),1,AR(1,L),AI(1,L),1)
+            IF (L /= K)&
+               CALL WSWAP(N,AR(1,K),AI(1,K),1,AR(1,L),AI(1,L),1)
   140    CONTINUE
   150    CONTINUE
   160 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WPOFA(AR,AI,LDA,N,INFO)
       DOUBLE PRECISION AR(LDA,1),AI(LDA,1)
       DOUBLE PRECISION S,TR,TI,WDOTCR,WDOTCI
@@ -4914,7 +4914,7 @@ C-----------------------------------------------------------------------
          INFO = J
          S = 0.0D0
          JM1 = J-1
-         IF (JM1 .LT. 1) GOTO 20
+         IF (JM1 < 1) GOTO 20
          DO 10 K = 1, JM1
             TR = AR(K,J)-WDOTCR(K-1,AR(1,K),AI(1,K),1,AR(1,J),AI(1,J),1)
             TI = AI(K,J)-WDOTCI(K-1,AR(1,K),AI(1,K),1,AR(1,J),AI(1,J),1)
@@ -4925,13 +4925,13 @@ C-----------------------------------------------------------------------
    10    CONTINUE
    20    CONTINUE
          S = AR(J,J) - S
-         IF (S.LE.0.0D0 .OR. AI(J,J).NE.0.0D0) GOTO 40
+         IF (S<=0.0D0 .OR. AI(J,J)/=0.0D0) GOTO 40
          AR(J,J) = DSQRT(S)
    30 CONTINUE
       INFO = 0
    40 RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE RREF(AR,AI,LDA,M,N,EPS)
       DOUBLE PRECISION AR(LDA,1),AI(LDA,1),EPS,TOL,TR,TI,WASUM
       TOL = 0.0D0
@@ -4941,9 +4941,9 @@ C-----------------------------------------------------------------------
       TOL = EPS*DFLOAT(2*MAX0(M,N))*TOL
       K = 1
       L = 1
-   20 IF (K.GT.M .OR. L.GT.N) RETURN
+   20 IF (K>M .OR. L>N) RETURN
       I = IWAMAX(M-K+1,AR(K,L),AI(K,L),1) + K-1
-      IF (DABS(AR(I,L))+DABS(AI(I,L)) .GT. TOL) GOTO 30
+      IF (DABS(AR(I,L))+DABS(AI(I,L)) > TOL) GOTO 30
          CALL WSET(M-K+1,0.0D0,0.0D0,AR(K,L),AI(K,L),1)
          L = L+1
          GOTO 20
@@ -4955,24 +4955,24 @@ C-----------------------------------------------------------------------
       DO 40 I = 1, M
          TR = -AR(I,L)
          TI = -AI(I,L)
-         IF (I .NE. K) CALL WAXPY(N-L+1,TR,TI,
-     $                 AR(K,L),AI(K,L),LDA,AR(I,L),AI(I,L),LDA)
+         IF (I /= K) CALL WAXPY(N-L+1,TR,TI,&
+                       AR(K,L),AI(K,L),LDA,AR(I,L),AI(I,L),LDA)
    40 CONTINUE
       K = K+1
       L = L+1
       GOTO 20
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE HILBER(A,LDA,N)
       DOUBLE PRECISION A(LDA,N)
-C     GENERATE INVERSE HILBERT MATRIX
+!     GENERATE INVERSE HILBERT MATRIX
       DOUBLE PRECISION P,R
       P = DFLOAT(N)
       DO 20 I = 1, N
-        IF (I.NE.1) P = (DFLOAT(N-I+1)*P*DFLOAT(N+I-1))/DFLOAT(I-1)**2
+        IF (I/=1) P = (DFLOAT(N-I+1)*P*DFLOAT(N+I-1))/DFLOAT(I-1)**2
         R = P*P
         A(I,I) = R/DFLOAT(2*I-1)
-        IF (I.EQ.N) GOTO 20
+        IF (I==N) GOTO 20
         IP1 = I+1
         DO 10 J = IP1, N
           R = (-1)*(DFLOAT(N-J+1)*R*(N+J-1))/DFLOAT(J-1)**2
@@ -4982,131 +4982,131 @@ C     GENERATE INVERSE HILBERT MATRIX
    20 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE HTRIDI(NM,N,AR,AI,D,E,E2,TAU)
-C
+!
       INTEGER I,J,K,L,N,II,NM,JP1
       DOUBLE PRECISION AR(NM,N),AI(NM,N),D(N),E(N),E2(N),TAU(2,N)
       DOUBLE PRECISION F,G,H,FI,GI,HH,SI,SCALE
       DOUBLE PRECISION FLOP,PYTHAG
-C
-C     THIS SUBROUTINE IS A TRANSLATION OF A COMPLEX ANALOGUE OF
-C     THE ALGOL PROCEDURE TRED1, NUM. MATH. 11, 181-195(1968)
-C     BY MARTIN, REINSCH, AND WILKINSON.
-C     HANDBOOK FOR AUTO. COMP., VOL.II-LINEAR ALGEBRA, 212-226(1971).
-C
-C     THIS SUBROUTINE REDUCES A COMPLEX HERMITIAN MATRIX
-C     TO A REAL SYMMETRIC TRIDIAGONAL MATRIX USING
-C     UNITARY SIMILARITY TRANSFORMATIONS.
-C
-C     ON INPUT.
-C
-C        NM MUST BE SET TO THE ROW DIMENSION OF TWO-DIMENSIONAL
-C          ARRAY PARAMETERS AS DECLARED IN THE CALLING PROGRAM
-C          DIMENSION STATEMENT.
-C
-C        N IS THE ORDER OF THE MATRIX.
-C
-C        AR AND AI CONTAIN THE REAL AND IMAGINARY PARTS,
-C          RESPECTIVELY, OF THE COMPLEX HERMITIAN INPUT MATRIX.
-C          ONLY THE LOWER TRIANGLE OF THE MATRIX NEED BE SUPPLIED.
-C
-C     ON OUTPUT.
-C
-C        AR AND AI CONTAIN INFORMATION ABOUT THE UNITARY TRANS-
-C          FORMATIONS USED IN THE REDUCTION IN THEIR FULL LOWER
-C          TRIANGLES.  THEIR STRICT UPPER TRIANGLES AND THE
-C          DIAGONAL OF AR ARE UNALTERED.
-C
-C        D CONTAINS THE DIAGONAL ELEMENTS OF THE THE TRIDIAGONAL MATRIX.
-C
-C        E CONTAINS THE SUBDIAGONAL ELEMENTS OF THE TRIDIAGONAL
-C          MATRIX IN ITS LAST N-1 POSITIONS.  E(1) IS SET TO ZERO.
-C
-C        E2 CONTAINS THE SQUARES OF THE CORRESPONDING ELEMENTS OF E.
-C          E2 MAY COINCIDE WITH E IF THE SQUARES ARE NOT NEEDED.
-C
-C        TAU CONTAINS FURTHER INFORMATION ABOUT THE TRANSFORMATIONS.
-C
-C     MODIFIED TO GET RID OF ALL COMPLEX ARITHMETIC, C. MOLER, 6/27/79.
-C
-C     QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,
-C     APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY
-C
-C     ------------------------------------------------------------------
-C
+!
+!     THIS SUBROUTINE IS A TRANSLATION OF A COMPLEX ANALOGUE OF
+!     THE ALGOL PROCEDURE TRED1, NUM. MATH. 11, 181-195(1968)
+!     BY MARTIN, REINSCH, AND WILKINSON.
+!     HANDBOOK FOR AUTO. COMP., VOL.II-LINEAR ALGEBRA, 212-226(1971).
+!
+!     THIS SUBROUTINE REDUCES A COMPLEX HERMITIAN MATRIX
+!     TO A REAL SYMMETRIC TRIDIAGONAL MATRIX USING
+!     UNITARY SIMILARITY TRANSFORMATIONS.
+!
+!     ON INPUT.
+!
+!        NM MUST BE SET TO THE ROW DIMENSION OF TWO-DIMENSIONAL
+!          ARRAY PARAMETERS AS DECLARED IN THE CALLING PROGRAM
+!          DIMENSION STATEMENT.
+!
+!        N IS THE ORDER OF THE MATRIX.
+!
+!        AR AND AI CONTAIN THE REAL AND IMAGINARY PARTS,
+!          RESPECTIVELY, OF THE COMPLEX HERMITIAN INPUT MATRIX.
+!          ONLY THE LOWER TRIANGLE OF THE MATRIX NEED BE SUPPLIED.
+!
+!     ON OUTPUT.
+!
+!        AR AND AI CONTAIN INFORMATION ABOUT THE UNITARY TRANS-
+!          FORMATIONS USED IN THE REDUCTION IN THEIR FULL LOWER
+!          TRIANGLES.  THEIR STRICT UPPER TRIANGLES AND THE
+!          DIAGONAL OF AR ARE UNALTERED.
+!
+!        D CONTAINS THE DIAGONAL ELEMENTS OF THE THE TRIDIAGONAL MATRIX.
+!
+!        E CONTAINS THE SUBDIAGONAL ELEMENTS OF THE TRIDIAGONAL
+!          MATRIX IN ITS LAST N-1 POSITIONS.  E(1) IS SET TO ZERO.
+!
+!        E2 CONTAINS THE SQUARES OF THE CORRESPONDING ELEMENTS OF E.
+!          E2 MAY COINCIDE WITH E IF THE SQUARES ARE NOT NEEDED.
+!
+!        TAU CONTAINS FURTHER INFORMATION ABOUT THE TRANSFORMATIONS.
+!
+!     MODIFIED TO GET RID OF ALL COMPLEX ARITHMETIC, C. MOLER, 6/27/79.
+!
+!     QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,
+!     APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY
+!
+!     ------------------------------------------------------------------
+!
       TAU(1,N) = 1.0D0
       TAU(2,N) = 0.0D0
-C
+!
       DO 100 I = 1, N
   100 D(I) = AR(I,I)
-C     .......... FOR I=N STEP -1 UNTIL 1 DO -- ..........
+!     .......... FOR I=N STEP -1 UNTIL 1 DO -- ..........
       DO 300 II = 1, N
          I = N + 1 - II
          L = I - 1
          H = 0.0D0
          SCALE = 0.0D0
-         IF (L .LT. 1) GOTO 130
-C     .......... SCALE ROW (ALGOL TOL THEN NOT NEEDED) ..........
+         IF (L < 1) GOTO 130
+!     .......... SCALE ROW (ALGOL TOL THEN NOT NEEDED) ..........
          DO 120 K = 1, L
   120    SCALE = FLOP(SCALE + DABS(AR(I,K)) + DABS(AI(I,K)))
-C
-         IF (SCALE .NE. 0.0D0) GOTO 140
+!
+         IF (SCALE /= 0.0D0) GOTO 140
          TAU(1,L) = 1.0D0
          TAU(2,L) = 0.0D0
   130    E(I) = 0.0D0
          E2(I) = 0.0D0
          GOTO 290
-C
+!
   140    DO 150 K = 1, L
             AR(I,K) = FLOP(AR(I,K)/SCALE)
             AI(I,K) = FLOP(AI(I,K)/SCALE)
             H = FLOP(H + AR(I,K)*AR(I,K) + AI(I,K)*AI(I,K))
   150    CONTINUE
-C
+!
          E2(I) = FLOP(SCALE*SCALE*H)
          G = FLOP(DSQRT(H))
          E(I) = FLOP(SCALE*G)
          F = PYTHAG(AR(I,L),AI(I,L))
-C     .......... FORM NEXT DIAGONAL ELEMENT OF MATRIX T ..........
-         IF (F .EQ. 0.0D0) GOTO 160
+!     .......... FORM NEXT DIAGONAL ELEMENT OF MATRIX T ..........
+         IF (F == 0.0D0) GOTO 160
          TAU(1,L) = FLOP((AI(I,L)*TAU(2,I) - AR(I,L)*TAU(1,I))/F)
          SI = FLOP((AR(I,L)*TAU(2,I) + AI(I,L)*TAU(1,I))/F)
          H = FLOP(H + F*G)
          G = FLOP(1.0D0 + G/F)
          AR(I,L) = FLOP(G*AR(I,L))
          AI(I,L) = FLOP(G*AI(I,L))
-         IF (L .EQ. 1) GOTO 270
+         IF (L == 1) GOTO 270
          GOTO 170
   160    TAU(1,L) = -TAU(1,I)
          SI = TAU(2,I)
          AR(I,L) = G
   170    F = 0.0D0
-C
+!
          DO 240 J = 1, L
             G = 0.0D0
             GI = 0.0D0
-C     .......... FORM ELEMENT OF A*U ..........
+!     .......... FORM ELEMENT OF A*U ..........
             DO 180 K = 1, J
                G = FLOP(G + AR(J,K)*AR(I,K) + AI(J,K)*AI(I,K))
                GI = FLOP(GI - AR(J,K)*AI(I,K) + AI(J,K)*AR(I,K))
   180       CONTINUE
-C
+!
             JP1 = J + 1
-            IF (L .LT. JP1) GOTO 220
-C
+            IF (L < JP1) GOTO 220
+!
             DO 200 K = JP1, L
                G = FLOP(G + AR(K,J)*AR(I,K) - AI(K,J)*AI(I,K))
                GI = FLOP(GI - AR(K,J)*AI(I,K) - AI(K,J)*AR(I,K))
   200       CONTINUE
-C     .......... FORM ELEMENT OF P ..........
+!     .......... FORM ELEMENT OF P ..........
   220       E(J) = FLOP(G/H)
             TAU(2,J) = FLOP(GI/H)
             F = FLOP(F + E(J)*AR(I,J) - TAU(2,J)*AI(I,J))
   240    CONTINUE
-C
+!
          HH = FLOP(F/(H + H))
-C     .......... FORM REDUCED A ..........
+!     .......... FORM REDUCED A ..........
          DO 260 J = 1, L
             F = AR(I,J)
             G = FLOP(E(J) - HH*F)
@@ -5114,208 +5114,208 @@ C     .......... FORM REDUCED A ..........
             FI = -AI(I,J)
             GI = FLOP(TAU(2,J) - HH*FI)
             TAU(2,J) = -GI
-C
+!
             DO 260 K = 1, J
-               AR(J,K) = FLOP(AR(J,K) - F*E(K) - G*AR(I,K)
-     X        + FI*TAU(2,K) + GI*AI(I,K))
-               AI(J,K) = FLOP(AI(J,K) - F*TAU(2,K) - G*AI(I,K)
-     X        - FI*E(K) - GI*AR(I,K))
+               AR(J,K) = FLOP(AR(J,K) - F*E(K) - G*AR(I,K)&
+              + FI*TAU(2,K) + GI*AI(I,K))
+               AI(J,K) = FLOP(AI(J,K) - F*TAU(2,K) - G*AI(I,K)&
+              - FI*E(K) - GI*AR(I,K))
   260    CONTINUE
-C
+!
   270    DO 280 K = 1, L
             AR(I,K) = FLOP(SCALE*AR(I,K))
             AI(I,K) = FLOP(SCALE*AI(I,K))
   280    CONTINUE
-C
+!
          TAU(2,L) = -SI
   290    HH = D(I)
          D(I) = AR(I,I)
          AR(I,I) = HH
          AI(I,I) = FLOP(SCALE*DSQRT(H))
   300 CONTINUE
-C
+!
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE HTRIBK(NM,N,AR,AI,TAU,M,ZR,ZI)
-C
+!
       INTEGER I,J,K,L,M,N,NM
       DOUBLE PRECISION AR(NM,N),AI(NM,N),TAU(2,N),ZR(NM,M),ZI(NM,M)
       DOUBLE PRECISION H,S,SI,FLOP
-C
-C     THIS SUBROUTINE IS A TRANSLATION OF A COMPLEX ANALOGUE OF
-C     THE ALGOL PROCEDURE TRBAK1, NUM. MATH. 11, 181-195(1968)
-C     BY MARTIN, REINSCH, AND WILKINSON.
-C     HANDBOOK FOR AUTO. COMP., VOL.II-LINEAR ALGEBRA, 212-226(1971).
-C
-C     THIS SUBROUTINE FORMS THE EIGENVECTORS OF A COMPLEX HERMITIAN
-C     MATRIX BY BACK TRANSFORMING THOSE OF THE CORRESPONDING
-C     REAL SYMMETRIC TRIDIAGONAL MATRIX DETERMINED BY  HTRIDI.
-C
-C     ON INPUT.
-C
-C        NM MUST BE SET TO THE ROW DIMENSION OF TWO-DIMENSIONAL
-C          ARRAY PARAMETERS AS DECLARED IN THE CALLING PROGRAM
-C          DIMENSION STATEMENT.
-C
-C        N IS THE ORDER OF THE MATRIX.
-C
-C        AR AND AI CONTAIN INFORMATION ABOUT THE UNITARY TRANS-
-C          FORMATIONS USED IN THE REDUCTION BY  HTRIDI  IN THEIR
-C          FULL LOWER TRIANGLES EXCEPT FOR THE DIAGONAL OF AR.
-C
-C        TAU CONTAINS FURTHER INFORMATION ABOUT THE TRANSFORMATIONS.
-C
-C        M IS THE NUMBER OF EIGENVECTORS TO BE BACK TRANSFORMED.
-C
-C        ZR CONTAINS THE EIGENVECTORS TO BE BACK TRANSFORMED
-C          IN ITS FIRST M COLUMNS.
-C
-C     ON OUTPUT.
-C
-C        ZR AND ZI CONTAIN THE REAL AND IMAGINARY PARTS,
-C          RESPECTIVELY, OF THE TRANSFORMED EIGENVECTORS
-C          IN THEIR FIRST M COLUMNS.
-C
-C     NOTE THAT THE LAST COMPONENT OF EACH RETURNED VECTOR
-C     IS REAL AND THAT VECTOR EUCLIDEAN NORMS ARE PRESERVED.
-C
-C     QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,
-C     APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY
-C
-C     ------------------------------------------------------------------
-C
-      IF (M .EQ. 0) GOTO 200
-C     .......... TRANSFORM THE EIGENVECTORS OF THE REAL SYMMETRIC
-C                TRIDIAGONAL MATRIX TO THOSE OF THE HERMITIAN
-C                TRIDIAGONAL MATRIX. ..........
+!
+!     THIS SUBROUTINE IS A TRANSLATION OF A COMPLEX ANALOGUE OF
+!     THE ALGOL PROCEDURE TRBAK1, NUM. MATH. 11, 181-195(1968)
+!     BY MARTIN, REINSCH, AND WILKINSON.
+!     HANDBOOK FOR AUTO. COMP., VOL.II-LINEAR ALGEBRA, 212-226(1971).
+!
+!     THIS SUBROUTINE FORMS THE EIGENVECTORS OF A COMPLEX HERMITIAN
+!     MATRIX BY BACK TRANSFORMING THOSE OF THE CORRESPONDING
+!     REAL SYMMETRIC TRIDIAGONAL MATRIX DETERMINED BY  HTRIDI.
+!
+!     ON INPUT.
+!
+!        NM MUST BE SET TO THE ROW DIMENSION OF TWO-DIMENSIONAL
+!          ARRAY PARAMETERS AS DECLARED IN THE CALLING PROGRAM
+!          DIMENSION STATEMENT.
+!
+!        N IS THE ORDER OF THE MATRIX.
+!
+!        AR AND AI CONTAIN INFORMATION ABOUT THE UNITARY TRANS-
+!          FORMATIONS USED IN THE REDUCTION BY  HTRIDI  IN THEIR
+!          FULL LOWER TRIANGLES EXCEPT FOR THE DIAGONAL OF AR.
+!
+!        TAU CONTAINS FURTHER INFORMATION ABOUT THE TRANSFORMATIONS.
+!
+!        M IS THE NUMBER OF EIGENVECTORS TO BE BACK TRANSFORMED.
+!
+!        ZR CONTAINS THE EIGENVECTORS TO BE BACK TRANSFORMED
+!          IN ITS FIRST M COLUMNS.
+!
+!     ON OUTPUT.
+!
+!        ZR AND ZI CONTAIN THE REAL AND IMAGINARY PARTS,
+!          RESPECTIVELY, OF THE TRANSFORMED EIGENVECTORS
+!          IN THEIR FIRST M COLUMNS.
+!
+!     NOTE THAT THE LAST COMPONENT OF EACH RETURNED VECTOR
+!     IS REAL AND THAT VECTOR EUCLIDEAN NORMS ARE PRESERVED.
+!
+!     QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,
+!     APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY
+!
+!     ------------------------------------------------------------------
+!
+      IF (M == 0) GOTO 200
+!     .......... TRANSFORM THE EIGENVECTORS OF THE REAL SYMMETRIC
+!                TRIDIAGONAL MATRIX TO THOSE OF THE HERMITIAN
+!                TRIDIAGONAL MATRIX. ..........
       DO 50 K = 1, N
-C
+!
          DO 50 J = 1, M
             ZI(K,J) = FLOP(-(ZR(K,J)*TAU(2,K)))
             ZR(K,J) = FLOP(ZR(K,J)*TAU(1,K))
    50 CONTINUE
-C
-      IF (N .EQ. 1) GOTO 200
-C     .......... RECOVER AND APPLY THE HOUSEHOLDER MATRICES ..........
+!
+      IF (N == 1) GOTO 200
+!     .......... RECOVER AND APPLY THE HOUSEHOLDER MATRICES ..........
       DO 140 I = 2, N
          L = I - 1
          H = AI(I,I)
-         IF (H .EQ. 0.0D0) GOTO 140
-C
+         IF (H == 0.0D0) GOTO 140
+!
          DO 130 J = 1, M
             S = 0.0D0
             SI = 0.0D0
-C
+!
             DO 110 K = 1, L
                S = FLOP(S + AR(I,K)*ZR(K,J) - AI(I,K)*ZI(K,J))
                SI = FLOP(SI + AR(I,K)*ZI(K,J) + AI(I,K)*ZR(K,J))
   110       CONTINUE
-C     .......... DOUBLE DIVISIONS AVOID POSSIBLE UNDERFLOW ..........
+!     .......... DOUBLE DIVISIONS AVOID POSSIBLE UNDERFLOW ..........
             S = FLOP((S/H)/H)
             SI = FLOP((SI/H)/H)
-C
+!
             DO 120 K = 1, L
                ZR(K,J) = FLOP(ZR(K,J) - S*AR(I,K) - SI*AI(I,K))
                ZI(K,J) = FLOP(ZI(K,J) - SI*AR(I,K) + S*AI(I,K))
   120       CONTINUE
-C
+!
   130    CONTINUE
-C
+!
   140 CONTINUE
-C
+!
   200 RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE IMTQL2(NM,N,D,E,Z,IERR,JOB)
-C
+!
       INTEGER I,J,K,L,M,N,II,NM,MML,IERR
       DOUBLE PRECISION D(N),E(N),Z(NM,N)
       DOUBLE PRECISION B,C,F,G,P,R,S
       DOUBLE PRECISION FLOP
-C
-C     THIS SUBROUTINE IS A TRANSLATION OF THE ALGOL PROCEDURE IMTQL2,
-C     NUM. MATH. 12, 377-383(1968) BY MARTIN AND WILKINSON,
-C     AS MODIFIED IN NUM. MATH. 15, 450(1970) BY DUBRULLE.
-C     HANDBOOK FOR AUTO. COMP., VOL.II-LINEAR ALGEBRA, 241-248(1971).
-C
-C     THIS SUBROUTINE FINDS THE EIGENVALUES AND EIGENVECTORS
-C     OF A SYMMETRIC TRIDIAGONAL MATRIX BY THE IMPLICIT QL METHOD.
-C     THE EIGENVECTORS OF A FULL SYMMETRIC MATRIX CAN ALSO
-C     BE FOUND IF  TRED2  HAS BEEN USED TO REDUCE THIS
-C     FULL MATRIX TO TRIDIAGONAL FORM.
-C
-C     ON INPUT.
-C
-C        NM MUST BE SET TO THE ROW DIMENSION OF TWO-DIMENSIONAL
-C          ARRAY PARAMETERS AS DECLARED IN THE CALLING PROGRAM
-C          DIMENSION STATEMENT.
-C
-C        N IS THE ORDER OF THE MATRIX.
-C
-C        D CONTAINS THE DIAGONAL ELEMENTS OF THE INPUT MATRIX.
-C
-C        E CONTAINS THE SUBDIAGONAL ELEMENTS OF THE INPUT MATRIX
-C          IN ITS LAST N-1 POSITIONS.  E(1) IS ARBITRARY.
-C
-C        Z CONTAINS THE TRANSFORMATION MATRIX PRODUCED IN THE
-C          REDUCTION BY  TRED2, IF PERFORMED.  IF THE EIGENVECTORS
-C          OF THE TRIDIAGONAL MATRIX ARE DESIRED, Z MUST CONTAIN
-C          THE IDENTITY MATRIX.
-C
-C      ON OUTPUT.
-C
-C        D CONTAINS THE EIGENVALUES IN ASCENDING ORDER.  IF AN
-C          ERROR EXIT IS MADE, THE EIGENVALUES ARE CORRECT BUT
-C          UNORDERED FOR INDICES 1,2,...,IERR-1.
-C
-C        E HAS BEEN DESTROYED.
-C
-C        Z CONTAINS ORTHONORMAL EIGENVECTORS OF THE SYMMETRIC
-C          TRIDIAGONAL (OR FULL) MATRIX.  IF AN ERROR EXIT IS MADE,
-C          Z CONTAINS THE EIGENVECTORS ASSOCIATED WITH THE STORED
-C          EIGENVALUES.
-C
-C        IERR IS SET TO
-C          ZERO       FOR NORMAL RETURN,
-C          J          IF THE J-TH EIGENVALUE HAS NOT BEEN
-C  DETERMINED AFTER 30 ITERATIONS.
-C
-C     QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,
-C     APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY
-C
-C     ------------------------------------------------------------------
-C
-C
-C*****
-C     MODIFIED BY C. MOLER TO ELIMINATE MACHEP 11/22/78
-C     MODIFIED TO ADD JOB PARAMETER 08/27/79
-C*****
+!
+!     THIS SUBROUTINE IS A TRANSLATION OF THE ALGOL PROCEDURE IMTQL2,
+!     NUM. MATH. 12, 377-383(1968) BY MARTIN AND WILKINSON,
+!     AS MODIFIED IN NUM. MATH. 15, 450(1970) BY DUBRULLE.
+!     HANDBOOK FOR AUTO. COMP., VOL.II-LINEAR ALGEBRA, 241-248(1971).
+!
+!     THIS SUBROUTINE FINDS THE EIGENVALUES AND EIGENVECTORS
+!     OF A SYMMETRIC TRIDIAGONAL MATRIX BY THE IMPLICIT QL METHOD.
+!     THE EIGENVECTORS OF A FULL SYMMETRIC MATRIX CAN ALSO
+!     BE FOUND IF  TRED2  HAS BEEN USED TO REDUCE THIS
+!     FULL MATRIX TO TRIDIAGONAL FORM.
+!
+!     ON INPUT.
+!
+!        NM MUST BE SET TO THE ROW DIMENSION OF TWO-DIMENSIONAL
+!          ARRAY PARAMETERS AS DECLARED IN THE CALLING PROGRAM
+!          DIMENSION STATEMENT.
+!
+!        N IS THE ORDER OF THE MATRIX.
+!
+!        D CONTAINS THE DIAGONAL ELEMENTS OF THE INPUT MATRIX.
+!
+!        E CONTAINS THE SUBDIAGONAL ELEMENTS OF THE INPUT MATRIX
+!          IN ITS LAST N-1 POSITIONS.  E(1) IS ARBITRARY.
+!
+!        Z CONTAINS THE TRANSFORMATION MATRIX PRODUCED IN THE
+!          REDUCTION BY  TRED2, IF PERFORMED.  IF THE EIGENVECTORS
+!          OF THE TRIDIAGONAL MATRIX ARE DESIRED, Z MUST CONTAIN
+!          THE IDENTITY MATRIX.
+!
+!      ON OUTPUT.
+!
+!        D CONTAINS THE EIGENVALUES IN ASCENDING ORDER.  IF AN
+!          ERROR EXIT IS MADE, THE EIGENVALUES ARE CORRECT BUT
+!          UNORDERED FOR INDICES 1,2,...,IERR-1.
+!
+!        E HAS BEEN DESTROYED.
+!
+!        Z CONTAINS ORTHONORMAL EIGENVECTORS OF THE SYMMETRIC
+!          TRIDIAGONAL (OR FULL) MATRIX.  IF AN ERROR EXIT IS MADE,
+!          Z CONTAINS THE EIGENVECTORS ASSOCIATED WITH THE STORED
+!          EIGENVALUES.
+!
+!        IERR IS SET TO
+!          ZERO       FOR NORMAL RETURN,
+!          J          IF THE J-TH EIGENVALUE HAS NOT BEEN
+!  DETERMINED AFTER 30 ITERATIONS.
+!
+!     QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,
+!     APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY
+!
+!     ------------------------------------------------------------------
+!
+!
+!*****
+!     MODIFIED BY C. MOLER TO ELIMINATE MACHEP 11/22/78
+!     MODIFIED TO ADD JOB PARAMETER 08/27/79
+!*****
       IERR = 0
-      IF (N .EQ. 1) GOTO 1001
-C
+      IF (N == 1) GOTO 1001
+!
       DO 100 I = 2, N
   100 E(I-1) = E(I)
-C
+!
       E(N) = 0.0D0
-C
+!
       DO 240 L = 1, N
          J = 0
-C     .......... LOOK FOR SMALL SUB-DIAGONAL ELEMENT ..........
+!     .......... LOOK FOR SMALL SUB-DIAGONAL ELEMENT ..........
   105    DO 110 M = L, N
-            IF (M .EQ. N) GOTO 120
-C*****
+            IF (M == N) GOTO 120
+!*****
             P = FLOP(DABS(D(M)) + DABS(D(M+1)))
             S = FLOP(P + DABS(E(M)))
-            IF (P .EQ. S) GOTO 120
-C*****
+            IF (P == S) GOTO 120
+!*****
   110    CONTINUE
-C
+!
   120    P = D(L)
-         IF (M .EQ. L) GOTO 240
-         IF (J .EQ. 30) GOTO 1000
+         IF (M == L) GOTO 240
+         IF (J == 30) GOTO 1000
          J = J + 1
-C     .......... FORM SHIFT ..........
+!     .......... FORM SHIFT ..........
          G = FLOP((D(L+1) - P)/(2.0D0*E(L)))
          R = FLOP(DSQRT(G*G+1.0D0))
          G = FLOP(D(M) - P + E(L)/(G + DSIGN(R,G)))
@@ -5323,12 +5323,12 @@ C     .......... FORM SHIFT ..........
          C = 1.0D0
          P = 0.0D0
          MML = M - L
-C     .......... FOR I=M-1 STEP -1 UNTIL L DO -- ..........
+!     .......... FOR I=M-1 STEP -1 UNTIL L DO -- ..........
          DO 200 II = 1, MML
             I = M - II
             F = FLOP(S*E(I))
             B = FLOP(C*E(I))
-            IF (DABS(F) .LT. DABS(G)) GOTO 150
+            IF (DABS(F) < DABS(G)) GOTO 150
             C = FLOP(G/F)
             R = FLOP(DSQRT(C*C+1.0D0))
             E(I+1) = FLOP(F*R)
@@ -5345,427 +5345,427 @@ C     .......... FOR I=M-1 STEP -1 UNTIL L DO -- ..........
             P = FLOP(S*R)
             D(I+1) = G + P
             G = FLOP(C*R - B)
-            IF (JOB .EQ. 0) GOTO 185
-C     .......... FORM VECTOR ..........
+            IF (JOB == 0) GOTO 185
+!     .......... FORM VECTOR ..........
             DO 180 K = 1, N
                F = Z(K,I+1)
                Z(K,I+1) = FLOP(S*Z(K,I) + C*F)
                Z(K,I) = FLOP(C*Z(K,I) - S*F)
   180       CONTINUE
   185       CONTINUE
-C
+!
   200    CONTINUE
-C
+!
          D(L) = FLOP(D(L) - P)
          E(L) = G
          E(M) = 0.0D0
          GOTO 105
   240 CONTINUE
-C     .......... ORDER EIGENVALUES AND EIGENVECTORS ..........
+!     .......... ORDER EIGENVALUES AND EIGENVECTORS ..........
       DO 300 II = 2, N
          I = II - 1
          K = I
          P = D(I)
-C
+!
          DO 260 J = II, N
-            IF (D(J) .GE. P) GOTO 260
+            IF (D(J) >= P) GOTO 260
             K = J
             P = D(J)
   260    CONTINUE
-C
-         IF (K .EQ. I) GOTO 300
+!
+         IF (K == I) GOTO 300
          D(K) = D(I)
          D(I) = P
-C
-         IF (JOB .EQ. 0) GOTO 285
+!
+         IF (JOB == 0) GOTO 285
          DO 280 J = 1, N
             P = Z(J,I)
             Z(J,I) = Z(J,K)
             Z(J,K) = P
   280    CONTINUE
   285    CONTINUE
-C
+!
   300 CONTINUE
-C
+!
       GOTO 1001
-C     .......... SET ERROR -- NO CONVERGENCE TO AN
-C                EIGENVALUE AFTER 30 ITERATIONS ..........
+!     .......... SET ERROR -- NO CONVERGENCE TO AN
+!                EIGENVALUE AFTER 30 ITERATIONS ..........
  1000 IERR = L
  1001 RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE CORTH(NM,N,LOW,IGH,AR,AI,ORTR,ORTI)
-C
+!
       INTEGER I,J,M,N,II,JJ,LA,MP,NM,IGH,KP1,LOW
       DOUBLE PRECISION AR(NM,N),AI(NM,N),ORTR(IGH),ORTI(IGH)
       DOUBLE PRECISION F,G,H,FI,FR,SCALE
       DOUBLE PRECISION FLOP,PYTHAG
-C
-C     THIS SUBROUTINE IS A TRANSLATION OF A COMPLEX ANALOGUE OF
-C     THE ALGOL PROCEDURE ORTHES, NUM. MATH. 12, 349-368(1968)
-C     BY MARTIN AND WILKINSON.
-C     HANDBOOK FOR AUTO. COMP., VOL.II-LINEAR ALGEBRA, 339-358(1971).
-C
-C     GIVEN A COMPLEX GENERAL MATRIX, THIS SUBROUTINE
-C     REDUCES A SUBMATRIX SITUATED IN ROWS AND COLUMNS
-C     LOW THROUGH IGH TO UPPER HESSENBERG FORM BY
-C     UNITARY SIMILARITY TRANSFORMATIONS.
-C
-C     ON INPUT.
-C
-C        NM MUST BE SET TO THE ROW DIMENSION OF TWO-DIMENSIONAL
-C          ARRAY PARAMETERS AS DECLARED IN THE CALLING PROGRAM
-C          DIMENSION STATEMENT.
-C
-C        N IS THE ORDER OF THE MATRIX.
-C
-C        LOW AND IGH ARE INTEGERS DETERMINED BY THE BALANCING
-C          SUBROUTINE  CBAL.  IF  CBAL  HAS NOT BEEN USED,
-C          SET LOW=1, IGH=N.
-C
-C        AR AND AI CONTAIN THE REAL AND IMAGINARY PARTS,
-C          RESPECTIVELY, OF THE COMPLEX INPUT MATRIX.
-C
-C     ON OUTPUT.
-C
-C        AR AND AI CONTAIN THE REAL AND IMAGINARY PARTS,
-C          RESPECTIVELY, OF THE HESSENBERG MATRIX.  INFORMATION
-C          ABOUT THE UNITARY TRANSFORMATIONS USED IN THE REDUCTION
-C          IS STORED IN THE REMAINING TRIANGLES UNDER THE
-C          HESSENBERG MATRIX.
-C
-C        ORTR AND ORTI CONTAIN FURTHER INFORMATION ABOUT THE
-C          TRANSFORMATIONS.  ONLY ELEMENTS LOW THROUGH IGH ARE USED.
-C
-C     QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,
-C     APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY
-C
-C     ------------------------------------------------------------------
-C
+!
+!     THIS SUBROUTINE IS A TRANSLATION OF A COMPLEX ANALOGUE OF
+!     THE ALGOL PROCEDURE ORTHES, NUM. MATH. 12, 349-368(1968)
+!     BY MARTIN AND WILKINSON.
+!     HANDBOOK FOR AUTO. COMP., VOL.II-LINEAR ALGEBRA, 339-358(1971).
+!
+!     GIVEN A COMPLEX GENERAL MATRIX, THIS SUBROUTINE
+!     REDUCES A SUBMATRIX SITUATED IN ROWS AND COLUMNS
+!     LOW THROUGH IGH TO UPPER HESSENBERG FORM BY
+!     UNITARY SIMILARITY TRANSFORMATIONS.
+!
+!     ON INPUT.
+!
+!        NM MUST BE SET TO THE ROW DIMENSION OF TWO-DIMENSIONAL
+!          ARRAY PARAMETERS AS DECLARED IN THE CALLING PROGRAM
+!          DIMENSION STATEMENT.
+!
+!        N IS THE ORDER OF THE MATRIX.
+!
+!        LOW AND IGH ARE INTEGERS DETERMINED BY THE BALANCING
+!          SUBROUTINE  CBAL.  IF  CBAL  HAS NOT BEEN USED,
+!          SET LOW=1, IGH=N.
+!
+!        AR AND AI CONTAIN THE REAL AND IMAGINARY PARTS,
+!          RESPECTIVELY, OF THE COMPLEX INPUT MATRIX.
+!
+!     ON OUTPUT.
+!
+!        AR AND AI CONTAIN THE REAL AND IMAGINARY PARTS,
+!          RESPECTIVELY, OF THE HESSENBERG MATRIX.  INFORMATION
+!          ABOUT THE UNITARY TRANSFORMATIONS USED IN THE REDUCTION
+!          IS STORED IN THE REMAINING TRIANGLES UNDER THE
+!          HESSENBERG MATRIX.
+!
+!        ORTR AND ORTI CONTAIN FURTHER INFORMATION ABOUT THE
+!          TRANSFORMATIONS.  ONLY ELEMENTS LOW THROUGH IGH ARE USED.
+!
+!     QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,
+!     APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY
+!
+!     ------------------------------------------------------------------
+!
       LA = IGH - 1
       KP1 = LOW + 1
-      IF (LA .LT. KP1) GOTO 200
-C
+      IF (LA < KP1) GOTO 200
+!
       DO 180 M = KP1, LA
          H = 0.0D0
          ORTR(M) = 0.0D0
          ORTI(M) = 0.0D0
          SCALE = 0.0D0
-C     .......... SCALE COLUMN (ALGOL TOL THEN NOT NEEDED) ..........
+!     .......... SCALE COLUMN (ALGOL TOL THEN NOT NEEDED) ..........
          DO 90 I = M, IGH
    90    SCALE = FLOP(SCALE + DABS(AR(I,M-1)) + DABS(AI(I,M-1)))
-C
-         IF (SCALE .EQ. 0.0D0) GOTO 180
+!
+         IF (SCALE == 0.0D0) GOTO 180
          MP = M + IGH
-C     .......... FOR I=IGH STEP -1 UNTIL M DO -- ..........
+!     .......... FOR I=IGH STEP -1 UNTIL M DO -- ..........
          DO 100 II = M, IGH
             I = MP - II
             ORTR(I) = FLOP(AR(I,M-1)/SCALE)
             ORTI(I) = FLOP(AI(I,M-1)/SCALE)
             H = FLOP(H + ORTR(I)*ORTR(I) + ORTI(I)*ORTI(I))
   100    CONTINUE
-C
+!
          G = FLOP(DSQRT(H))
          F = PYTHAG(ORTR(M),ORTI(M))
-         IF (F .EQ. 0.0D0) GOTO 103
+         IF (F == 0.0D0) GOTO 103
          H = FLOP(H + F*G)
          G = FLOP(G/F)
          ORTR(M) = FLOP((1.0D0 + G)*ORTR(M))
          ORTI(M) = FLOP((1.0D0 + G)*ORTI(M))
          GOTO 105
-C
+!
   103    ORTR(M) = G
          AR(M,M-1) = SCALE
-C     .......... FORM (I-(U*UT)/H)*A ..........
+!     .......... FORM (I-(U*UT)/H)*A ..........
   105    DO 130 J = M, N
             FR = 0.0D0
             FI = 0.0D0
-C     .......... FOR I=IGH STEP -1 UNTIL M DO -- ..........
+!     .......... FOR I=IGH STEP -1 UNTIL M DO -- ..........
             DO 110 II = M, IGH
                I = MP - II
                FR = FLOP(FR + ORTR(I)*AR(I,J) + ORTI(I)*AI(I,J))
                FI = FLOP(FI + ORTR(I)*AI(I,J) - ORTI(I)*AR(I,J))
   110       CONTINUE
-C
+!
             FR = FLOP(FR/H)
             FI = FLOP(FI/H)
-C
+!
             DO 120 I = M, IGH
                AR(I,J) = FLOP(AR(I,J) - FR*ORTR(I) + FI*ORTI(I))
                AI(I,J) = FLOP(AI(I,J) - FR*ORTI(I) - FI*ORTR(I))
   120       CONTINUE
-C
+!
   130    CONTINUE
-C     .......... FORM (I-(U*UT)/H)*A*(I-(U*UT)/H) ..........
+!     .......... FORM (I-(U*UT)/H)*A*(I-(U*UT)/H) ..........
          DO 160 I = 1, IGH
             FR = 0.0D0
             FI = 0.0D0
-C     .......... FOR J=IGH STEP -1 UNTIL M DO -- ..........
+!     .......... FOR J=IGH STEP -1 UNTIL M DO -- ..........
             DO 140 JJ = M, IGH
                J = MP - JJ
                FR = FLOP(FR + ORTR(J)*AR(I,J) - ORTI(J)*AI(I,J))
                FI = FLOP(FI + ORTR(J)*AI(I,J) + ORTI(J)*AR(I,J))
   140       CONTINUE
-C
+!
             FR = FLOP(FR/H)
             FI = FLOP(FI/H)
-C
+!
             DO 150 J = M, IGH
                AR(I,J) = FLOP(AR(I,J) - FR*ORTR(J) - FI*ORTI(J))
                AI(I,J) = FLOP(AI(I,J) + FR*ORTI(J) - FI*ORTR(J))
   150       CONTINUE
-C
+!
   160    CONTINUE
-C
+!
          ORTR(M) = FLOP(SCALE*ORTR(M))
          ORTI(M) = FLOP(SCALE*ORTI(M))
          AR(M,M-1) = FLOP(-(G*AR(M,M-1)))
          AI(M,M-1) = FLOP(-(G*AI(M,M-1)))
   180 CONTINUE
-C
+!
   200 RETURN
       END
-C-----------------------------------------------------------------------
-      SUBROUTINE COMQR3(NM,N,LOW,IGH,ORTR,ORTI,HR,HI,WR,WI,ZR,ZI,IERR
-     *                 ,JOB)
-C*****
-C     MODIFICATION OF EISPACK COMQR2 TO ADD JOB PARAMETER
-C     JOB = 0  OUTPUT H = SCHUR TRIANGULAR FORM, Z NOT USED
-C         = 1  OUTPUT H = SCHUR FORM, Z = UNITARY SIMILARITY
-C         = 2  SAME AS COMQR2
-C         = 3  OUTPUT H = HESSENBERG FORM, Z = UNITARY SIMILARITY
-C     ALSO ELIMINATE MACHEP
-C     C. MOLER, 11/22/78 AND 09/14/80
-C     OVERFLOW CONTROL IN EIGENVECTOR BACKSUBSTITUTION, 3/16/82
-C*****
-C
-      INTEGER I,J,K,L,M,N,EN,II,JJ,LL,NM,NN,IGH,IP1,
-     X        ITN,ITS,LOW,LP1,ENM1,IEND,IERR
-      DOUBLE PRECISION HR(NM,N),HI(NM,N),WR(N),WI(N),ZR(NM,N),ZI(NM,N),
-     X       ORTR(IGH),ORTI(IGH)
+!-----------------------------------------------------------------------
+      SUBROUTINE COMQR3(NM,N,LOW,IGH,ORTR,ORTI,HR,HI,WR,WI,ZR,ZI,IERR&
+                       ,JOB)
+!*****
+!     MODIFICATION OF EISPACK COMQR2 TO ADD JOB PARAMETER
+!     JOB = 0  OUTPUT H = SCHUR TRIANGULAR FORM, Z NOT USED
+!         = 1  OUTPUT H = SCHUR FORM, Z = UNITARY SIMILARITY
+!         = 2  SAME AS COMQR2
+!         = 3  OUTPUT H = HESSENBERG FORM, Z = UNITARY SIMILARITY
+!     ALSO ELIMINATE MACHEP
+!     C. MOLER, 11/22/78 AND 09/14/80
+!     OVERFLOW CONTROL IN EIGENVECTOR BACKSUBSTITUTION, 3/16/82
+!*****
+!
+      INTEGER I,J,K,L,M,N,EN,II,JJ,LL,NM,NN,IGH,IP1,&
+              ITN,ITS,LOW,LP1,ENM1,IEND,IERR
+      DOUBLE PRECISION HR(NM,N),HI(NM,N),WR(N),WI(N),ZR(NM,N),ZI(NM,N),&
+             ORTR(IGH),ORTI(IGH)
       DOUBLE PRECISION SI,SR,TI,TR,XI,XR,YI,YR,ZZI,ZZR,NORM
       DOUBLE PRECISION FLOP,PYTHAG
-C
-C     THIS SUBROUTINE IS A TRANSLATION OF A UNITARY ANALOGUE OF THE
-C     ALGOL PROCEDURE  COMLR2, NUM. MATH. 16, 181-204(1970) BY PETERS
-C     AND WILKINSON.
-C     HANDBOOK FOR AUTO. COMP., VOL.II-LINEAR ALGEBRA, 372-395(1971).
-C     THE UNITARY ANALOGUE SUBSTITUTES THE QR ALGORITHM OF FRANCIS
-C     (COMP. JOUR. 4, 332-345(1962)) FOR THE LR ALGORITHM.
-C
-C     THIS SUBROUTINE FINDS THE EIGENVALUES AND EIGENVECTORS
-C     OF A COMPLEX UPPER HESSENBERG MATRIX BY THE QR
-C     METHOD.  THE EIGENVECTORS OF A COMPLEX GENERAL MATRIX
-C     CAN ALSO BE FOUND IF  CORTH  HAS BEEN USED TO REDUCE
-C     THIS GENERAL MATRIX TO HESSENBERG FORM.
-C
-C     ON INPUT.
-C
-C        NM MUST BE SET TO THE ROW DIMENSION OF TWO-DIMENSIONAL
-C          ARRAY PARAMETERS AS DECLARED IN THE CALLING PROGRAM
-C          DIMENSION STATEMENT.
-C
-C        N IS THE ORDER OF THE MATRIX.
-C
-C        LOW AND IGH ARE INTEGERS DETERMINED BY THE BALANCING
-C          SUBROUTINE  CBAL.  IF  CBAL  HAS NOT BEEN USED,
-C          SET LOW=1, IGH=N.
-C
-C        ORTR AND ORTI CONTAIN INFORMATION ABOUT THE UNITARY TRANS-
-C          FORMATIONS USED IN THE REDUCTION BY  CORTH, IF PERFORMED.
-C          ONLY ELEMENTS LOW THROUGH IGH ARE USED.  IF THE EIGENVECTORS
-C          OF THE HESSENBERG MATRIX ARE DESIRED, SET ORTR(J) AND
-C          ORTI(J) TO 0.0D0 FOR THESE ELEMENTS.
-C
-C        HR AND HI CONTAIN THE REAL AND IMAGINARY PARTS,
-C          RESPECTIVELY, OF THE COMPLEX UPPER HESSENBERG MATRIX.
-C          THEIR LOWER TRIANGLES BELOW THE SUBDIAGONAL CONTAIN FURTHER
-C          INFORMATION ABOUT THE TRANSFORMATIONS WHICH WERE USED IN THE
-C          REDUCTION BY  CORTH, IF PERFORMED.  IF THE EIGENVECTORS OF
-C          THE HESSENBERG MATRIX ARE DESIRED, THESE ELEMENTS MAY BE
-C          ARBITRARY.
-C
-C     ON OUTPUT.
-C
-C        ORTR, ORTI, AND THE UPPER HESSENBERG PORTIONS OF HR AND HI
-C          HAVE BEEN DESTROYED.
-C
-C        WR AND WI CONTAIN THE REAL AND IMAGINARY PARTS,
-C          RESPECTIVELY, OF THE EIGENVALUES.  IF AN ERROR
-C          EXIT IS MADE, THE EIGENVALUES SHOULD BE CORRECT
-C          FOR INDICES IERR+1,...,N.
-C
-C        ZR AND ZI CONTAIN THE REAL AND IMAGINARY PARTS,
-C          RESPECTIVELY, OF THE EIGENVECTORS.  THE EIGENVECTORS
-C          ARE UNNORMALIZED.  IF AN ERROR EXIT IS MADE, NONE OF
-C          THE EIGENVECTORS HAS BEEN FOUND.
-C
-C        IERR IS SET TO
-C          ZERO       FOR NORMAL RETURN,
-C          J          IF THE J-TH EIGENVALUE HAS NOT BEEN
-C  DETERMINED AFTER A TOTAL OF 30*N ITERATIONS.
-C
-C     MODIFIED TO GET RID OF ALL COMPLEX ARITHMETIC, C. MOLER, 6/27/79.
-C
-C     QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,
-C     APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY
-C
-C     ------------------------------------------------------------------
-C
+!
+!     THIS SUBROUTINE IS A TRANSLATION OF A UNITARY ANALOGUE OF THE
+!     ALGOL PROCEDURE  COMLR2, NUM. MATH. 16, 181-204(1970) BY PETERS
+!     AND WILKINSON.
+!     HANDBOOK FOR AUTO. COMP., VOL.II-LINEAR ALGEBRA, 372-395(1971).
+!     THE UNITARY ANALOGUE SUBSTITUTES THE QR ALGORITHM OF FRANCIS
+!     (COMP. JOUR. 4, 332-345(1962)) FOR THE LR ALGORITHM.
+!
+!     THIS SUBROUTINE FINDS THE EIGENVALUES AND EIGENVECTORS
+!     OF A COMPLEX UPPER HESSENBERG MATRIX BY THE QR
+!     METHOD.  THE EIGENVECTORS OF A COMPLEX GENERAL MATRIX
+!     CAN ALSO BE FOUND IF  CORTH  HAS BEEN USED TO REDUCE
+!     THIS GENERAL MATRIX TO HESSENBERG FORM.
+!
+!     ON INPUT.
+!
+!        NM MUST BE SET TO THE ROW DIMENSION OF TWO-DIMENSIONAL
+!          ARRAY PARAMETERS AS DECLARED IN THE CALLING PROGRAM
+!          DIMENSION STATEMENT.
+!
+!        N IS THE ORDER OF THE MATRIX.
+!
+!        LOW AND IGH ARE INTEGERS DETERMINED BY THE BALANCING
+!          SUBROUTINE  CBAL.  IF  CBAL  HAS NOT BEEN USED,
+!          SET LOW=1, IGH=N.
+!
+!        ORTR AND ORTI CONTAIN INFORMATION ABOUT THE UNITARY TRANS-
+!          FORMATIONS USED IN THE REDUCTION BY  CORTH, IF PERFORMED.
+!          ONLY ELEMENTS LOW THROUGH IGH ARE USED.  IF THE EIGENVECTORS
+!          OF THE HESSENBERG MATRIX ARE DESIRED, SET ORTR(J) AND
+!          ORTI(J) TO 0.0D0 FOR THESE ELEMENTS.
+!
+!        HR AND HI CONTAIN THE REAL AND IMAGINARY PARTS,
+!          RESPECTIVELY, OF THE COMPLEX UPPER HESSENBERG MATRIX.
+!          THEIR LOWER TRIANGLES BELOW THE SUBDIAGONAL CONTAIN FURTHER
+!          INFORMATION ABOUT THE TRANSFORMATIONS WHICH WERE USED IN THE
+!          REDUCTION BY  CORTH, IF PERFORMED.  IF THE EIGENVECTORS OF
+!          THE HESSENBERG MATRIX ARE DESIRED, THESE ELEMENTS MAY BE
+!          ARBITRARY.
+!
+!     ON OUTPUT.
+!
+!        ORTR, ORTI, AND THE UPPER HESSENBERG PORTIONS OF HR AND HI
+!          HAVE BEEN DESTROYED.
+!
+!        WR AND WI CONTAIN THE REAL AND IMAGINARY PARTS,
+!          RESPECTIVELY, OF THE EIGENVALUES.  IF AN ERROR
+!          EXIT IS MADE, THE EIGENVALUES SHOULD BE CORRECT
+!          FOR INDICES IERR+1,...,N.
+!
+!        ZR AND ZI CONTAIN THE REAL AND IMAGINARY PARTS,
+!          RESPECTIVELY, OF THE EIGENVECTORS.  THE EIGENVECTORS
+!          ARE UNNORMALIZED.  IF AN ERROR EXIT IS MADE, NONE OF
+!          THE EIGENVECTORS HAS BEEN FOUND.
+!
+!        IERR IS SET TO
+!          ZERO       FOR NORMAL RETURN,
+!          J          IF THE J-TH EIGENVALUE HAS NOT BEEN
+!  DETERMINED AFTER A TOTAL OF 30*N ITERATIONS.
+!
+!     MODIFIED TO GET RID OF ALL COMPLEX ARITHMETIC, C. MOLER, 6/27/79.
+!
+!     QUESTIONS AND COMMENTS SHOULD BE DIRECTED TO B. S. GARBOW,
+!     APPLIED MATHEMATICS DIVISION, ARGONNE NATIONAL LABORATORY
+!
+!     ------------------------------------------------------------------
+!
       IERR = 0
-C*****
-      IF (JOB .EQ. 0) GOTO 150
-C*****
-C     .......... INITIALIZE EIGENVECTOR MATRIX ..........
+!*****
+      IF (JOB == 0) GOTO 150
+!*****
+!     .......... INITIALIZE EIGENVECTOR MATRIX ..........
       DO 100 I = 1, N
-C
+!
          DO 100 J = 1, N
             ZR(I,J) = 0.0D0
             ZI(I,J) = 0.0D0
-            IF (I .EQ. J) ZR(I,J) = 1.0D0
+            IF (I == J) ZR(I,J) = 1.0D0
   100 CONTINUE
-C     .......... FORM THE MATRIX OF ACCUMULATED TRANSFORMATIONS
-C                FROM THE INFORMATION LEFT BY CORTH ..........
+!     .......... FORM THE MATRIX OF ACCUMULATED TRANSFORMATIONS
+!                FROM THE INFORMATION LEFT BY CORTH ..........
       IEND = IGH - LOW - 1
       IF (IEND) 180, 150, 105
-C     .......... FOR I=IGH-1 STEP -1 UNTIL LOW+1 DO -- ..........
+!     .......... FOR I=IGH-1 STEP -1 UNTIL LOW+1 DO -- ..........
   105 DO 140 II = 1, IEND
          I = IGH - II
-         IF (ORTR(I) .EQ. 0.0D0 .AND. ORTI(I) .EQ. 0.0D0) GOTO 140
-         IF (HR(I,I-1) .EQ. 0.0D0 .AND. HI(I,I-1) .EQ. 0.0D0) GOTO 140
-C     .......... NORM BELOW IS NEGATIVE OF H FORMED IN CORTH ..........
+         IF (ORTR(I) == 0.0D0 .AND. ORTI(I) == 0.0D0) GOTO 140
+         IF (HR(I,I-1) == 0.0D0 .AND. HI(I,I-1) == 0.0D0) GOTO 140
+!     .......... NORM BELOW IS NEGATIVE OF H FORMED IN CORTH ..........
          NORM = FLOP(HR(I,I-1)*ORTR(I) + HI(I,I-1)*ORTI(I))
          IP1 = I + 1
-C
+!
          DO 110 K = IP1, IGH
             ORTR(K) = HR(K,I-1)
             ORTI(K) = HI(K,I-1)
   110    CONTINUE
-C
+!
          DO 130 J = I, IGH
             SR = 0.0D0
             SI = 0.0D0
-C
+!
             DO 115 K = I, IGH
                SR = FLOP(SR + ORTR(K)*ZR(K,J) + ORTI(K)*ZI(K,J))
                SI = FLOP(SI + ORTR(K)*ZI(K,J) - ORTI(K)*ZR(K,J))
   115       CONTINUE
-C
+!
             SR = FLOP(SR/NORM)
             SI = FLOP(SI/NORM)
-C
+!
             DO 120 K = I, IGH
                ZR(K,J) = FLOP(ZR(K,J) + SR*ORTR(K) - SI*ORTI(K))
                ZI(K,J) = FLOP(ZI(K,J) + SR*ORTI(K) + SI*ORTR(K))
   120       CONTINUE
-C
+!
   130    CONTINUE
-C
+!
   140 CONTINUE
-C*****
-      IF (JOB .EQ. 3) GOTO 1001
-C*****
-C     .......... CREATE REAL SUBDIAGONAL ELEMENTS ..........
+!*****
+      IF (JOB == 3) GOTO 1001
+!*****
+!     .......... CREATE REAL SUBDIAGONAL ELEMENTS ..........
   150 L = LOW + 1
-C
+!
       DO 170 I = L, IGH
          LL = MIN0(I+1,IGH)
-         IF (HI(I,I-1) .EQ. 0.0D0) GOTO 170
+         IF (HI(I,I-1) == 0.0D0) GOTO 170
          NORM = PYTHAG(HR(I,I-1),HI(I,I-1))
          YR = FLOP(HR(I,I-1)/NORM)
          YI = FLOP(HI(I,I-1)/NORM)
          HR(I,I-1) = NORM
          HI(I,I-1) = 0.0D0
-C
+!
          DO 155 J = I, N
             SI = FLOP(YR*HI(I,J) - YI*HR(I,J))
             HR(I,J) = FLOP(YR*HR(I,J) + YI*HI(I,J))
             HI(I,J) = SI
   155    CONTINUE
-C
+!
          DO 160 J = 1, LL
             SI = FLOP(YR*HI(J,I) + YI*HR(J,I))
             HR(J,I) = FLOP(YR*HR(J,I) - YI*HI(J,I))
             HI(J,I) = SI
   160    CONTINUE
-C*****
-         IF (JOB .EQ. 0) GOTO 170
-C*****
+!*****
+         IF (JOB == 0) GOTO 170
+!*****
          DO 165 J = LOW, IGH
             SI = FLOP(YR*ZI(J,I) + YI*ZR(J,I))
             ZR(J,I) = FLOP(YR*ZR(J,I) - YI*ZI(J,I))
             ZI(J,I) = SI
   165    CONTINUE
-C
+!
   170 CONTINUE
-C     .......... STORE ROOTS ISOLATED BY CBAL ..........
+!     .......... STORE ROOTS ISOLATED BY CBAL ..........
   180 DO 200 I = 1, N
-         IF (I .GE. LOW .AND. I .LE. IGH) GOTO 200
+         IF (I >= LOW .AND. I <= IGH) GOTO 200
          WR(I) = HR(I,I)
          WI(I) = HI(I,I)
   200 CONTINUE
-C
+!
       EN = IGH
       TR = 0.0D0
       TI = 0.0D0
       ITN = 30*N
-C     .......... SEARCH FOR NEXT EIGENVALUE ..........
-  220 IF (EN .LT. LOW) GOTO 680
+!     .......... SEARCH FOR NEXT EIGENVALUE ..........
+  220 IF (EN < LOW) GOTO 680
       ITS = 0
       ENM1 = EN - 1
-C     .......... LOOK FOR SINGLE SMALL SUB-DIAGONAL ELEMENT
-C                FOR L=EN STEP -1 UNTIL LOW DO -- ..........
+!     .......... LOOK FOR SINGLE SMALL SUB-DIAGONAL ELEMENT
+!                FOR L=EN STEP -1 UNTIL LOW DO -- ..........
   240 DO 260 LL = LOW, EN
          L = EN + LOW - LL
-         IF (L .EQ. LOW) GOTO 300
-C*****
-         XR = FLOP(DABS(HR(L-1,L-1)) + DABS(HI(L-1,L-1))
-     X             + DABS(HR(L,L)) +DABS(HI(L,L)))
+         IF (L == LOW) GOTO 300
+!*****
+         XR = FLOP(DABS(HR(L-1,L-1)) + DABS(HI(L-1,L-1))&
+                   + DABS(HR(L,L)) +DABS(HI(L,L)))
          YR = FLOP(XR + DABS(HR(L,L-1)))
-         IF (XR .EQ. YR) GOTO 300
-C*****
+         IF (XR == YR) GOTO 300
+!*****
   260 CONTINUE
-C     .......... FORM SHIFT ..........
-  300 IF (L .EQ. EN) GOTO 660
-      IF (ITN .EQ. 0) GOTO 1000
-      IF (ITS .EQ. 10 .OR. ITS .EQ. 20) GOTO 320
+!     .......... FORM SHIFT ..........
+  300 IF (L == EN) GOTO 660
+      IF (ITN == 0) GOTO 1000
+      IF (ITS == 10 .OR. ITS == 20) GOTO 320
       SR = HR(EN,EN)
       SI = HI(EN,EN)
       XR = FLOP(HR(ENM1,EN)*HR(EN,ENM1))
       XI = FLOP(HI(ENM1,EN)*HR(EN,ENM1))
-      IF (XR .EQ. 0.0D0 .AND. XI .EQ. 0.0D0) GOTO 340
+      IF (XR == 0.0D0 .AND. XI == 0.0D0) GOTO 340
       YR = FLOP((HR(ENM1,ENM1) - SR)/2.0D0)
       YI = FLOP((HI(ENM1,ENM1) - SI)/2.0D0)
       CALL WSQRT(YR**2-YI**2+XR,2.0D0*YR*YI+XI,ZZR,ZZI)
-      IF (YR*ZZR + YI*ZZI .GE. 0.0D0) GOTO 310
+      IF (YR*ZZR + YI*ZZI >= 0.0D0) GOTO 310
       ZZR = -ZZR
       ZZI = -ZZI
   310 CALL WDIV(XR,XI,YR+ZZR,YI+ZZI,ZZR,ZZI)
       SR = FLOP(SR - ZZR)
       SI = FLOP(SI - ZZI)
       GOTO 340
-C     .......... FORM EXCEPTIONAL SHIFT ..........
+!     .......... FORM EXCEPTIONAL SHIFT ..........
   320 SR = FLOP(DABS(HR(EN,ENM1)) + DABS(HR(ENM1,EN-2)))
       SI = 0.0D0
-C
+!
   340 DO 360 I = LOW, EN
          HR(I,I) = FLOP(HR(I,I) - SR)
          HI(I,I) = FLOP(HI(I,I) - SI)
   360 CONTINUE
-C
+!
       TR = FLOP(TR + SR)
       TI = FLOP(TI + SI)
       ITS = ITS + 1
       ITN = ITN - 1
-C     .......... REDUCE TO TRIANGLE (ROWS) ..........
+!     .......... REDUCE TO TRIANGLE (ROWS) ..........
       LP1 = L + 1
-C
+!
       DO 500 I = LP1, EN
          SR = HR(I,I-1)
          HR(I,I-1) = 0.0D0
          NORM = FLOP(DABS(HR(I-1,I-1)) + DABS(HI(I-1,I-1)) + DABS(SR))
-         NORM = FLOP(NORM*DSQRT((HR(I-1,I-1)/NORM)**2 +
-     X  (HI(I-1,I-1)/NORM)**2 + (SR/NORM)**2))
+         NORM = FLOP(NORM*DSQRT((HR(I-1,I-1)/NORM)**2 +&
+        (HI(I-1,I-1)/NORM)**2 + (SR/NORM)**2))
          XR = FLOP(HR(I-1,I-1)/NORM)
          WR(I-1) = XR
          XI = FLOP(HI(I-1,I-1)/NORM)
@@ -5773,7 +5773,7 @@ C
          HR(I-1,I-1) = NORM
          HI(I-1,I-1) = 0.0D0
          HI(I,I-1) = FLOP(SR/NORM)
-C
+!
          DO 490 J = I, N
             YR = HR(I-1,J)
             YI = HI(I-1,J)
@@ -5784,45 +5784,45 @@ C
             HR(I,J) = FLOP(XR*ZZR - XI*ZZI - HI(I,I-1)*YR)
             HI(I,J) = FLOP(XR*ZZI + XI*ZZR - HI(I,I-1)*YI)
   490    CONTINUE
-C
+!
   500 CONTINUE
-C
+!
       SI = HI(EN,EN)
-      IF (SI .EQ. 0.0D0) GOTO 540
+      IF (SI == 0.0D0) GOTO 540
       NORM = PYTHAG(HR(EN,EN),SI)
       SR = FLOP(HR(EN,EN)/NORM)
       SI = FLOP(SI/NORM)
       HR(EN,EN) = NORM
       HI(EN,EN) = 0.0D0
-      IF (EN .EQ. N) GOTO 540
+      IF (EN == N) GOTO 540
       IP1 = EN + 1
-C
+!
       DO 520 J = IP1, N
          YR = HR(EN,J)
          YI = HI(EN,J)
          HR(EN,J) = FLOP(SR*YR + SI*YI)
          HI(EN,J) = FLOP(SR*YI - SI*YR)
   520 CONTINUE
-C     .......... INVERSE OPERATION (COLUMNS) ..........
+!     .......... INVERSE OPERATION (COLUMNS) ..........
   540 DO 600 J = LP1, EN
          XR = WR(J-1)
          XI = WI(J-1)
-C
+!
          DO 580 I = 1, J
             YR = HR(I,J-1)
             YI = 0.0D0
             ZZR = HR(I,J)
             ZZI = HI(I,J)
-            IF (I .EQ. J) GOTO 560
+            IF (I == J) GOTO 560
             YI = HI(I,J-1)
             HI(I,J-1) = FLOP(XR*YI + XI*YR + HI(J,J-1)*ZZI)
   560       HR(I,J-1) = FLOP(XR*YR - XI*YI + HI(J,J-1)*ZZR)
             HR(I,J) = FLOP(XR*ZZR + XI*ZZI - HI(J,J-1)*YR)
             HI(I,J) = FLOP(XR*ZZI - XI*ZZR - HI(J,J-1)*YI)
   580    CONTINUE
-C*****
-         IF (JOB .EQ. 0) GOTO 600
-C*****
+!*****
+         IF (JOB == 0) GOTO 600
+!*****
          DO 590 I = LOW, IGH
             YR = ZR(I,J-1)
             YI = ZI(I,J-1)
@@ -5833,51 +5833,51 @@ C*****
             ZR(I,J) = FLOP(XR*ZZR + XI*ZZI - HI(J,J-1)*YR)
             ZI(I,J) = FLOP(XR*ZZI - XI*ZZR - HI(J,J-1)*YI)
   590    CONTINUE
-C
+!
   600 CONTINUE
-C
-      IF (SI .EQ. 0.0D0) GOTO 240
-C
+!
+      IF (SI == 0.0D0) GOTO 240
+!
       DO 630 I = 1, EN
          YR = HR(I,EN)
          YI = HI(I,EN)
          HR(I,EN) = FLOP(SR*YR - SI*YI)
          HI(I,EN) = FLOP(SR*YI + SI*YR)
   630 CONTINUE
-C*****
-      IF (JOB .EQ. 0) GOTO 240
-C*****
+!*****
+      IF (JOB == 0) GOTO 240
+!*****
       DO 640 I = LOW, IGH
          YR = ZR(I,EN)
          YI = ZI(I,EN)
          ZR(I,EN) = FLOP(SR*YR - SI*YI)
          ZI(I,EN) = FLOP(SR*YI + SI*YR)
   640 CONTINUE
-C
+!
       GOTO 240
-C     .......... A ROOT FOUND ..........
+!     .......... A ROOT FOUND ..........
   660 HR(EN,EN) = FLOP(HR(EN,EN) + TR)
       WR(EN) = HR(EN,EN)
       HI(EN,EN) = FLOP(HI(EN,EN) + TI)
       WI(EN) = HI(EN,EN)
       EN = ENM1
       GOTO 220
-C     .......... ALL ROOTS FOUND.  BACKSUBSTITUTE TO FIND
-C                VECTORS OF UPPER TRIANGULAR FORM ..........
-C
-C*****  THE FOLLOWING SECTION CHANGED FOR OVERFLOW CONTROL
-C       C. MOLER, 3/16/82
-C
-  680 IF (JOB .NE. 2) GOTO 1001
-C
+!     .......... ALL ROOTS FOUND.  BACKSUBSTITUTE TO FIND
+!                VECTORS OF UPPER TRIANGULAR FORM ..........
+!
+!*****  THE FOLLOWING SECTION CHANGED FOR OVERFLOW CONTROL
+!       C. MOLER, 3/16/82
+!
+  680 IF (JOB /= 2) GOTO 1001
+!
       NORM = 0.0D0
       DO 720 I = 1, N
          DO 720 J = I, N
             TR = FLOP(DABS(HR(I,J))) + FLOP(DABS(HI(I,J)))
-            IF (TR .GT. NORM) NORM = TR
+            IF (TR > NORM) NORM = TR
   720 CONTINUE
-      IF (N .EQ. 1 .OR. NORM .EQ. 0.0D0) GOTO 1001
-C     .......... FOR EN=N STEP -1 UNTIL 2 DO -- ..........
+      IF (N == 1 .OR. NORM == 0.0D0) GOTO 1001
+!     .......... FOR EN=N STEP -1 UNTIL 2 DO -- ..........
       DO 800 NN = 2, N
          EN = N + 2 - NN
          XR = WR(EN)
@@ -5885,7 +5885,7 @@ C     .......... FOR EN=N STEP -1 UNTIL 2 DO -- ..........
          HR(EN,EN) = 1.0D0
          HI(EN,EN) = 0.0D0
          ENM1 = EN - 1
-C     .......... FOR I=EN-1 STEP -1 UNTIL 1 DO -- ..........
+!     .......... FOR I=EN-1 STEP -1 UNTIL 1 DO -- ..........
          DO 780 II = 1, ENM1
             I = EN - II
             ZZR = 0.0D0
@@ -5897,218 +5897,218 @@ C     .......... FOR I=EN-1 STEP -1 UNTIL 1 DO -- ..........
   740       CONTINUE
             YR = FLOP(XR - WR(I))
             YI = FLOP(XI - WI(I))
-            IF (YR .NE. 0.0D0 .OR. YI .NE. 0.0D0) GOTO 765
+            IF (YR /= 0.0D0 .OR. YI /= 0.0D0) GOTO 765
                YR = NORM
   760          YR = FLOP(YR/100.0D0)
                YI = FLOP(NORM + YR)
-               IF (YI .NE. NORM) GOTO 760
+               IF (YI /= NORM) GOTO 760
                YI = 0.0D0
   765       CONTINUE
             CALL WDIV(ZZR,ZZI,YR,YI,HR(I,EN),HI(I,EN))
             TR = FLOP(DABS(HR(I,EN))) + FLOP(DABS(HI(I,EN)))
-            IF (TR .EQ. 0.0D0) GOTO 780
-            IF (TR + 1.0D0/TR .GT. TR) GOTO 780
+            IF (TR == 0.0D0) GOTO 780
+            IF (TR + 1.0D0/TR > TR) GOTO 780
             DO 770 J = I, EN
                HR(J,EN) = FLOP(HR(J,EN)/TR)
                HI(J,EN) = FLOP(HI(J,EN)/TR)
   770       CONTINUE
   780    CONTINUE
-C
+!
   800 CONTINUE
-C*****
-C     .......... END BACKSUBSTITUTION ..........
+!*****
+!     .......... END BACKSUBSTITUTION ..........
       ENM1 = N - 1
-C     .......... VECTORS OF ISOLATED ROOTS ..........
+!     .......... VECTORS OF ISOLATED ROOTS ..........
       DO  840 I = 1, ENM1
-         IF (I .GE. LOW .AND. I .LE. IGH) GOTO 840
+         IF (I >= LOW .AND. I <= IGH) GOTO 840
          IP1 = I + 1
-C
+!
          DO 820 J = IP1, N
             ZR(I,J) = HR(I,J)
             ZI(I,J) = HI(I,J)
   820    CONTINUE
-C
+!
   840 CONTINUE
-C     .......... MULTIPLY BY TRANSFORMATION MATRIX TO GIVE
-C                VECTORS OF ORIGINAL FULL MATRIX.
-C                FOR J=N STEP -1 UNTIL LOW+1 DO -- ..........
+!     .......... MULTIPLY BY TRANSFORMATION MATRIX TO GIVE
+!                VECTORS OF ORIGINAL FULL MATRIX.
+!                FOR J=N STEP -1 UNTIL LOW+1 DO -- ..........
       DO 880 JJ = LOW, ENM1
          J = N + LOW - JJ
          M = MIN0(J,IGH)
-C
+!
          DO 880 I = LOW, IGH
             ZZR = 0.0D0
             ZZI = 0.0D0
-C
+!
             DO 860 K = LOW, M
                ZZR = FLOP(ZZR + ZR(I,K)*HR(K,J) - ZI(I,K)*HI(K,J))
                ZZI = FLOP(ZZI + ZR(I,K)*HI(K,J) + ZI(I,K)*HR(K,J))
   860       CONTINUE
-C
+!
             ZR(I,J) = ZZR
             ZI(I,J) = ZZI
   880 CONTINUE
-C
+!
       GOTO 1001
-C     .......... SET ERROR -- NO CONVERGENCE TO AN
-C                EIGENVALUE AFTER 30 ITERATIONS ..........
+!     .......... SET ERROR -- NO CONVERGENCE TO AN
+!                EIGENVALUE AFTER 30 ITERATIONS ..........
  1000 IERR = EN
  1001 RETURN
       END
-C-----------------------------------------------------------------------
-      SUBROUTINE WSVDC(XR,XI,LDX,N,P,SR,SI,ER,EI,UR,UI,LDU,VR,VI,LDV,
-     *                 WORKR,WORKI,JOB,INFO)
+!-----------------------------------------------------------------------
+      SUBROUTINE WSVDC(XR,XI,LDX,N,P,SR,SI,ER,EI,UR,UI,LDU,VR,VI,LDV,&
+                       WORKR,WORKI,JOB,INFO)
       INTEGER LDX,N,P,LDU,LDV,JOB,INFO
-      DOUBLE PRECISION XR(LDX,1),XI(LDX,1),SR(1),SI(1),ER(1),EI(1),
-     *                 UR(LDU,1),UI(LDU,1),VR(LDV,1),VI(LDV,1),
-     *                 WORKR(1),WORKI(1)
-C
-C
-C     WSVDC IS A SUBROUTINE TO REDUCE A DOUBLE-COMPLEX NXP MATRIX X BY
-C     UNITARY TRANSFORMATIONS U AND V TO DIAGONAL FORM.  THE
-C     DIAGONAL ELEMENTS S(I) ARE THE SINGULAR VALUES OF X.  THE
-C     COLUMNS OF U ARE THE CORRESPONDING LEFT SINGULAR VECTORS,
-C     AND THE COLUMNS OF V THE RIGHT SINGULAR VECTORS.
-C
-C     ON ENTRY
-C
-C         X         DOUBLE-COMPLEX(LDX,P), WHERE LDX.GE.N.
-C                   X CONTAINS THE MATRIX WHOSE SINGULAR VALUE
-C                   DECOMPOSITION IS TO BE COMPUTED.  X IS
-C                   DESTROYED BY WSVDC.
-C
-C         LDX       INTEGER.
-C                   LDX IS THE LEADING DIMENSION OF THE ARRAY X.
-C
-C         N         INTEGER.
-C                   N IS THE NUMBER OF COLUMNS OF THE MATRIX X.
-C
-C         P         INTEGER.
-C                   P IS THE NUMBER OF ROWS OF THE MATRIX X.
-C
-C         LDU       INTEGER.
-C                   LDU IS THE LEADING DIMENSION OF THE ARRAY U
-C                   (SEE BELOW).
-C
-C         LDV       INTEGER.
-C                   LDV IS THE LEADING DIMENSION OF THE ARRAY V
-C                   (SEE BELOW).
-C
-C         WORK      DOUBLE-COMPLEX(N).
-C                   WORK IS A SCRATCH ARRAY.
-C
-C         JOB       INTEGER.
-C                   JOB CONTROLS THE COMPUTATION OF THE SINGULAR
-C                   VECTORS.  IT HAS THE DECIMAL EXPANSION AB
-C                   WITH THE FOLLOWING MEANING
-C
-C     A.EQ.0    DO NOT COMPUTE THE LEFT SINGULAR
-C               VECTORS.
-C     A.EQ.1    RETURN THE N LEFT SINGULAR VECTORS
-C               IN U.
-C     A.GE.2    RETURNS THE FIRST MIN(N,P)
-C               LEFT SINGULAR VECTORS IN U.
-C     B.EQ.0    DO NOT COMPUTE THE RIGHT SINGULAR
-C               VECTORS.
-C     B.EQ.1    RETURN THE RIGHT SINGULAR VECTORS
-C               IN V.
-C
-C     ON RETURN
-C
-C         S         DOUBLE-COMPLEX(MM), WHERE MM=MIN(N+1,P).
-C                   THE FIRST MIN(N,P) ENTRIES OF S CONTAIN THE
-C                   SINGULAR VALUES OF X ARRANGED IN DESCENDING
-C                   ORDER OF MAGNITUDE.
-C
-C         E         DOUBLE-COMPLEX(P).
-C                   E ORDINARILY CONTAINS ZEROS.  HOWEVER SEE THE
-C                   DISCUSSION OF INFO FOR EXCEPTIONS.
-C
-C         U         DOUBLE-COMPLEX(LDU,K), WHERE LDU.GE.N.
-C                   IF JOBA.EQ.1 THEN K.EQ.N,
-C                   IF JOBA.EQ.2 THEN K.EQ.MIN(N,P).
-C                   U CONTAINS THE MATRIX OF RIGHT SINGULAR VECTORS.
-C                   U IS NOT REFERENCED IF JOBA.EQ.0.  IF N.LE.P
-C                   OR IF JOBA.GT.2, THEN U MAY BE IDENTIFIED WITH X
-C                   IN THE SUBROUTINE CALL.
-C
-C         V         DOUBLE-COMPLEX(LDV,P), WHERE LDV.GE.P.
-C                   V CONTAINS THE MATRIX OF RIGHT SINGULAR VECTORS.
-C                   V IS NOT REFERENCED IF JOBB.EQ.0.  IF P.LE.N,
-C                   THEN V MAY BE IDENTIFIED WHTH X IN THE
-C                   SUBROUTINE CALL.
-C
-C         INFO      INTEGER.
-C                   THE SINGULAR VALUES (AND THEIR CORRESPONDING
-C                   SINGULAR VECTORS) S(INFO+1),S(INFO+2),...,S(M)
-C                   ARE CORRECT (HERE M=MIN(N,P)).  THUS IF
-C                   INFO.EQ.0, ALL THE SINGULAR VALUES AND THEIR
-C                   VECTORS ARE CORRECT.  IN ANY EVENT, THE MATRIX
-C                   B = CTRANS(U)*X*V IS THE BIDIAGONAL MATRIX
-C                   WITH THE ELEMENTS OF S ON ITS DIAGONAL AND THE
-C                   ELEMENTS OF E ON ITS SUPER-DIAGONAL (CTRANS(U)
-C                   IS THE CONJUGATE-TRANSPOSE OF U).  THUS THE
-C                   SINGULAR VALUES OF X AND B ARE THE SAME.
-C
-C     LINPACK. THIS VERSION DATED 07/03/79 .
-C     G.W. STEWART, UNIVERSITY OF MARYLAND, ARGONNE NATIONAL LAB.
-C
-C     WSVDC USES THE FOLLOWING FUNCTIONS AND SUBPROGRAMS.
-C
-C     BLAS WAXPY,PYTHAG,WDOTCR,WDOTCI,WSCAL,WSWAP,WNRM2,RROTG
-C     FORTRAN DABS,DIMAG,DMAX1
-C     FORTRAN MAX0,MIN0,MOD,DSQRT
-C
-C     INTERNAL VARIABLES
-C
-      INTEGER I,ITER,J,JOBU,K,KASE,KK,L,LL,LLS,LM1,LP1,LS,LU,M,MAXIT,
-     *        MM,MM1,MP1,NCT,NCTP1,NCU,NRT,NRTP1
+      DOUBLE PRECISION XR(LDX,1),XI(LDX,1),SR(1),SI(1),ER(1),EI(1),&
+                       UR(LDU,1),UI(LDU,1),VR(LDV,1),VI(LDV,1),&
+                       WORKR(1),WORKI(1)
+!
+!
+!     WSVDC IS A SUBROUTINE TO REDUCE A DOUBLE-COMPLEX NXP MATRIX X BY
+!     UNITARY TRANSFORMATIONS U AND V TO DIAGONAL FORM.  THE
+!     DIAGONAL ELEMENTS S(I) ARE THE SINGULAR VALUES OF X.  THE
+!     COLUMNS OF U ARE THE CORRESPONDING LEFT SINGULAR VECTORS,
+!     AND THE COLUMNS OF V THE RIGHT SINGULAR VECTORS.
+!
+!     ON ENTRY
+!
+!         X         DOUBLE-COMPLEX(LDX,P), WHERE LDX>=N.
+!                   X CONTAINS THE MATRIX WHOSE SINGULAR VALUE
+!                   DECOMPOSITION IS TO BE COMPUTED.  X IS
+!                   DESTROYED BY WSVDC.
+!
+!         LDX       INTEGER.
+!                   LDX IS THE LEADING DIMENSION OF THE ARRAY X.
+!
+!         N         INTEGER.
+!                   N IS THE NUMBER OF COLUMNS OF THE MATRIX X.
+!
+!         P         INTEGER.
+!                   P IS THE NUMBER OF ROWS OF THE MATRIX X.
+!
+!         LDU       INTEGER.
+!                   LDU IS THE LEADING DIMENSION OF THE ARRAY U
+!                   (SEE BELOW).
+!
+!         LDV       INTEGER.
+!                   LDV IS THE LEADING DIMENSION OF THE ARRAY V
+!                   (SEE BELOW).
+!
+!         WORK      DOUBLE-COMPLEX(N).
+!                   WORK IS A SCRATCH ARRAY.
+!
+!         JOB       INTEGER.
+!                   JOB CONTROLS THE COMPUTATION OF THE SINGULAR
+!                   VECTORS.  IT HAS THE DECIMAL EXPANSION AB
+!                   WITH THE FOLLOWING MEANING
+!
+!     A==0    DO NOT COMPUTE THE LEFT SINGULAR
+!               VECTORS.
+!     A==1    RETURN THE N LEFT SINGULAR VECTORS
+!               IN U.
+!     A>=2    RETURNS THE FIRST MIN(N,P)
+!               LEFT SINGULAR VECTORS IN U.
+!     B==0    DO NOT COMPUTE THE RIGHT SINGULAR
+!               VECTORS.
+!     B==1    RETURN THE RIGHT SINGULAR VECTORS
+!               IN V.
+!
+!     ON RETURN
+!
+!         S         DOUBLE-COMPLEX(MM), WHERE MM=MIN(N+1,P).
+!                   THE FIRST MIN(N,P) ENTRIES OF S CONTAIN THE
+!                   SINGULAR VALUES OF X ARRANGED IN DESCENDING
+!                   ORDER OF MAGNITUDE.
+!
+!         E         DOUBLE-COMPLEX(P).
+!                   E ORDINARILY CONTAINS ZEROS.  HOWEVER SEE THE
+!                   DISCUSSION OF INFO FOR EXCEPTIONS.
+!
+!         U         DOUBLE-COMPLEX(LDU,K), WHERE LDU>=N.
+!                   IF JOBA==1 THEN K==N,
+!                   IF JOBA==2 THEN K==MIN(N,P).
+!                   U CONTAINS THE MATRIX OF RIGHT SINGULAR VECTORS.
+!                   U IS NOT REFERENCED IF JOBA==0.  IF N<=P
+!                   OR IF JOBA>2, THEN U MAY BE IDENTIFIED WITH X
+!                   IN THE SUBROUTINE CALL.
+!
+!         V         DOUBLE-COMPLEX(LDV,P), WHERE LDV>=P.
+!                   V CONTAINS THE MATRIX OF RIGHT SINGULAR VECTORS.
+!                   V IS NOT REFERENCED IF JOBB==0.  IF P<=N,
+!                   THEN V MAY BE IDENTIFIED WHTH X IN THE
+!                   SUBROUTINE CALL.
+!
+!         INFO      INTEGER.
+!                   THE SINGULAR VALUES (AND THEIR CORRESPONDING
+!                   SINGULAR VECTORS) S(INFO+1),S(INFO+2),...,S(M)
+!                   ARE CORRECT (HERE M=MIN(N,P)).  THUS IF
+!                   INFO==0, ALL THE SINGULAR VALUES AND THEIR
+!                   VECTORS ARE CORRECT.  IN ANY EVENT, THE MATRIX
+!                   B = CTRANS(U)*X*V IS THE BIDIAGONAL MATRIX
+!                   WITH THE ELEMENTS OF S ON ITS DIAGONAL AND THE
+!                   ELEMENTS OF E ON ITS SUPER-DIAGONAL (CTRANS(U)
+!                   IS THE CONJUGATE-TRANSPOSE OF U).  THUS THE
+!                   SINGULAR VALUES OF X AND B ARE THE SAME.
+!
+!     LINPACK. THIS VERSION DATED 07/03/79 .
+!     G.W. STEWART, UNIVERSITY OF MARYLAND, ARGONNE NATIONAL LAB.
+!
+!     WSVDC USES THE FOLLOWING FUNCTIONS AND SUBPROGRAMS.
+!
+!     BLAS WAXPY,PYTHAG,WDOTCR,WDOTCI,WSCAL,WSWAP,WNRM2,RROTG
+!     FORTRAN DABS,DIMAG,DMAX1
+!     FORTRAN MAX0,MIN0,MOD,DSQRT
+!
+!     INTERNAL VARIABLES
+!
+      INTEGER I,ITER,J,JOBU,K,KASE,KK,L,LL,LLS,LM1,LP1,LS,LU,M,MAXIT,&
+              MM,MM1,MP1,NCT,NCTP1,NCU,NRT,NRTP1
       DOUBLE PRECISION PYTHAG,WDOTCR,WDOTCI,TR,TI,RR,RI
-      DOUBLE PRECISION B,C,CS,EL,EMM1,F,G,WNRM2,SCALE,SHIFT,SL,SM,SN,
-     *                 SMM1,T1,TEST,ZTEST,SMALL,FLOP
+      DOUBLE PRECISION B,C,CS,EL,EMM1,F,G,WNRM2,SCALE,SHIFT,SL,SM,SN,&
+                       SMM1,T1,TEST,ZTEST,SMALL,FLOP
       LOGICAL WANTU,WANTV
-C
+!
       DOUBLE PRECISION ZDUMR,ZDUMI
       DOUBLE PRECISION CABS1
       CABS1(ZDUMR,ZDUMI) = DABS(ZDUMR) + DABS(ZDUMI)
-C
-C     SET THE MAXIMUM NUMBER OF ITERATIONS.
-C
+!
+!     SET THE MAXIMUM NUMBER OF ITERATIONS.
+!
       MAXIT = 75
-C
-C     SMALL NUMBER, ROUGHLY MACHINE EPSILON, USED TO AVOID UNDERFLOW
-C
+!
+!     SMALL NUMBER, ROUGHLY MACHINE EPSILON, USED TO AVOID UNDERFLOW
+!
       SMALL = 1.D0/2.D0**48
-C
-C     DETERMINE WHAT IS TO BE COMPUTED.
-C
+!
+!     DETERMINE WHAT IS TO BE COMPUTED.
+!
       WANTU = .FALSE.
       WANTV = .FALSE.
       JOBU = MOD(JOB,100)/10
       NCU = N
-      IF (JOBU .GT. 1) NCU = MIN0(N,P)
-      IF (JOBU .NE. 0) WANTU = .TRUE.
-      IF (MOD(JOB,10) .NE. 0) WANTV = .TRUE.
-C
-C     REDUCE X TO BIDIAGONAL FORM, STORING THE DIAGONAL ELEMENTS
-C     IN S AND THE SUPER-DIAGONAL ELEMENTS IN E.
-C
+      IF (JOBU > 1) NCU = MIN0(N,P)
+      IF (JOBU /= 0) WANTU = .TRUE.
+      IF (MOD(JOB,10) /= 0) WANTV = .TRUE.
+!
+!     REDUCE X TO BIDIAGONAL FORM, STORING THE DIAGONAL ELEMENTS
+!     IN S AND THE SUPER-DIAGONAL ELEMENTS IN E.
+!
       INFO = 0
       NCT = MIN0(N-1,P)
       NRT = MAX0(0,MIN0(P-2,N))
       LU = MAX0(NCT,NRT)
-      IF (LU .LT. 1) GOTO 190
+      IF (LU < 1) GOTO 190
       DO 180 L = 1, LU
          LP1 = L + 1
-         IF (L .GT. NCT) GOTO 30
-C
-C           COMPUTE THE TRANSFORMATION FOR THE L-TH COLUMN AND
-C           PLACE THE L-TH DIAGONAL IN S(L).
-C
+         IF (L > NCT) GOTO 30
+!
+!           COMPUTE THE TRANSFORMATION FOR THE L-TH COLUMN AND
+!           PLACE THE L-TH DIAGONAL IN S(L).
+!
             SR(L) = WNRM2(N-L+1,XR(L,L),XI(L,L),1)
             SI(L) = 0.0D0
-            IF (CABS1(SR(L),SI(L)) .EQ. 0.0D0) GOTO 20
-               IF (CABS1(XR(L,L),XI(L,L)) .EQ. 0.0D0) GOTO 10
+            IF (CABS1(SR(L),SI(L)) == 0.0D0) GOTO 20
+               IF (CABS1(XR(L,L),XI(L,L)) == 0.0D0) GOTO 10
                   CALL WSIGN(SR(L),SI(L),XR(L,L),XI(L,L),SR(L),SI(L))
    10          CONTINUE
                CALL WDIV(1.0D0,0.0D0,SR(L),SI(L),TR,TI)
@@ -6118,46 +6118,46 @@ C
             SR(L) = -SR(L)
             SI(L) = -SI(L)
    30    CONTINUE
-         IF (P .LT. LP1) GOTO 60
+         IF (P < LP1) GOTO 60
          DO 50 J = LP1, P
-            IF (L .GT. NCT) GOTO 40
-            IF (CABS1(SR(L),SI(L)) .EQ. 0.0D0) GOTO 40
-C
-C              APPLY THE TRANSFORMATION.
-C
+            IF (L > NCT) GOTO 40
+            IF (CABS1(SR(L),SI(L)) == 0.0D0) GOTO 40
+!
+!              APPLY THE TRANSFORMATION.
+!
                TR = -WDOTCR(N-L+1,XR(L,L),XI(L,L),1,XR(L,J),XI(L,J),1)
                TI = -WDOTCI(N-L+1,XR(L,L),XI(L,L),1,XR(L,J),XI(L,J),1)
                CALL WDIV(TR,TI,XR(L,L),XI(L,L),TR,TI)
-               CALL WAXPY(N-L+1,TR,TI,XR(L,L),XI(L,L),1,XR(L,J),
-     * XI(L,J),1)
+               CALL WAXPY(N-L+1,TR,TI,XR(L,L),XI(L,L),1,XR(L,J),&
+       XI(L,J),1)
    40       CONTINUE
-C
-C           PLACE THE L-TH ROW OF X INTO  E FOR THE
-C           SUBSEQUENT CALCULATION OF THE ROW TRANSFORMATION.
-C
+!
+!           PLACE THE L-TH ROW OF X INTO  E FOR THE
+!           SUBSEQUENT CALCULATION OF THE ROW TRANSFORMATION.
+!
             ER(J) = XR(L,J)
             EI(J) = -XI(L,J)
    50    CONTINUE
    60    CONTINUE
-         IF (.NOT.WANTU .OR. L .GT. NCT) GOTO 80
-C
-C           PLACE THE TRANSFORMATION IN U FOR SUBSEQUENT BACK
-C           MULTIPLICATION.
-C
+         IF (.NOT.WANTU .OR. L > NCT) GOTO 80
+!
+!           PLACE THE TRANSFORMATION IN U FOR SUBSEQUENT BACK
+!           MULTIPLICATION.
+!
             DO 70 I = L, N
                UR(I,L) = XR(I,L)
                UI(I,L) = XI(I,L)
    70       CONTINUE
    80    CONTINUE
-         IF (L .GT. NRT) GOTO 170
-C
-C           COMPUTE THE L-TH ROW TRANSFORMATION AND PLACE THE
-C           L-TH SUPER-DIAGONAL IN E(L).
-C
+         IF (L > NRT) GOTO 170
+!
+!           COMPUTE THE L-TH ROW TRANSFORMATION AND PLACE THE
+!           L-TH SUPER-DIAGONAL IN E(L).
+!
             ER(L) = WNRM2(P-L,ER(LP1),EI(LP1),1)
             EI(L) = 0.0D0
-            IF (CABS1(ER(L),EI(L)) .EQ. 0.0D0) GOTO 100
-               IF (CABS1(ER(LP1),EI(LP1)) .EQ. 0.0D0) GOTO 90
+            IF (CABS1(ER(L),EI(L)) == 0.0D0) GOTO 100
+               IF (CABS1(ER(LP1),EI(LP1)) == 0.0D0) GOTO 90
                   CALL WSIGN(ER(L),EI(L),ER(LP1),EI(LP1),ER(L),EI(L))
    90          CONTINUE
                CALL WDIV(1.0D0,0.0D0,ER(L),EI(L),TR,TI)
@@ -6166,30 +6166,30 @@ C
   100       CONTINUE
             ER(L) = -ER(L)
             EI(L) = +EI(L)
-            IF (LP1 .GT. N .OR. CABS1(ER(L),EI(L)) .EQ. 0.0D0)
-     *         GOTO 140
-C
-C              APPLY THE TRANSFORMATION.
-C
+            IF (LP1 > N .OR. CABS1(ER(L),EI(L)) == 0.0D0)&
+               GOTO 140
+!
+!              APPLY THE TRANSFORMATION.
+!
                DO 110 I = LP1, N
                   WORKR(I) = 0.0D0
                   WORKI(I) = 0.0D0
   110          CONTINUE
                DO 120 J = LP1, P
-                  CALL WAXPY(N-L,ER(J),EI(J),XR(LP1,J),XI(LP1,J),1,
-     *    WORKR(LP1),WORKI(LP1),1)
+                  CALL WAXPY(N-L,ER(J),EI(J),XR(LP1,J),XI(LP1,J),1,&
+          WORKR(LP1),WORKI(LP1),1)
   120          CONTINUE
                DO 130 J = LP1, P
                   CALL WDIV(-ER(J),-EI(J),ER(LP1),EI(LP1),TR,TI)
-                  CALL WAXPY(N-L,TR,-TI,WORKR(LP1),WORKI(LP1),1,
-     *    XR(LP1,J),XI(LP1,J),1)
+                  CALL WAXPY(N-L,TR,-TI,WORKR(LP1),WORKI(LP1),1,&
+          XR(LP1,J),XI(LP1,J),1)
   130          CONTINUE
   140       CONTINUE
             IF (.NOT.WANTV) GOTO 160
-C
-C              PLACE THE TRANSFORMATION IN V FOR SUBSEQUENT
-C              BACK MULTIPLICATION.
-C
+!
+!              PLACE THE TRANSFORMATION IN V FOR SUBSEQUENT
+!              BACK MULTIPLICATION.
+!
                DO 150 I = LP1, P
                   VR(I,L) = ER(I)
                   VI(I,L) = EI(I)
@@ -6198,31 +6198,31 @@ C
   170    CONTINUE
   180 CONTINUE
   190 CONTINUE
-C
-C     SET UP THE FINAL BIDIAGONAL MATRIX OR ORDER M.
-C
+!
+!     SET UP THE FINAL BIDIAGONAL MATRIX OR ORDER M.
+!
       M = MIN0(P,N+1)
       NCTP1 = NCT + 1
       NRTP1 = NRT + 1
-      IF (NCT .GE. P) GOTO 200
+      IF (NCT >= P) GOTO 200
          SR(NCTP1) = XR(NCTP1,NCTP1)
          SI(NCTP1) = XI(NCTP1,NCTP1)
   200 CONTINUE
-      IF (N .GE. M) GOTO 210
+      IF (N >= M) GOTO 210
          SR(M) = 0.0D0
          SI(M) = 0.0D0
   210 CONTINUE
-      IF (NRTP1 .GE. M) GOTO 220
+      IF (NRTP1 >= M) GOTO 220
          ER(NRTP1) = XR(NRTP1,M)
          EI(NRTP1) = XI(NRTP1,M)
   220 CONTINUE
       ER(M) = 0.0D0
       EI(M) = 0.0D0
-C
-C     IF REQUIRED, GENERATE U.
-C
+!
+!     IF REQUIRED, GENERATE U.
+!
       IF (.NOT.WANTU) GOTO 350
-         IF (NCU .LT. NCTP1) GOTO 250
+         IF (NCU < NCTP1) GOTO 250
          DO 240 J = NCTP1, NCU
             DO 230 I = 1, N
                UR(I,J) = 0.0D0
@@ -6232,26 +6232,26 @@ C
             UI(J,J) = 0.0D0
   240    CONTINUE
   250    CONTINUE
-         IF (NCT .LT. 1) GOTO 340
+         IF (NCT < 1) GOTO 340
          DO 330 LL = 1, NCT
             L = NCT - LL + 1
-            IF (CABS1(SR(L),SI(L)) .EQ. 0.0D0) GOTO 300
+            IF (CABS1(SR(L),SI(L)) == 0.0D0) GOTO 300
                LP1 = L + 1
-               IF (NCU .LT. LP1) GOTO 270
+               IF (NCU < LP1) GOTO 270
                DO 260 J = LP1, NCU
-                  TR = -WDOTCR(N-L+1,UR(L,L),UI(L,L),1,UR(L,J),
-     *      UI(L,J),1)
-                  TI = -WDOTCI(N-L+1,UR(L,L),UI(L,L),1,UR(L,J),
-     *      UI(L,J),1)
+                  TR = -WDOTCR(N-L+1,UR(L,L),UI(L,L),1,UR(L,J),&
+            UI(L,J),1)
+                  TI = -WDOTCI(N-L+1,UR(L,L),UI(L,L),1,UR(L,J),&
+            UI(L,J),1)
                   CALL WDIV(TR,TI,UR(L,L),UI(L,L),TR,TI)
-                  CALL WAXPY(N-L+1,TR,TI,UR(L,L),UI(L,L),1,UR(L,J),
-     *    UI(L,J),1)
+                  CALL WAXPY(N-L+1,TR,TI,UR(L,L),UI(L,L),1,UR(L,J),&
+          UI(L,J),1)
   260          CONTINUE
   270          CONTINUE
                CALL WRSCAL(N-L+1,-1.0D0,UR(L,L),UI(L,L),1)
                UR(L,L) = FLOP(1.0D0 + UR(L,L))
                LM1 = L - 1
-               IF (LM1 .LT. 1) GOTO 290
+               IF (LM1 < 1) GOTO 290
                DO 280 I = 1, LM1
                   UR(I,L) = 0.0D0
                   UI(I,L) = 0.0D0
@@ -6269,23 +6269,23 @@ C
   330    CONTINUE
   340    CONTINUE
   350 CONTINUE
-C
-C     IF IT IS REQUIRED, GENERATE V.
-C
+!
+!     IF IT IS REQUIRED, GENERATE V.
+!
       IF (.NOT.WANTV) GOTO 400
          DO 390 LL = 1, P
             L = P - LL + 1
             LP1 = L + 1
-            IF (L .GT. NRT) GOTO 370
-            IF (CABS1(ER(L),EI(L)) .EQ. 0.0D0) GOTO 370
+            IF (L > NRT) GOTO 370
+            IF (CABS1(ER(L),EI(L)) == 0.0D0) GOTO 370
                DO 360 J = LP1, P
-                  TR = -WDOTCR(P-L,VR(LP1,L),VI(LP1,L),1,VR(LP1,J),
-     *      VI(LP1,J),1)
-                  TI = -WDOTCI(P-L,VR(LP1,L),VI(LP1,L),1,VR(LP1,J),
-     *      VI(LP1,J),1)
+                  TR = -WDOTCR(P-L,VR(LP1,L),VI(LP1,L),1,VR(LP1,J),&
+            VI(LP1,J),1)
+                  TI = -WDOTCI(P-L,VR(LP1,L),VI(LP1,L),1,VR(LP1,J),&
+            VI(LP1,J),1)
                   CALL WDIV(TR,TI,VR(LP1,L),VI(LP1,L),TR,TI)
-                  CALL WAXPY(P-L,TR,TI,VR(LP1,L),VI(LP1,L),1,VR(LP1,J),
-     *    VI(LP1,J),1)
+                  CALL WAXPY(P-L,TR,TI,VR(LP1,L),VI(LP1,L),1,VR(LP1,J),&
+          VI(LP1,J),1)
   360          CONTINUE
   370       CONTINUE
             DO 380 I = 1, P
@@ -6296,23 +6296,23 @@ C
             VI(L,L) = 0.0D0
   390    CONTINUE
   400 CONTINUE
-C
-C     TRANSFORM S AND E SO THAT THEY ARE REAL.
-C
+!
+!     TRANSFORM S AND E SO THAT THEY ARE REAL.
+!
       DO 420 I = 1, M
             TR = PYTHAG(SR(I),SI(I))
-            IF (TR .EQ. 0.0D0) GOTO 405
+            IF (TR == 0.0D0) GOTO 405
             RR = SR(I)/TR
             RI = SI(I)/TR
             SR(I) = TR
             SI(I) = 0.0D0
-            IF (I .LT. M) CALL WDIV(ER(I),EI(I),RR,RI,ER(I),EI(I))
+            IF (I < M) CALL WDIV(ER(I),EI(I),RR,RI,ER(I),EI(I))
             IF (WANTU) CALL WSCAL(N,RR,RI,UR(1,I),UI(1,I),1)
   405    CONTINUE
-C     ...EXIT
-         IF (I .EQ. M) GOTO 430
+!     ...EXIT
+         IF (I == M) GOTO 430
             TR = PYTHAG(ER(I),EI(I))
-            IF (TR .EQ. 0.0D0) GOTO 410
+            IF (TR == 0.0D0) GOTO 410
             CALL WDIV(TR,0.0D0,ER(I),EI(I),RR,RI)
             ER(I) = TR
             EI(I) = 0.0D0
@@ -6321,51 +6321,51 @@ C     ...EXIT
   410    CONTINUE
   420 CONTINUE
   430 CONTINUE
-C
-C     MAIN ITERATION LOOP FOR THE SINGULAR VALUES.
-C
+!
+!     MAIN ITERATION LOOP FOR THE SINGULAR VALUES.
+!
       MM = M
       ITER = 0
   440 CONTINUE
-C
-C        QUIT IF ALL THE SINGULAR VALUES HAVE BEEN FOUND.
-C
-C     ...EXIT
-         IF (M .EQ. 0) GOTO 700
-C
-C        IF TOO MANY ITERATIONS HAVE BEEN PERFORMED, SET
-C        FLAG AND RETURN.
-C
-         IF (ITER .LT. MAXIT) GOTO 450
+!
+!        QUIT IF ALL THE SINGULAR VALUES HAVE BEEN FOUND.
+!
+!     ...EXIT
+         IF (M == 0) GOTO 700
+!
+!        IF TOO MANY ITERATIONS HAVE BEEN PERFORMED, SET
+!        FLAG AND RETURN.
+!
+         IF (ITER < MAXIT) GOTO 450
             INFO = M
-C     ......EXIT
+!     ......EXIT
             GOTO 700
   450    CONTINUE
-C
-C        THIS SECTION OF THE PROGRAM INSPECTS FOR
-C        NEGLIGIBLE ELEMENTS IN THE S AND E ARRAYS.  ON
-C        COMPLETION THE VARIABLE KASE IS SET AS FOLLOWS.
-C
-C           KASE = 1     IF SR(M) AND ER(L-1) ARE NEGLIGIBLE AND L.LT.M
-C           KASE = 2     IF SR(L) IS NEGLIGIBLE AND L.LT.M
-C           KASE = 3     IF ER(L-1) IS NEGLIGIBLE, L.LT.M, AND
-C     SR(L), ..., SR(M) ARE NOT NEGLIGIBLE (QR STEP).
-C           KASE = 4     IF ER(M-1) IS NEGLIGIBLE (CONVERGENCE).
-C
+!
+!        THIS SECTION OF THE PROGRAM INSPECTS FOR
+!        NEGLIGIBLE ELEMENTS IN THE S AND E ARRAYS.  ON
+!        COMPLETION THE VARIABLE KASE IS SET AS FOLLOWS.
+!
+!           KASE = 1     IF SR(M) AND ER(L-1) ARE NEGLIGIBLE AND L<M
+!           KASE = 2     IF SR(L) IS NEGLIGIBLE AND L<M
+!           KASE = 3     IF ER(L-1) IS NEGLIGIBLE, L<M, AND
+!     SR(L), ..., SR(M) ARE NOT NEGLIGIBLE (QR STEP).
+!           KASE = 4     IF ER(M-1) IS NEGLIGIBLE (CONVERGENCE).
+!
          DO 470 LL = 1, M
             L = M - LL
-C        ...EXIT
-            IF (L .EQ. 0) GOTO 480
+!        ...EXIT
+            IF (L == 0) GOTO 480
             TEST = FLOP(DABS(SR(L)) + DABS(SR(L+1)))
             ZTEST = FLOP(TEST + DABS(ER(L))/2.0D0)
-            IF (SMALL*ZTEST .NE. SMALL*TEST) GOTO 460
+            IF (SMALL*ZTEST /= SMALL*TEST) GOTO 460
                ER(L) = 0.0D0
-C        ......EXIT
+!        ......EXIT
                GOTO 480
   460       CONTINUE
   470    CONTINUE
   480    CONTINUE
-         IF (L .NE. M - 1) GOTO 490
+         IF (L /= M - 1) GOTO 490
             KASE = 4
          GOTO 560
   490    CONTINUE
@@ -6373,24 +6373,24 @@ C        ......EXIT
             MP1 = M + 1
             DO 510 LLS = LP1, MP1
                LS = M - LLS + LP1
-C           ...EXIT
-               IF (LS .EQ. L) GOTO 520
+!           ...EXIT
+               IF (LS == L) GOTO 520
                TEST = 0.0D0
-               IF (LS .NE. M) TEST = FLOP(TEST + DABS(ER(LS)))
-               IF (LS .NE. L + 1) TEST = FLOP(TEST + DABS(ER(LS-1)))
+               IF (LS /= M) TEST = FLOP(TEST + DABS(ER(LS)))
+               IF (LS /= L + 1) TEST = FLOP(TEST + DABS(ER(LS-1)))
                ZTEST = FLOP(TEST + DABS(SR(LS))/2.0D0)
-               IF (SMALL*ZTEST .NE. SMALL*TEST) GOTO 500
+               IF (SMALL*ZTEST /= SMALL*TEST) GOTO 500
                   SR(LS) = 0.0D0
-C           ......EXIT
+!           ......EXIT
                   GOTO 520
   500          CONTINUE
   510       CONTINUE
   520       CONTINUE
-            IF (LS .NE. L) GOTO 530
+            IF (LS /= L) GOTO 530
                KASE = 3
             GOTO 550
   530       CONTINUE
-            IF (LS .NE. M) GOTO 540
+            IF (LS /= M) GOTO 540
                KASE = 1
             GOTO 550
   540       CONTINUE
@@ -6399,13 +6399,13 @@ C           ......EXIT
   550       CONTINUE
   560    CONTINUE
          L = L + 1
-C
-C        PERFORM THE TASK INDICATED BY KASE.
-C
+!
+!        PERFORM THE TASK INDICATED BY KASE.
+!
          GOTO (570, 600, 620, 650), KASE
-C
-C        DEFLATE NEGLIGIBLE SR(M).
-C
+!
+!        DEFLATE NEGLIGIBLE SR(M).
+!
   570    CONTINUE
             MM1 = M - 1
             F = ER(M-1)
@@ -6415,7 +6415,7 @@ C
                T1 = SR(K)
                CALL RROTG(T1,F,CS,SN)
                SR(K) = T1
-               IF (K .EQ. L) GOTO 580
+               IF (K == L) GOTO 580
                   F = FLOP(-(SN*ER(K-1)))
                   ER(K-1) = FLOP(CS*ER(K-1))
   580          CONTINUE
@@ -6423,9 +6423,9 @@ C
                IF (WANTV) CALL RROT(P,VI(1,K),1,VI(1,M),1,CS,SN)
   590       CONTINUE
          GOTO 690
-C
-C        SPLIT AT NEGLIGIBLE SR(L).
-C
+!
+!        SPLIT AT NEGLIGIBLE SR(L).
+!
   600    CONTINUE
             F = ER(L-1)
             ER(L-1) = 0.0D0
@@ -6439,15 +6439,15 @@ C
                IF (WANTU) CALL RROT(N,UI(1,K),1,UI(1,L-1),1,CS,SN)
   610       CONTINUE
          GOTO 690
-C
-C        PERFORM ONE QR STEP.
-C
+!
+!        PERFORM ONE QR STEP.
+!
   620    CONTINUE
-C
-C           CALCULATE THE SHIFT.
-C
-            SCALE = DMAX1(DABS(SR(M)),DABS(SR(M-1)),DABS(ER(M-1)),
-     * DABS(SR(L)),DABS(ER(L)))
+!
+!           CALCULATE THE SHIFT.
+!
+            SCALE = DMAX1(DABS(SR(M)),DABS(SR(M-1)),DABS(ER(M-1)),&
+       DABS(SR(L)),DABS(ER(L)))
             SM = SR(M)/SCALE
             SMM1 = SR(M-1)/SCALE
             EMM1 = ER(M-1)/SCALE
@@ -6456,20 +6456,20 @@ C
             B = FLOP(((SMM1 + SM)*(SMM1 - SM) + EMM1**2)/2.0D0)
             C = FLOP((SM*EMM1)**2)
             SHIFT = 0.0D0
-            IF (B .EQ. 0.0D0 .AND. C .EQ. 0.0D0) GOTO 630
+            IF (B == 0.0D0 .AND. C == 0.0D0) GOTO 630
                SHIFT = FLOP(DSQRT(B**2+C))
-               IF (B .LT. 0.0D0) SHIFT = -SHIFT
+               IF (B < 0.0D0) SHIFT = -SHIFT
                SHIFT = FLOP(C/(B + SHIFT))
   630       CONTINUE
             F = FLOP((SL + SM)*(SL - SM) - SHIFT)
             G = FLOP(SL*EL)
-C
-C           CHASE ZEROS.
-C
+!
+!           CHASE ZEROS.
+!
             MM1 = M - 1
             DO 640 K = L, MM1
                CALL RROTG(F,G,CS,SN)
-               IF (K .NE. L) ER(K-1) = F
+               IF (K /= L) ER(K-1) = F
                F = FLOP(CS*SR(K) + SN*ER(K))
                ER(K) = FLOP(CS*ER(K) - SN*SR(K))
                G = FLOP(SN*SR(K+1))
@@ -6482,38 +6482,38 @@ C
                SR(K+1) = FLOP(-(SN*ER(K)) + CS*SR(K+1))
                G = FLOP(SN*ER(K+1))
                ER(K+1) = FLOP(CS*ER(K+1))
-               IF (WANTU .AND. K .LT. N)
-     *            CALL RROT(N,UR(1,K),1,UR(1,K+1),1,CS,SN)
-               IF (WANTU .AND. K .LT. N)
-     *            CALL RROT(N,UI(1,K),1,UI(1,K+1),1,CS,SN)
+               IF (WANTU .AND. K < N)&
+                  CALL RROT(N,UR(1,K),1,UR(1,K+1),1,CS,SN)
+               IF (WANTU .AND. K < N)&
+                  CALL RROT(N,UI(1,K),1,UI(1,K+1),1,CS,SN)
   640       CONTINUE
             ER(M-1) = F
             ITER = ITER + 1
          GOTO 690
-C
-C        CONVERGENCE
-C
+!
+!        CONVERGENCE
+!
   650    CONTINUE
-C
-C           MAKE THE SINGULAR VALUE  POSITIVE
-C
-            IF (SR(L) .GE. 0.0D0) GOTO 660
+!
+!           MAKE THE SINGULAR VALUE  POSITIVE
+!
+            IF (SR(L) >= 0.0D0) GOTO 660
                SR(L) = -SR(L)
              IF (WANTV) CALL WRSCAL(P,-1.0D0,VR(1,L),VI(1,L),1)
   660       CONTINUE
-C
-C           ORDER THE SINGULAR VALUE.
-C
-  670       IF (L .EQ. MM) GOTO 680
-C           ...EXIT
-               IF (SR(L) .GE. SR(L+1)) GOTO 680
+!
+!           ORDER THE SINGULAR VALUE.
+!
+  670       IF (L == MM) GOTO 680
+!           ...EXIT
+               IF (SR(L) >= SR(L+1)) GOTO 680
                TR = SR(L)
                SR(L) = SR(L+1)
                SR(L+1) = TR
-               IF (WANTV .AND. L .LT. P)
-     *            CALL WSWAP(P,VR(1,L),VI(1,L),1,VR(1,L+1),VI(1,L+1),1)
-               IF (WANTU .AND. L .LT. N)
-     *            CALL WSWAP(N,UR(1,L),UI(1,L),1,UR(1,L+1),UI(1,L+1),1)
+               IF (WANTV .AND. L < P)&
+                  CALL WSWAP(P,VR(1,L),VI(1,L),1,VR(1,L+1),VI(1,L+1),1)
+               IF (WANTU .AND. L < N)&
+                  CALL WSWAP(N,UR(1,L),UI(1,L),1,UR(1,L+1),UI(1,L+1),1)
                L = L + 1
             GOTO 670
   680       CONTINUE
@@ -6524,118 +6524,118 @@ C           ...EXIT
   700 CONTINUE
       RETURN
       END
-      SUBROUTINE WQRDC(XR,XI,LDX,N,P,QRAUXR,QRAUXI,JPVT,WORKR,WORKI,
-     *                 JOB)
+      SUBROUTINE WQRDC(XR,XI,LDX,N,P,QRAUXR,QRAUXI,JPVT,WORKR,WORKI,&
+                       JOB)
       INTEGER LDX,N,P,JOB
       INTEGER JPVT(1)
-      DOUBLE PRECISION XR(LDX,1),XI(LDX,1),QRAUXR(1),QRAUXI(1),
-     *                 WORKR(1),WORKI(1)
-C
-C     WQRDC USES HOUSEHOLDER TRANSFORMATIONS TO COMPUTE THE QR
-C     FACTORIZATION OF AN N BY P MATRIX X.  COLUMN PIVOTING
-C     BASED ON THE 2-NORMS OF THE REDUCED COLUMNS MAY BE
-C     PERFORMED AT THE USERS OPTION.
-C
-C     ON ENTRY
-C
-C        X       DOUBLE-COMPLEX(LDX,P), WHERE LDX .GE. N.
-C                X CONTAINS THE MATRIX WHOSE DECOMPOSITION IS TO BE
-C                COMPUTED.
-C
-C        LDX     INTEGER.
-C                LDX IS THE LEADING DIMENSION OF THE ARRAY X.
-C
-C        N       INTEGER.
-C                N IS THE NUMBER OF ROWS OF THE MATRIX X.
-C
-C        P       INTEGER.
-C                P IS THE NUMBER OF COLUMNS OF THE MATRIX X.
-C
-C        JPVT    INTEGER(P).
-C                JPVT CONTAINS INTEGERS THAT CONTROL THE SELECTION
-C                OF THE PIVOT COLUMNS.  THE K-TH COLUMN X(K) OF X
-C                IS PLACED IN ONE OF THREE CLASSES ACCORDING TO THE
-C                VALUE OF JPVT(K).
-C
-C                   IF JPVT(K) .GT. 0, THEN X(K) IS AN INITIAL
-C                   COLUMN.
-C
-C                   IF JPVT(K) .EQ. 0, THEN X(K) IS A FREE COLUMN.
-C
-C                   IF JPVT(K) .LT. 0, THEN X(K) IS A FINAL COLUMN.
-C
-C                BEFORE THE DECOMPOSITION IS COMPUTED, INITIAL COLUMNS
-C                ARE MOVED TO THE BEGINNING OF THE ARRAY X AND FINAL
-C                COLUMNS TO THE END.  BOTH INITIAL AND FINAL COLUMNS
-C                ARE FROZEN IN PLACE DURING THE COMPUTATION AND ONLY
-C                FREE COLUMNS ARE MOVED.  AT THE K-TH STAGE OF THE
-C                REDUCTION, IF X(K) IS OCCUPIED BY A FREE COLUMN
-C                IT IS INTERCHANGED WITH THE FREE COLUMN OF LARGEST
-C                REDUCED NORM.  JPVT IS NOT REFERENCED IF
-C                JOB .EQ. 0.
-C
-C        WORK    DOUBLE-COMPLEX(P).
-C                WORK IS A WORK ARRAY.  WORK IS NOT REFERENCED IF
-C                JOB .EQ. 0.
-C
-C        JOB     INTEGER.
-C                JOB IS AN INTEGER THAT INITIATES COLUMN PIVOTING.
-C                IF JOB .EQ. 0, NO PIVOTING IS DONE.
-C                IF JOB .NE. 0, PIVOTING IS DONE.
-C
-C     ON RETURN
-C
-C        X       X CONTAINS IN ITS UPPER TRIANGLE THE UPPER
-C                TRIANGULAR MATRIX R OF THE QR FACTORIZATION.
-C                BELOW ITS DIAGONAL X CONTAINS INFORMATION FROM
-C                WHICH THE UNITARY PART OF THE DECOMPOSITION
-C                CAN BE RECOVERED.  NOTE THAT IF PIVOTING HAS
-C                BEEN REQUESTED, THE DECOMPOSITION IS NOT THAT
-C                OF THE ORIGINAL MATRIX X BUT THAT OF X
-C                WITH ITS COLUMNS PERMUTED AS DESCRIBED BY JPVT.
-C
-C        QRAUX   DOUBLE-COMPLEX(P).
-C                QRAUX CONTAINS FURTHER INFORMATION REQUIRED TO RECOVER
-C                THE UNITARY PART OF THE DECOMPOSITION.
-C
-C        JPVT    JPVT(K) CONTAINS THE INDEX OF THE COLUMN OF THE
-C                ORIGINAL MATRIX THAT HAS BEEN INTERCHANGED INTO
-C                THE K-TH COLUMN, IF PIVOTING WAS REQUESTED.
-C
-C     LINPACK. THIS VERSION DATED 07/03/79 .
-C     G.W. STEWART, UNIVERSITY OF MARYLAND, ARGONNE NATIONAL LAB.
-C
-C     WQRDC USES THE FOLLOWING FUNCTIONS AND SUBPROGRAMS.
-C
-C     BLAS WAXPY,PYTHAG,WDOTCR,WDOTCI,WSCAL,WSWAP,WNRM2
-C     FORTRAN DABS,DIMAG,DMAX1,MIN0
-C
-C     INTERNAL VARIABLES
-C
+      DOUBLE PRECISION XR(LDX,1),XI(LDX,1),QRAUXR(1),QRAUXI(1),&
+                       WORKR(1),WORKI(1)
+!
+!     WQRDC USES HOUSEHOLDER TRANSFORMATIONS TO COMPUTE THE QR
+!     FACTORIZATION OF AN N BY P MATRIX X.  COLUMN PIVOTING
+!     BASED ON THE 2-NORMS OF THE REDUCED COLUMNS MAY BE
+!     PERFORMED AT THE USERS OPTION.
+!
+!     ON ENTRY
+!
+!        X       DOUBLE-COMPLEX(LDX,P), WHERE LDX >= N.
+!                X CONTAINS THE MATRIX WHOSE DECOMPOSITION IS TO BE
+!                COMPUTED.
+!
+!        LDX     INTEGER.
+!                LDX IS THE LEADING DIMENSION OF THE ARRAY X.
+!
+!        N       INTEGER.
+!                N IS THE NUMBER OF ROWS OF THE MATRIX X.
+!
+!        P       INTEGER.
+!                P IS THE NUMBER OF COLUMNS OF THE MATRIX X.
+!
+!        JPVT    INTEGER(P).
+!                JPVT CONTAINS INTEGERS THAT CONTROL THE SELECTION
+!                OF THE PIVOT COLUMNS.  THE K-TH COLUMN X(K) OF X
+!                IS PLACED IN ONE OF THREE CLASSES ACCORDING TO THE
+!                VALUE OF JPVT(K).
+!
+!                   IF JPVT(K) > 0, THEN X(K) IS AN INITIAL
+!                   COLUMN.
+!
+!                   IF JPVT(K) == 0, THEN X(K) IS A FREE COLUMN.
+!
+!                   IF JPVT(K) < 0, THEN X(K) IS A FINAL COLUMN.
+!
+!                BEFORE THE DECOMPOSITION IS COMPUTED, INITIAL COLUMNS
+!                ARE MOVED TO THE BEGINNING OF THE ARRAY X AND FINAL
+!                COLUMNS TO THE END.  BOTH INITIAL AND FINAL COLUMNS
+!                ARE FROZEN IN PLACE DURING THE COMPUTATION AND ONLY
+!                FREE COLUMNS ARE MOVED.  AT THE K-TH STAGE OF THE
+!                REDUCTION, IF X(K) IS OCCUPIED BY A FREE COLUMN
+!                IT IS INTERCHANGED WITH THE FREE COLUMN OF LARGEST
+!                REDUCED NORM.  JPVT IS NOT REFERENCED IF
+!                JOB == 0.
+!
+!        WORK    DOUBLE-COMPLEX(P).
+!                WORK IS A WORK ARRAY.  WORK IS NOT REFERENCED IF
+!                JOB == 0.
+!
+!        JOB     INTEGER.
+!                JOB IS AN INTEGER THAT INITIATES COLUMN PIVOTING.
+!                IF JOB == 0, NO PIVOTING IS DONE.
+!                IF JOB /= 0, PIVOTING IS DONE.
+!
+!     ON RETURN
+!
+!        X       X CONTAINS IN ITS UPPER TRIANGLE THE UPPER
+!                TRIANGULAR MATRIX R OF THE QR FACTORIZATION.
+!                BELOW ITS DIAGONAL X CONTAINS INFORMATION FROM
+!                WHICH THE UNITARY PART OF THE DECOMPOSITION
+!                CAN BE RECOVERED.  NOTE THAT IF PIVOTING HAS
+!                BEEN REQUESTED, THE DECOMPOSITION IS NOT THAT
+!                OF THE ORIGINAL MATRIX X BUT THAT OF X
+!                WITH ITS COLUMNS PERMUTED AS DESCRIBED BY JPVT.
+!
+!        QRAUX   DOUBLE-COMPLEX(P).
+!                QRAUX CONTAINS FURTHER INFORMATION REQUIRED TO RECOVER
+!                THE UNITARY PART OF THE DECOMPOSITION.
+!
+!        JPVT    JPVT(K) CONTAINS THE INDEX OF THE COLUMN OF THE
+!                ORIGINAL MATRIX THAT HAS BEEN INTERCHANGED INTO
+!                THE K-TH COLUMN, IF PIVOTING WAS REQUESTED.
+!
+!     LINPACK. THIS VERSION DATED 07/03/79 .
+!     G.W. STEWART, UNIVERSITY OF MARYLAND, ARGONNE NATIONAL LAB.
+!
+!     WQRDC USES THE FOLLOWING FUNCTIONS AND SUBPROGRAMS.
+!
+!     BLAS WAXPY,PYTHAG,WDOTCR,WDOTCI,WSCAL,WSWAP,WNRM2
+!     FORTRAN DABS,DIMAG,DMAX1,MIN0
+!
+!     INTERNAL VARIABLES
+!
       INTEGER J,JP,L,LP1,LUP,MAXJ,PL,PU
       DOUBLE PRECISION MAXNRM,WNRM2,TT
       DOUBLE PRECISION PYTHAG,WDOTCR,WDOTCI,NRMXLR,NRMXLI,TR,TI,FLOP
       LOGICAL NEGJ,SWAPJ
-C
+!
       DOUBLE PRECISION ZDUMR,ZDUMI
       DOUBLE PRECISION CABS1
       CABS1(ZDUMR,ZDUMI) = DABS(ZDUMR) + DABS(ZDUMI)
-C
+!
       PL = 1
       PU = 0
-      IF (JOB .EQ. 0) GOTO 60
-C
-C        PIVOTING HAS BEEN REQUESTED.  REARRANGE THE COLUMNS
-C        ACCORDING TO JPVT.
-C
+      IF (JOB == 0) GOTO 60
+!
+!        PIVOTING HAS BEEN REQUESTED.  REARRANGE THE COLUMNS
+!        ACCORDING TO JPVT.
+!
          DO 20 J = 1, P
-            SWAPJ = JPVT(J) .GT. 0
-            NEGJ = JPVT(J) .LT. 0
+            SWAPJ = JPVT(J) > 0
+            NEGJ = JPVT(J) < 0
             JPVT(J) = J
             IF (NEGJ) JPVT(J) = -J
             IF (.NOT.SWAPJ) GOTO 10
-               IF (J .NE. PL)
-     *            CALL WSWAP(N,XR(1,PL),XI(1,PL),1,XR(1,J),XI(1,J),1)
+               IF (J /= PL)&
+                  CALL WSWAP(N,XR(1,PL),XI(1,PL),1,XR(1,J),XI(1,J),1)
                JPVT(J) = JPVT(PL)
                JPVT(PL) = J
                PL = PL + 1
@@ -6644,9 +6644,9 @@ C
          PU = P
          DO 50 JJ = 1, P
             J = P - JJ + 1
-            IF (JPVT(J) .GE. 0) GOTO 40
+            IF (JPVT(J) >= 0) GOTO 40
                JPVT(J) = -JPVT(J)
-               IF (J .EQ. PU) GOTO 30
+               IF (J == PU) GOTO 30
                   CALL WSWAP(N,XR(1,PU),XI(1,PU),1,XR(1,J),XI(1,J),1)
                   JP = JPVT(PU)
                   JPVT(PU) = JPVT(J)
@@ -6656,10 +6656,10 @@ C
    40       CONTINUE
    50    CONTINUE
    60 CONTINUE
-C
-C     COMPUTE THE NORMS OF THE FREE COLUMNS.
-C
-      IF (PU .LT. PL) GOTO 80
+!
+!     COMPUTE THE NORMS OF THE FREE COLUMNS.
+!
+      IF (PU < PL) GOTO 80
       DO 70 J = PL, PU
          QRAUXR(J) = WNRM2(N,XR(1,J),XI(1,J),1)
          QRAUXI(J) = 0.0D0
@@ -6667,25 +6667,25 @@ C
          WORKI(J) = QRAUXI(J)
    70 CONTINUE
    80 CONTINUE
-C
-C     PERFORM THE HOUSEHOLDER REDUCTION OF X.
-C
+!
+!     PERFORM THE HOUSEHOLDER REDUCTION OF X.
+!
       LUP = MIN0(N,P)
       DO 210 L = 1, LUP
-         IF (L .LT. PL .OR. L .GE. PU) GOTO 120
-C
-C           LOCATE THE COLUMN OF LARGEST NORM AND BRING IT
-C           INTO THE PIVOT POSITION.
-C
+         IF (L < PL .OR. L >= PU) GOTO 120
+!
+!           LOCATE THE COLUMN OF LARGEST NORM AND BRING IT
+!           INTO THE PIVOT POSITION.
+!
             MAXNRM = 0.0D0
             MAXJ = L
             DO 100 J = L, PU
-               IF (QRAUXR(J) .LE. MAXNRM) GOTO 90
+               IF (QRAUXR(J) <= MAXNRM) GOTO 90
                   MAXNRM = QRAUXR(J)
                   MAXJ = J
    90          CONTINUE
   100       CONTINUE
-            IF (MAXJ .EQ. L) GOTO 110
+            IF (MAXJ == L) GOTO 110
                CALL WSWAP(N,XR(1,L),XI(1,L),1,XR(1,MAXJ),XI(1,MAXJ),1)
                QRAUXR(MAXJ) = QRAUXR(L)
                QRAUXI(MAXJ) = QRAUXI(L)
@@ -6698,41 +6698,41 @@ C
   120    CONTINUE
          QRAUXR(L) = 0.0D0
          QRAUXI(L) = 0.0D0
-         IF (L .EQ. N) GOTO 200
-C
-C           COMPUTE THE HOUSEHOLDER TRANSFORMATION FOR COLUMN L.
-C
+         IF (L == N) GOTO 200
+!
+!           COMPUTE THE HOUSEHOLDER TRANSFORMATION FOR COLUMN L.
+!
             NRMXLR = WNRM2(N-L+1,XR(L,L),XI(L,L),1)
             NRMXLI = 0.0D0
-            IF (CABS1(NRMXLR,NRMXLI) .EQ. 0.0D0) GOTO 190
-               IF (CABS1(XR(L,L),XI(L,L)) .EQ. 0.0D0) GOTO 130
+            IF (CABS1(NRMXLR,NRMXLI) == 0.0D0) GOTO 190
+               IF (CABS1(XR(L,L),XI(L,L)) == 0.0D0) GOTO 130
                  CALL WSIGN(NRMXLR,NRMXLI,XR(L,L),XI(L,L),NRMXLR,NRMXLI)
   130          CONTINUE
                CALL WDIV(1.0D0,0.0D0,NRMXLR,NRMXLI,TR,TI)
                CALL WSCAL(N-L+1,TR,TI,XR(L,L),XI(L,L),1)
                XR(L,L) = FLOP(1.0D0 + XR(L,L))
-C
-C              APPLY THE TRANSFORMATION TO THE REMAINING COLUMNS,
-C              UPDATING THE NORMS.
-C
+!
+!              APPLY THE TRANSFORMATION TO THE REMAINING COLUMNS,
+!              UPDATING THE NORMS.
+!
                LP1 = L + 1
-               IF (P .LT. LP1) GOTO 180
+               IF (P < LP1) GOTO 180
                DO 170 J = LP1, P
-                  TR = -WDOTCR(N-L+1,XR(L,L),XI(L,L),1,XR(L,J),
-     *      XI(L,J),1)
-                  TI = -WDOTCI(N-L+1,XR(L,L),XI(L,L),1,XR(L,J),
-     *      XI(L,J),1)
+                  TR = -WDOTCR(N-L+1,XR(L,L),XI(L,L),1,XR(L,J),&
+            XI(L,J),1)
+                  TI = -WDOTCI(N-L+1,XR(L,L),XI(L,L),1,XR(L,J),&
+            XI(L,J),1)
                   CALL WDIV(TR,TI,XR(L,L),XI(L,L),TR,TI)
-                  CALL WAXPY(N-L+1,TR,TI,XR(L,L),XI(L,L),1,XR(L,J),
-     *    XI(L,J),1)
-                  IF (J .LT. PL .OR. J .GT. PU) GOTO 160
-                  IF (CABS1(QRAUXR(J),QRAUXI(J)) .EQ. 0.0D0)
-     *               GOTO 160
+                  CALL WAXPY(N-L+1,TR,TI,XR(L,L),XI(L,L),1,XR(L,J),&
+          XI(L,J),1)
+                  IF (J < PL .OR. J > PU) GOTO 160
+                  IF (CABS1(QRAUXR(J),QRAUXI(J)) == 0.0D0)&
+                     GOTO 160
                     TT = 1.0D0 - (PYTHAG(XR(L,J),XI(L,J))/QRAUXR(J))**2
                     TT = DMAX1(TT,0.0D0)
                     TR = FLOP(TT)
                     TT = FLOP(1.0D0+0.05D0*TT*(QRAUXR(J)/WORKR(J))**2)
-                    IF (TT .EQ. 1.0D0) GOTO 140
+                    IF (TT == 1.0D0) GOTO 140
                      QRAUXR(J) = QRAUXR(J)*DSQRT(TR)
                      QRAUXI(J) = QRAUXI(J)*DSQRT(TR)
                      GOTO 150
@@ -6745,9 +6745,9 @@ C
   160             CONTINUE
   170          CONTINUE
   180          CONTINUE
-C
-C              SAVE THE TRANSFORMATION.
-C
+!
+!              SAVE THE TRANSFORMATION.
+!
                QRAUXR(L) = XR(L,L)
                QRAUXI(L) = XI(L,L)
                XR(L,L) = -NRMXLR
@@ -6757,178 +6757,178 @@ C
   210 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
-      SUBROUTINE WQRSL(XR,XI,LDX,N,K,QRAUXR,QRAUXI,YR,YI,QYR,QYI,QTYR,
-     *                 QTYI,BR,BI,RSDR,RSDI,XBR,XBI,JOB,INFO)
+!-----------------------------------------------------------------------
+      SUBROUTINE WQRSL(XR,XI,LDX,N,K,QRAUXR,QRAUXI,YR,YI,QYR,QYI,QTYR,&
+                       QTYI,BR,BI,RSDR,RSDI,XBR,XBI,JOB,INFO)
       INTEGER LDX,N,K,JOB,INFO
-      DOUBLE PRECISION XR(LDX,1),XI(LDX,1),QRAUXR(1),QRAUXI(1),YR(1),
-     *                 YI(1),QYR(1),QYI(1),QTYR(1),QTYI(1),BR(1),BI(1),
-     *                 RSDR(1),RSDI(1),XBR(1),XBI(1)
-C
-C     WQRSL APPLIES THE OUTPUT OF WQRDC TO COMPUTE COORDINATE
-C     TRANSFORMATIONS, PROJECTIONS, AND LEAST SQUARES SOLUTIONS.
-C     FOR K .LE. MIN(N,P), LET XK BE THE MATRIX
-C
-C            XK = (X(JPVT(1)),X(JPVT(2)), ... ,X(JPVT(K)))
-C
-C     FORMED FROM COLUMNNS JPVT(1), ... ,JPVT(K) OF THE ORIGINAL
-C     N X P MATRIX X THAT WAS INPUT TO WQRDC (IF NO PIVOTING WAS
-C     DONE, XK CONSISTS OF THE FIRST K COLUMNS OF X IN THEIR
-C     ORIGINAL ORDER).  WQRDC PRODUCES A FACTORED UNITARY MATRIX Q
-C     AND AN UPPER TRIANGULAR MATRIX R SUCH THAT
-C
-C              XK = Q * (R)
-C    (0)
-C
-C     THIS INFORMATION IS CONTAINED IN CODED FORM IN THE ARRAYS
-C     X AND QRAUX.
-C
-C     ON ENTRY
-C
-C        X      DOUBLE-COMPLEX(LDX,P).
-C               X CONTAINS THE OUTPUT OF WQRDC.
-C
-C        LDX    INTEGER.
-C               LDX IS THE LEADING DIMENSION OF THE ARRAY X.
-C
-C        N      INTEGER.
-C               N IS THE NUMBER OF ROWS OF THE MATRIX XK.  IT MUST
-C               HAVE THE SAME VALUE AS N IN WQRDC.
-C
-C        K      INTEGER.
-C               K IS THE NUMBER OF COLUMNS OF THE MATRIX XK.  K
-C               MUST NNOT BE GREATER THAN MIN(N,P), WHERE P IS THE
-C               SAME AS IN THE CALLING SEQUENCE TO WQRDC.
-C
-C        QRAUX  DOUBLE-COMPLEX(P).
-C               QRAUX CONTAINS THE AUXILIARY OUTPUT FROM WQRDC.
-C
-C        Y      DOUBLE-COMPLEX(N)
-C               Y CONTAINS AN N-VECTOR THAT IS TO BE MANIPULATED
-C               BY WQRSL.
-C
-C        JOB    INTEGER.
-C               JOB SPECIFIES WHAT IS TO BE COMPUTED.  JOB HAS
-C               THE DECIMAL EXPANSION ABCDE, WITH THE FOLLOWING
-C               MEANING.
-C
-C IF A.NE.0, COMPUTE QY.
-C IF B,C,D, OR E .NE. 0, COMPUTE QTY.
-C IF C.NE.0, COMPUTE B.
-C IF D.NE.0, COMPUTE RSD.
-C IF E.NE.0, COMPUTE XB.
-C
-C               NOTE THAT A REQUEST TO COMPUTE B, RSD, OR XB
-C               AUTOMATICALLY TRIGGERS THE COMPUTATION OF QTY, FOR
-C               WHICH AN ARRAY MUST BE PROVIDED IN THE CALLING
-C               SEQUENCE.
-C
-C     ON RETURN
-C
-C        QY     DOUBLE-COMPLEX(N).
-C               QY CONNTAINS Q*Y, IF ITS COMPUTATION HAS BEEN
-C               REQUESTED.
-C
-C        QTY    DOUBLE-COMPLEX(N).
-C               QTY CONTAINS CTRANS(Q)*Y, IF ITS COMPUTATION HAS
-C               BEEN REQUESTED.  HERE CTRANS(Q) IS THE CONJUGATE
-C               TRANSPOSE OF THE MATRIX Q.
-C
-C        B      DOUBLE-COMPLEX(K)
-C               B CONTAINS THE SOLUTION OF THE LEAST SQUARES PROBLEM
-C
-C MINIMIZE NORM2(Y - XK*B),
-C
-C               IF ITS COMPUTATION HAS BEEN REQUESTED.  (NOTE THAT
-C               IF PIVOTING WAS REQUESTED IN WQRDC, THE J-TH
-C               COMPONENT OF B WILL BE ASSOCIATED WITH COLUMN JPVT(J)
-C               OF THE ORIGINAL MATRIX X THAT WAS INPUT INTO WQRDC.)
-C
-C        RSD    DOUBLE-COMPLEX(N).
-C               RSD CONTAINS THE LEAST SQUARES RESIDUAL Y - XK*B,
-C               IF ITS COMPUTATION HAS BEEN REQUESTED.  RSD IS
-C               ALSO THE ORTHOGONAL PROJECTION OF Y ONTO THE
-C               ORTHOGONAL COMPLEMENT OF THE COLUMN SPACE OF XK.
-C
-C        XB     DOUBLE-COMPLEX(N).
-C               XB CONTAINS THE LEAST SQUARES APPROXIMATION XK*B,
-C               IF ITS COMPUTATION HAS BEEN REQUESTED.  XB IS ALSO
-C               THE ORTHOGONAL PROJECTION OF Y ONTO THE COLUMN SPACE
-C               OF X.
-C
-C        INFO   INTEGER.
-C               INFO IS ZERO UNLESS THE COMPUTATION OF B HAS
-C               BEEN REQUESTED AND R IS EXACTLY SINGULAR.  IN
-C               THIS CASE, INFO IS THE INDEX OF THE FIRST ZERO
-C               DIAGONAL ELEMENT OF R AND B IS LEFT UNALTERED.
-C
-C     THE PARAMETERS QY, QTY, B, RSD, AND XB ARE NOT REFERENCED
-C     IF THEIR COMPUTATION IS NOT REQUESTED AND IN THIS CASE
-C     CAN BE REPLACED BY DUMMY VARIABLES IN THE CALLING PROGRAM.
-C     TO SAVE STORAGE, THE USER MAY IN SOME CASES USE THE SAME
-C     ARRAY FOR DIFFERENT PARAMETERS IN THE CALLING SEQUENCE.  A
-C     FREQUENTLY OCCURING EXAMPLE IS WHEN ONE WISHES TO COMPUTE
-C     ANY OF B, RSD, OR XB AND DOES NOT NEED Y OR QTY.  IN THIS
-C     CASE ONE MAY IDENTIFY Y, QTY, AND ONE OF B, RSD, OR XB, WHILE
-C     PROVIDING SEPARATE ARRAYS FOR ANYTHING ELSE THAT IS TO BE
-C     COMPUTED.  THUS THE CALLING SEQUENCE
-C
-C          CALL WQRSL(X,LDX,N,K,QRAUX,Y,DUM,Y,B,Y,DUM,110,INFO)
-C
-C     WILL RESULT IN THE COMPUTATION OF B AND RSD, WITH RSD
-C     OVERWRITING Y.  MORE GENERALLY, EACH ITEM IN THE FOLLOWING
-C     LIST CONTAINS GROUPS OF PERMISSIBLE IDENTIFICATIONS FOR
-C     A SINGLE CALLINNG SEQUENCE.
-C
-C          1. (Y,QTY,B) (RSD) (XB) (QY)
-C
-C          2. (Y,QTY,RSD) (B) (XB) (QY)
-C
-C          3. (Y,QTY,XB) (B) (RSD) (QY)
-C
-C          4. (Y,QY) (QTY,B) (RSD) (XB)
-C
-C          5. (Y,QY) (QTY,RSD) (B) (XB)
-C
-C          6. (Y,QY) (QTY,XB) (B) (RSD)
-C
-C     IN ANY GROUP THE VALUE RETURNED IN THE ARRAY ALLOCATED TO
-C     THE GROUP CORRESPONDS TO THE LAST MEMBER OF THE GROUP.
-C
-C     LINPACK. THIS VERSION DATED 07/03/79 .
-C     G.W. STEWART, UNIVERSITY OF MARYLAND, ARGONNE NATIONAL LAB.
-C
-C     WQRSL USES THE FOLLOWING FUNCTIONS AND SUBPROGRAMS.
-C
-C     BLAS WAXPY,WCOPY,WDOTCR,WDOTCI
-C     FORTRAN DABS,DIMAG,MIN0,MOD
-C
-C     INTERNAL VARIABLES
-C
+      DOUBLE PRECISION XR(LDX,1),XI(LDX,1),QRAUXR(1),QRAUXI(1),YR(1),&
+                       YI(1),QYR(1),QYI(1),QTYR(1),QTYI(1),BR(1),BI(1),&
+                       RSDR(1),RSDI(1),XBR(1),XBI(1)
+!
+!     WQRSL APPLIES THE OUTPUT OF WQRDC TO COMPUTE COORDINATE
+!     TRANSFORMATIONS, PROJECTIONS, AND LEAST SQUARES SOLUTIONS.
+!     FOR K <= MIN(N,P), LET XK BE THE MATRIX
+!
+!            XK = (X(JPVT(1)),X(JPVT(2)), ... ,X(JPVT(K)))
+!
+!     FORMED FROM COLUMNNS JPVT(1), ... ,JPVT(K) OF THE ORIGINAL
+!     N X P MATRIX X THAT WAS INPUT TO WQRDC (IF NO PIVOTING WAS
+!     DONE, XK CONSISTS OF THE FIRST K COLUMNS OF X IN THEIR
+!     ORIGINAL ORDER).  WQRDC PRODUCES A FACTORED UNITARY MATRIX Q
+!     AND AN UPPER TRIANGULAR MATRIX R SUCH THAT
+!
+!              XK = Q * (R)
+!    (0)
+!
+!     THIS INFORMATION IS CONTAINED IN CODED FORM IN THE ARRAYS
+!     X AND QRAUX.
+!
+!     ON ENTRY
+!
+!        X      DOUBLE-COMPLEX(LDX,P).
+!               X CONTAINS THE OUTPUT OF WQRDC.
+!
+!        LDX    INTEGER.
+!               LDX IS THE LEADING DIMENSION OF THE ARRAY X.
+!
+!        N      INTEGER.
+!               N IS THE NUMBER OF ROWS OF THE MATRIX XK.  IT MUST
+!               HAVE THE SAME VALUE AS N IN WQRDC.
+!
+!        K      INTEGER.
+!               K IS THE NUMBER OF COLUMNS OF THE MATRIX XK.  K
+!               MUST NNOT BE GREATER THAN MIN(N,P), WHERE P IS THE
+!               SAME AS IN THE CALLING SEQUENCE TO WQRDC.
+!
+!        QRAUX  DOUBLE-COMPLEX(P).
+!               QRAUX CONTAINS THE AUXILIARY OUTPUT FROM WQRDC.
+!
+!        Y      DOUBLE-COMPLEX(N)
+!               Y CONTAINS AN N-VECTOR THAT IS TO BE MANIPULATED
+!               BY WQRSL.
+!
+!        JOB    INTEGER.
+!               JOB SPECIFIES WHAT IS TO BE COMPUTED.  JOB HAS
+!               THE DECIMAL EXPANSION ABCDE, WITH THE FOLLOWING
+!               MEANING.
+!
+! IF A/=0, COMPUTE QY.
+! IF B,C,D, OR E /= 0, COMPUTE QTY.
+! IF C/=0, COMPUTE B.
+! IF D/=0, COMPUTE RSD.
+! IF E/=0, COMPUTE XB.
+!
+!               NOTE THAT A REQUEST TO COMPUTE B, RSD, OR XB
+!               AUTOMATICALLY TRIGGERS THE COMPUTATION OF QTY, FOR
+!               WHICH AN ARRAY MUST BE PROVIDED IN THE CALLING
+!               SEQUENCE.
+!
+!     ON RETURN
+!
+!        QY     DOUBLE-COMPLEX(N).
+!               QY CONNTAINS Q*Y, IF ITS COMPUTATION HAS BEEN
+!               REQUESTED.
+!
+!        QTY    DOUBLE-COMPLEX(N).
+!               QTY CONTAINS CTRANS(Q)*Y, IF ITS COMPUTATION HAS
+!               BEEN REQUESTED.  HERE CTRANS(Q) IS THE CONJUGATE
+!               TRANSPOSE OF THE MATRIX Q.
+!
+!        B      DOUBLE-COMPLEX(K)
+!               B CONTAINS THE SOLUTION OF THE LEAST SQUARES PROBLEM
+!
+! MINIMIZE NORM2(Y - XK*B),
+!
+!               IF ITS COMPUTATION HAS BEEN REQUESTED.  (NOTE THAT
+!               IF PIVOTING WAS REQUESTED IN WQRDC, THE J-TH
+!               COMPONENT OF B WILL BE ASSOCIATED WITH COLUMN JPVT(J)
+!               OF THE ORIGINAL MATRIX X THAT WAS INPUT INTO WQRDC.)
+!
+!        RSD    DOUBLE-COMPLEX(N).
+!               RSD CONTAINS THE LEAST SQUARES RESIDUAL Y - XK*B,
+!               IF ITS COMPUTATION HAS BEEN REQUESTED.  RSD IS
+!               ALSO THE ORTHOGONAL PROJECTION OF Y ONTO THE
+!               ORTHOGONAL COMPLEMENT OF THE COLUMN SPACE OF XK.
+!
+!        XB     DOUBLE-COMPLEX(N).
+!               XB CONTAINS THE LEAST SQUARES APPROXIMATION XK*B,
+!               IF ITS COMPUTATION HAS BEEN REQUESTED.  XB IS ALSO
+!               THE ORTHOGONAL PROJECTION OF Y ONTO THE COLUMN SPACE
+!               OF X.
+!
+!        INFO   INTEGER.
+!               INFO IS ZERO UNLESS THE COMPUTATION OF B HAS
+!               BEEN REQUESTED AND R IS EXACTLY SINGULAR.  IN
+!               THIS CASE, INFO IS THE INDEX OF THE FIRST ZERO
+!               DIAGONAL ELEMENT OF R AND B IS LEFT UNALTERED.
+!
+!     THE PARAMETERS QY, QTY, B, RSD, AND XB ARE NOT REFERENCED
+!     IF THEIR COMPUTATION IS NOT REQUESTED AND IN THIS CASE
+!     CAN BE REPLACED BY DUMMY VARIABLES IN THE CALLING PROGRAM.
+!     TO SAVE STORAGE, THE USER MAY IN SOME CASES USE THE SAME
+!     ARRAY FOR DIFFERENT PARAMETERS IN THE CALLING SEQUENCE.  A
+!     FREQUENTLY OCCURING EXAMPLE IS WHEN ONE WISHES TO COMPUTE
+!     ANY OF B, RSD, OR XB AND DOES NOT NEED Y OR QTY.  IN THIS
+!     CASE ONE MAY IDENTIFY Y, QTY, AND ONE OF B, RSD, OR XB, WHILE
+!     PROVIDING SEPARATE ARRAYS FOR ANYTHING ELSE THAT IS TO BE
+!     COMPUTED.  THUS THE CALLING SEQUENCE
+!
+!          CALL WQRSL(X,LDX,N,K,QRAUX,Y,DUM,Y,B,Y,DUM,110,INFO)
+!
+!     WILL RESULT IN THE COMPUTATION OF B AND RSD, WITH RSD
+!     OVERWRITING Y.  MORE GENERALLY, EACH ITEM IN THE FOLLOWING
+!     LIST CONTAINS GROUPS OF PERMISSIBLE IDENTIFICATIONS FOR
+!     A SINGLE CALLINNG SEQUENCE.
+!
+!          1. (Y,QTY,B) (RSD) (XB) (QY)
+!
+!          2. (Y,QTY,RSD) (B) (XB) (QY)
+!
+!          3. (Y,QTY,XB) (B) (RSD) (QY)
+!
+!          4. (Y,QY) (QTY,B) (RSD) (XB)
+!
+!          5. (Y,QY) (QTY,RSD) (B) (XB)
+!
+!          6. (Y,QY) (QTY,XB) (B) (RSD)
+!
+!     IN ANY GROUP THE VALUE RETURNED IN THE ARRAY ALLOCATED TO
+!     THE GROUP CORRESPONDS TO THE LAST MEMBER OF THE GROUP.
+!
+!     LINPACK. THIS VERSION DATED 07/03/79 .
+!     G.W. STEWART, UNIVERSITY OF MARYLAND, ARGONNE NATIONAL LAB.
+!
+!     WQRSL USES THE FOLLOWING FUNCTIONS AND SUBPROGRAMS.
+!
+!     BLAS WAXPY,WCOPY,WDOTCR,WDOTCI
+!     FORTRAN DABS,DIMAG,MIN0,MOD
+!
+!     INTERNAL VARIABLES
+!
       INTEGER I,J,JJ,JU,KP1
       DOUBLE PRECISION WDOTCR,WDOTCI,TR,TI,TEMPR,TEMPI
       LOGICAL CB,CQY,CQTY,CR,CXB
-C
+!
       DOUBLE PRECISION ZDUMR,ZDUMI
       DOUBLE PRECISION CABS1
       CABS1(ZDUMR,ZDUMI) = DABS(ZDUMR) + DABS(ZDUMI)
-C
-C     SET INFO FLAG.
-C
+!
+!     SET INFO FLAG.
+!
       INFO = 0
-C
-C     DETERMINE WHAT IS TO BE COMPUTED.
-C
-      CQY = JOB/10000 .NE. 0
-      CQTY = MOD(JOB,10000) .NE. 0
-      CB = MOD(JOB,1000)/100 .NE. 0
-      CR = MOD(JOB,100)/10 .NE. 0
-      CXB = MOD(JOB,10) .NE. 0
+!
+!     DETERMINE WHAT IS TO BE COMPUTED.
+!
+      CQY = JOB/10000 /= 0
+      CQTY = MOD(JOB,10000) /= 0
+      CB = MOD(JOB,1000)/100 /= 0
+      CR = MOD(JOB,100)/10 /= 0
+      CXB = MOD(JOB,10) /= 0
       JU = MIN0(K,N-1)
-C
-C     SPECIAL ACTION WHEN N=1.
-C
-      IF (JU .NE. 0) GOTO 80
+!
+!     SPECIAL ACTION WHEN N=1.
+!
+      IF (JU /= 0) GOTO 80
          IF (.NOT.CQY) GOTO 10
             QYR(1) = YR(1)
             QYI(1) = YI(1)
@@ -6942,7 +6942,7 @@ C
             XBI(1) = YI(1)
    30    CONTINUE
          IF (.NOT.CB) GOTO 60
-            IF (CABS1(XR(1,1),XI(1,1)) .NE. 0.0D0) GOTO 40
+            IF (CABS1(XR(1,1),XI(1,1)) /= 0.0D0) GOTO 40
                INFO = 1
             GOTO 50
    40       CONTINUE
@@ -6955,19 +6955,19 @@ C
    70    CONTINUE
       GOTO 290
    80 CONTINUE
-C
-C        SET UP TO COMPUTE QY OR QTY.
-C
+!
+!        SET UP TO COMPUTE QY OR QTY.
+!
          IF (CQY) CALL WCOPY(N,YR,YI,1,QYR,QYI,1)
          IF (CQTY) CALL WCOPY(N,YR,YI,1,QTYR,QTYI,1)
          IF (.NOT.CQY) GOTO 110
-C
-C           COMPUTE QY.
-C
+!
+!           COMPUTE QY.
+!
             DO 100 JJ = 1, JU
                J = JU - JJ + 1
-               IF (CABS1(QRAUXR(J),QRAUXI(J)) .EQ. 0.0D0)
-     *            GOTO 90
+               IF (CABS1(QRAUXR(J),QRAUXI(J)) == 0.0D0)&
+                  GOTO 90
                   TEMPR = XR(J,J)
                   TEMPI = XI(J,J)
                   XR(J,J) = QRAUXR(J)
@@ -6975,45 +6975,45 @@ C
                   TR = -WDOTCR(N-J+1,XR(J,J),XI(J,J),1,QYR(J),QYI(J),1)
                   TI = -WDOTCI(N-J+1,XR(J,J),XI(J,J),1,QYR(J),QYI(J),1)
                   CALL WDIV(TR,TI,XR(J,J),XI(J,J),TR,TI)
-                  CALL WAXPY(N-J+1,TR,TI,XR(J,J),XI(J,J),1,QYR(J),
-     *    QYI(J),1)
+                  CALL WAXPY(N-J+1,TR,TI,XR(J,J),XI(J,J),1,QYR(J),&
+          QYI(J),1)
                   XR(J,J) = TEMPR
                   XI(J,J) = TEMPI
    90          CONTINUE
   100       CONTINUE
   110    CONTINUE
          IF (.NOT.CQTY) GOTO 140
-C
-C           COMPUTE CTRANS(Q)*Y.
-C
+!
+!           COMPUTE CTRANS(Q)*Y.
+!
             DO 130 J = 1, JU
-               IF (CABS1(QRAUXR(J),QRAUXI(J)) .EQ. 0.0D0)
-     *            GOTO 120
+               IF (CABS1(QRAUXR(J),QRAUXI(J)) == 0.0D0)&
+                  GOTO 120
                   TEMPR = XR(J,J)
                   TEMPI = XI(J,J)
                   XR(J,J) = QRAUXR(J)
                   XI(J,J) = QRAUXI(J)
-                  TR = -WDOTCR(N-J+1,XR(J,J),XI(J,J),1,QTYR(J),
-     *      QTYI(J),1)
-                  TI = -WDOTCI(N-J+1,XR(J,J),XI(J,J),1,QTYR(J),
-     *      QTYI(J),1)
+                  TR = -WDOTCR(N-J+1,XR(J,J),XI(J,J),1,QTYR(J),&
+            QTYI(J),1)
+                  TI = -WDOTCI(N-J+1,XR(J,J),XI(J,J),1,QTYR(J),&
+            QTYI(J),1)
                   CALL WDIV(TR,TI,XR(J,J),XI(J,J),TR,TI)
-                  CALL WAXPY(N-J+1,TR,TI,XR(J,J),XI(J,J),1,QTYR(J),
-     *    QTYI(J),1)
+                  CALL WAXPY(N-J+1,TR,TI,XR(J,J),XI(J,J),1,QTYR(J),&
+          QTYI(J),1)
                   XR(J,J) = TEMPR
                   XI(J,J) = TEMPI
   120          CONTINUE
   130       CONTINUE
   140    CONTINUE
-C
-C        SET UP TO COMPUTE B, RSD, OR XB.
-C
+!
+!        SET UP TO COMPUTE B, RSD, OR XB.
+!
          IF (CB) CALL WCOPY(K,QTYR,QTYI,1,BR,BI,1)
          KP1 = K + 1
          IF (CXB) CALL WCOPY(K,QTYR,QTYI,1,XBR,XBI,1)
-         IF (CR .AND. K .LT. N)
-     *      CALL WCOPY(N-K,QTYR(KP1),QTYI(KP1),1,RSDR(KP1),RSDI(KP1),1)
-         IF (.NOT.CXB .OR. KP1 .GT. N) GOTO 160
+         IF (CR .AND. K < N)&
+            CALL WCOPY(N-K,QTYR(KP1),QTYI(KP1),1,RSDR(KP1),RSDI(KP1),1)
+         IF (.NOT.CXB .OR. KP1 > N) GOTO 160
             DO 150 I = KP1, N
                XBR(I) = 0.0D0
                XBI(I) = 0.0D0
@@ -7026,19 +7026,19 @@ C
   170       CONTINUE
   180    CONTINUE
          IF (.NOT.CB) GOTO 230
-C
-C           COMPUTE B.
-C
+!
+!           COMPUTE B.
+!
             DO 210 JJ = 1, K
                J = K - JJ + 1
-               IF (CABS1(XR(J,J),XI(J,J)) .NE. 0.0D0) GOTO 190
+               IF (CABS1(XR(J,J),XI(J,J)) /= 0.0D0) GOTO 190
                   INFO = J
-C                 ......EXIT
-C           ......EXIT
+!                 ......EXIT
+!           ......EXIT
                   GOTO 220
   190          CONTINUE
                CALL WDIV(BR(J),BI(J),XR(J,J),XI(J,J),BR(J),BI(J))
-               IF (J .EQ. 1) GOTO 200
+               IF (J == 1) GOTO 200
                   TR = -BR(J)
                   TI = -BI(J)
                   CALL WAXPY(J-1,TR,TI,XR(1,J),XI(1,J),1,BR,BI,1)
@@ -7047,34 +7047,34 @@ C           ......EXIT
   220       CONTINUE
   230    CONTINUE
          IF (.NOT.CR .AND. .NOT.CXB) GOTO 280
-C
-C           COMPUTE RSD OR XB AS REQUIRED.
-C
+!
+!           COMPUTE RSD OR XB AS REQUIRED.
+!
             DO 270 JJ = 1, JU
                J = JU - JJ + 1
-               IF (CABS1(QRAUXR(J),QRAUXI(J)) .EQ. 0.0D0)
-     *            GOTO 260
+               IF (CABS1(QRAUXR(J),QRAUXI(J)) == 0.0D0)&
+                  GOTO 260
                   TEMPR = XR(J,J)
                   TEMPI = XI(J,J)
                   XR(J,J) = QRAUXR(J)
                   XI(J,J) = QRAUXI(J)
                   IF (.NOT.CR) GOTO 240
-                  TR = -WDOTCR(N-J+1,XR(J,J),XI(J,J),1,RSDR(J),
-     *         RSDI(J),1)
-                  TI = -WDOTCI(N-J+1,XR(J,J),XI(J,J),1,RSDR(J),
-     *         RSDI(J),1)
+                  TR = -WDOTCR(N-J+1,XR(J,J),XI(J,J),1,RSDR(J),&
+               RSDI(J),1)
+                  TI = -WDOTCI(N-J+1,XR(J,J),XI(J,J),1,RSDR(J),&
+               RSDI(J),1)
                   CALL WDIV(TR,TI,XR(J,J),XI(J,J),TR,TI)
-                  CALL WAXPY(N-J+1,TR,TI,XR(J,J),XI(J,J),1,RSDR(J),
-     *       RSDI(J),1)
+                  CALL WAXPY(N-J+1,TR,TI,XR(J,J),XI(J,J),1,RSDR(J),&
+             RSDI(J),1)
   240             CONTINUE
                   IF (.NOT.CXB) GOTO 250
-                   TR = -WDOTCR(N-J+1,XR(J,J),XI(J,J),1,XBR(J),
-     *         XBI(J),1)
-                   TI = -WDOTCI(N-J+1,XR(J,J),XI(J,J),1,XBR(J),
-     *         XBI(J),1)
+                   TR = -WDOTCR(N-J+1,XR(J,J),XI(J,J),1,XBR(J),&
+               XBI(J),1)
+                   TI = -WDOTCI(N-J+1,XR(J,J),XI(J,J),1,XBR(J),&
+               XBI(J),1)
                    CALL WDIV(TR,TI,XR(J,J),XI(J,J),TR,TI)
-                   CALL WAXPY(N-J+1,TR,TI,XR(J,J),XI(J,J),1,XBR(J),
-     *       XBI(J),1)
+                   CALL WAXPY(N-J+1,TR,TI,XR(J,J),XI(J,J),1,XBR(J),&
+             XBI(J),1)
   250             CONTINUE
                   XR(J,J) = TEMPR
                   XI(J,J) = TEMPI
@@ -7084,21 +7084,21 @@ C
   290 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE MAGIC(A,LDA,N)
-C
-C     ALGORITHMS FOR MAGIC SQUARES TAKEN FROM
-C        MATHEMATICAL RECREATIONS AND ESSAYS, 12TH ED.,
-C        BY W. W. ROUSE BALL AND H. S. M. COXETER
-C
+!
+!     ALGORITHMS FOR MAGIC SQUARES TAKEN FROM
+!        MATHEMATICAL RECREATIONS AND ESSAYS, 12TH ED.,
+!        BY W. W. ROUSE BALL AND H. S. M. COXETER
+!
       DOUBLE PRECISION A(LDA,N),T
-C
-      IF (MOD(N,4) .EQ. 0) GOTO 100
-      IF (MOD(N,2) .EQ. 0) M = N/2
-      IF (MOD(N,2) .NE. 0) M = N
-C
-C     ODD ORDER OR UPPER CORNER OF EVEN ORDER
-C
+!
+      IF (MOD(N,4) == 0) GOTO 100
+      IF (MOD(N,2) == 0) M = N/2
+      IF (MOD(N,2) /= 0) M = N
+!
+!     ODD ORDER OR UPPER CORNER OF EVEN ORDER
+!
       DO 20 J = 1,M
          DO 10 I = 1,M
             A(I,J) = 0
@@ -7111,18 +7111,18 @@ C
          A(I,J) = K
          I1 = I-1
          J1 = J+1
-         IF(I1.LT.1) I1 = M
-         IF(J1.GT.M) J1 = 1
-         IF(IDINT(A(I1,J1)).EQ.0) GOTO 30
+         IF(I1<1) I1 = M
+         IF(J1>M) J1 = 1
+         IF(IDINT(A(I1,J1))==0) GOTO 30
             I1 = I+1
             J1 = J
    30    I = I1
          J = J1
    40 CONTINUE
-      IF (MOD(N,2) .NE. 0) RETURN
-C
-C     REST OF EVEN ORDER
-C
+      IF (MOD(N,2) /= 0) RETURN
+!
+!     REST OF EVEN ORDER
+!
       T = M*M
       DO 60 I = 1, M
          DO 50 J = 1, M
@@ -7134,7 +7134,7 @@ C
    50    CONTINUE
    60 CONTINUE
       M1 = (M-1)/2
-      IF (M1.EQ.0) RETURN
+      IF (M1==0) RETURN
       DO 70 J = 1, M1
          CALL RSWAP(M,A(1,J),1,A(M+1,J),1)
    70 CONTINUE
@@ -7143,49 +7143,49 @@ C
       CALL RSWAP(1,A(M1,1),1,A(M2,1),1)
       CALL RSWAP(1,A(M1,M1),1,A(M2,M1),1)
       M1 = N+1-(M-3)/2
-      IF(M1.GT.N) RETURN
+      IF(M1>N) RETURN
       DO 80 J = M1, N
          CALL RSWAP(M,A(1,J),1,A(M+1,J),1)
    80 CONTINUE
       RETURN
-C
-C     DOUBLE EVEN ORDER
-C
+!
+!     DOUBLE EVEN ORDER
+!
   100 K = 1
       DO 120 I = 1, N
          DO 110 J = 1, N
             A(I,J) = K
-            IF (MOD(I,4)/2 .EQ. MOD(J,4)/2) A(I,J) = N*N+1 - K
+            IF (MOD(I,4)/2 == MOD(J,4)/2) A(I,J) = N*N+1 - K
             K = K+1
   110    CONTINUE
   120 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE BASE(X,B,EPS,S,N)
       DOUBLE PRECISION X,B,EPS,S(1),T
-C
-C     STORE BASE B REPRESENTATION OF X IN S(1:N)
-C
+!
+!     STORE BASE B REPRESENTATION OF X IN S(1:N)
+!
       INTEGER PLUS,MINUS,DOT,ZERO,COMMA
       DATA PLUS/41/,MINUS/42/,DOT/47/,ZERO/0/,COMMA/48/
       save plus, minus, dot, zero, comma
       L = 1
-      IF (X .GE. 0.0D0) S(L) = PLUS
-      IF (X .LT. 0.0D0) S(L) = MINUS
+      IF (X >= 0.0D0) S(L) = PLUS
+      IF (X < 0.0D0) S(L) = MINUS
       S(L+1) = ZERO
       S(L+2) = DOT
       X = DABS(X)
-      IF (X .NE. 0.0D0) THEN
+      IF (X /= 0.0D0) THEN
          K = DLOG(X)/DLOG(B)
       ELSE
          K = 0
       ENDIF
-      IF (X .GT. 1.0D0) K = K + 1
+      IF (X > 1.0D0) K = K + 1
       X = X/B**K
-      IF (B*X .GE. B) K = K + 1
-      IF (B*X .GE. B) X = X/B
-      IF (EPS .NE. 0.0D0)THEN 
+      IF (B*X >= B) K = K + 1
+      IF (B*X >= B) X = X/B
+      IF (EPS /= 0.0D0)THEN
          M = (-1)*DLOG(EPS)/DLOG(B) + 4
       ELSE
          M = 54
@@ -7197,95 +7197,95 @@ C
       X = X - S(L)
    10 CONTINUE
       S(M+1) = COMMA
-      IF (K .GE. 0) S(M+2) = PLUS
-      IF (K .LT. 0) S(M+2) = MINUS
+      IF (K >= 0) S(M+2) = PLUS
+      IF (K < 0) S(M+2) = MINUS
       T = DABS(DFLOAT(K))
       N = M + 3
-      IF (T .GE. B) N = N + IDINT(DLOG(T)/DLOG(B))
+      IF (T >= B) N = N + IDINT(DLOG(T)/DLOG(B))
       L = N
    20 J = IDINT(DMOD(T,B))
       S(L) = DFLOAT(J)
       L = L - 1
       T = T/B
-      IF (L .GE. M+3) GOTO 20
+      IF (L >= M+3) GOTO 20
       RETURN
       END
       DOUBLE PRECISION FUNCTION URAND(IY)
       INTEGER IY
-C
-C      URAND IS A UNIFORM RANDOM NUMBER GENERATOR BASED  ON  THEORY  AND
-C  SUGGESTIONS  GIVEN  IN  D.E. KNUTH (1969),  VOL  2.   THE INTEGER  IY
-C  SHOULD BE INITIALIZED TO AN ARBITRARY INTEGER PRIOR TO THE FIRST CALL
-C  TO URAND.  THE CALLING PROGRAM SHOULD  NOT  ALTER  THE  VALUE  OF  IY
-C  BETWEEN  SUBSEQUENT CALLS TO URAND.  VALUES OF URAND WILL BE RETURNED
-C  IN THE INTERVAL (0,1).
-C
+!
+!      URAND IS A UNIFORM RANDOM NUMBER GENERATOR BASED  ON  THEORY  AND
+!  SUGGESTIONS  GIVEN  IN  D.E. KNUTH (1969),  VOL  2.   THE INTEGER  IY
+!  SHOULD BE INITIALIZED TO AN ARBITRARY INTEGER PRIOR TO THE FIRST CALL
+!  TO URAND.  THE CALLING PROGRAM SHOULD  NOT  ALTER  THE  VALUE  OF  IY
+!  BETWEEN  SUBSEQUENT CALLS TO URAND.  VALUES OF URAND WILL BE RETURNED
+!  IN THE INTERVAL (0,1).
+!
       INTEGER IA,IC,ITWO,M2,M,MIC
       DOUBLE PRECISION HALFM,S
       DOUBLE PRECISION DATAN,DSQRT
       DATA M2/0/,ITWO/2/
       save m2, itwo
-      IF (M2 .NE. 0) GOTO 20
-C
-C  IF FIRST ENTRY, COMPUTE MACHINE INTEGER WORD LENGTH
-C
+      IF (M2 /= 0) GOTO 20
+!
+!  IF FIRST ENTRY, COMPUTE MACHINE INTEGER WORD LENGTH
+!
       M = 1
    10 M2 = M
       M = ITWO*M2
-      IF (M .GT. M2) GOTO 10
+      IF (M > M2) GOTO 10
       HALFM = M2
-C
-C  COMPUTE MULTIPLIER AND INCREMENT FOR LINEAR CONGRUENTIAL METHOD
-C
+!
+!  COMPUTE MULTIPLIER AND INCREMENT FOR LINEAR CONGRUENTIAL METHOD
+!
       IA = 8*IDINT(HALFM*DATAN(1.D0)/8.D0) + 5
       IC = 2*IDINT(HALFM*(0.5D0-DSQRT(3.D0)/6.D0)) + 1
       MIC = (M2 - IC) + M2
-C
-C  S IS THE SCALE FACTOR FOR CONVERTING TO FLOATING POINT
-C
+!
+!  S IS THE SCALE FACTOR FOR CONVERTING TO FLOATING POINT
+!
       S = 0.5D0/HALFM
-C
-C  COMPUTE NEXT RANDOM NUMBER
-C
+!
+!  COMPUTE NEXT RANDOM NUMBER
+!
    20 IY = IY*IA
-C
-C  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHICH DO NOT ALLOW
-C  INTEGER OVERFLOW ON ADDITION
-C
-      IF (IY .GT. MIC) IY = (IY - M2) - M2
-C
+!
+!  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHICH DO NOT ALLOW
+!  INTEGER OVERFLOW ON ADDITION
+!
+      IF (IY > MIC) IY = (IY - M2) - M2
+!
       IY = IY + IC
-C
-C  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHERE THE
-C  WORD LENGTH FOR ADDITION IS GREATER THAN FOR MULTIPLICATION
-C
-      IF (IY/2 .GT. M2) IY = (IY - M2) - M2
-C
-C  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHERE INTEGER
-C  OVERFLOW AFFECTS THE SIGN BIT
-C
-      IF (IY .LT. 0) IY = (IY + M2) + M2
+!
+!  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHERE THE
+!  WORD LENGTH FOR ADDITION IS GREATER THAN FOR MULTIPLICATION
+!
+      IF (IY/2 > M2) IY = (IY - M2) - M2
+!
+!  THE FOLLOWING STATEMENT IS FOR COMPUTERS WHERE INTEGER
+!  OVERFLOW AFFECTS THE SIGN BIT
+!
+      IF (IY < 0) IY = (IY + M2) + M2
       URAND = DFLOAT(IY)*S
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WMUL(AR,AI,BR,BI,CR,CI)
       DOUBLE PRECISION AR,AI,BR,BI,CR,CI,T,FLOP
-C     C = A*B
+!     C = A*B
       T = AR*BI + AI*BR
-      IF (T .NE. 0.0D0) T = FLOP(T)
+      IF (T /= 0.0D0) T = FLOP(T)
       CR = FLOP(AR*BR - AI*BI)
       CI = T
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WDIV(AR,AI,BR,BI,CR,CI)
       DOUBLE PRECISION AR,AI,BR,BI,CR,CI
-C     C = A/B
+!     C = A/B
       DOUBLE PRECISION S,D,ARS,AIS,BRS,BIS,FLOP
       S = DABS(BR) + DABS(BI)
-      IF (S .EQ. 0.0D0) CALL ERROR(27)
-      IF (S .EQ. 0.0D0) RETURN
+      IF (S == 0.0D0) CALL ERROR(27)
+      IF (S == 0.0D0) RETURN
       ARS = AR/S
       AIS = AI/S
       BRS = BR/S
@@ -7293,57 +7293,57 @@ C     C = A/B
       D = BRS**2 + BIS**2
       CR = FLOP((ARS*BRS + AIS*BIS)/D)
       CI = (AIS*BRS - ARS*BIS)/D
-      IF (CI .NE. 0.0D0) CI = FLOP(CI)
+      IF (CI /= 0.0D0) CI = FLOP(CI)
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WSIGN(XR,XI,YR,YI,ZR,ZI)
       DOUBLE PRECISION XR,XI,YR,YI,ZR,ZI,PYTHAG,T
-C     IF Y .NE. 0, Z = X*Y/ABS(Y)
-C     IF Y .EQ. 0, Z = X
+!     IF Y /= 0, Z = X*Y/ABS(Y)
+!     IF Y == 0, Z = X
       T = PYTHAG(YR,YI)
       ZR = XR
       ZI = XI
-      IF (T .NE. 0.0D0) CALL WMUL(YR/T,YI/T,ZR,ZI,ZR,ZI)
+      IF (T /= 0.0D0) CALL WMUL(YR/T,YI/T,ZR,ZI,ZR,ZI)
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WSQRT(XR,XI,YR,YI)
       DOUBLE PRECISION XR,XI,YR,YI,S,TR,TI,PYTHAG,FLOP
-C     Y = SQRT(X) WITH YR .GE. 0.0 AND SIGN(YI) .EQ. SIGN(XI)
-C
+!     Y = SQRT(X) WITH YR >= 0.0 AND SIGN(YI) == SIGN(XI)
+!
       TR = XR
       TI = XI
       S = DSQRT(0.5D0*(PYTHAG(TR,TI) + DABS(TR)))
-      IF (TR .GE. 0.0D0) YR = FLOP(S)
-      IF (TI .LT. 0.0D0) S = -S
-      IF (TR .LE. 0.0D0) YI = FLOP(S)
-      IF (TR .LT. 0.0D0) YR = FLOP(0.5D0*(TI/YI))
-      IF (TR .GT. 0.0D0) YI = FLOP(0.5D0*(TI/YR))
+      IF (TR >= 0.0D0) YR = FLOP(S)
+      IF (TI < 0.0D0) S = -S
+      IF (TR <= 0.0D0) YI = FLOP(S)
+      IF (TR < 0.0D0) YR = FLOP(0.5D0*(TI/YI))
+      IF (TR > 0.0D0) YI = FLOP(0.5D0*(TI/YR))
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WLOG(XR,XI,YR,YI)
       DOUBLE PRECISION XR,XI,YR,YI,T,R,PYTHAG
-C     Y = LOG(X)
+!     Y = LOG(X)
       R = PYTHAG(XR,XI)
-      IF (R .EQ. 0.0D0) CALL ERROR(32)
-      IF (R .EQ. 0.0D0) RETURN
+      IF (R == 0.0D0) CALL ERROR(32)
+      IF (R == 0.0D0) RETURN
       T = DATAN2(XI,XR)
-      IF (XI.EQ.0.0D0 .AND. XR.LT.0.0D0) T = DABS(T)
+      IF (XI==0.0D0 .AND. XR<0.0D0) T = DABS(T)
       YR = DLOG(R)
       YI = T
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WATAN(XR,XI,YR,YI)
-C     Y = ATAN(X) = (I/2)*LOG((I+X)/(I-X))
+!     Y = ATAN(X) = (I/2)*LOG((I+X)/(I-X))
       DOUBLE PRECISION XR,XI,YR,YI,TR,TI
-      IF (XI .NE. 0.0D0) GOTO 10
+      IF (XI /= 0.0D0) GOTO 10
          YR = DATAN2(XR,1.0D0)
          YI = 0.0D0
          RETURN
-   10 IF (XR.NE.0.0D0 .OR. DABS(XI).NE.1.0D0) GOTO 20
+   10 IF (XR/=0.0D0 .OR. DABS(XI)/=1.0D0) GOTO 20
          CALL ERROR(32)
          RETURN
    20 CALL WDIV(XR,1.0D0+XI,-XR,1.0D0-XI,TR,TI)
@@ -7352,12 +7352,12 @@ C     Y = ATAN(X) = (I/2)*LOG((I+X)/(I-X))
       YI = TR/2.0D0
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WNRM2(N,XR,XI,INCX)
       DOUBLE PRECISION XR(1),XI(1),PYTHAG,S
-C     NORM2(X)
+!     NORM2(X)
       S = 0.0D0
-      IF (N .LE. 0) GOTO 20
+      IF (N <= 0) GOTO 20
       IX = 1
       DO 10 I = 1, N
          S = PYTHAG(S,XR(IX))
@@ -7367,12 +7367,12 @@ C     NORM2(X)
    20 WNRM2 = S
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WASUM(N,XR,XI,INCX)
       DOUBLE PRECISION XR(1),XI(1),S,FLOP
-C     NORM1(X)
+!     NORM1(X)
       S = 0.0D0
-      IF (N .LE. 0) GOTO 20
+      IF (N <= 0) GOTO 20
       IX = 1
       DO 10 I = 1, N
          S = FLOP(S + DABS(XR(IX)) + DABS(XI(IX)))
@@ -7381,39 +7381,39 @@ C     NORM1(X)
    20 WASUM = S
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       INTEGER FUNCTION IWAMAX(N,XR,XI,INCX)
       DOUBLE PRECISION XR(1),XI(1),S,P
-C     INDEX OF NORMINF(X)
+!     INDEX OF NORMINF(X)
       K = 0
-      IF (N .LE. 0) GOTO 20
+      IF (N <= 0) GOTO 20
       K = 1
       S = 0.0D0
       IX = 1
       DO 10 I = 1, N
          P = DABS(XR(IX)) + DABS(XI(IX))
-         IF (P .GT. S) K = I
-         IF (P .GT. S) S = P
+         IF (P > S) K = I
+         IF (P > S) S = P
          IX = IX + INCX
    10 CONTINUE
    20 IWAMAX = K
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WRSCAL(N,S,XR,XI,INCX)
       DOUBLE PRECISION S,XR(1),XI(1),FLOP
-      IF (N .LE. 0) RETURN
+      IF (N <= 0) RETURN
       IX = 1
       DO 10 I = 1, N
          XR(IX) = FLOP(S*XR(IX))
-         IF (XI(IX) .NE. 0.0D0) XI(IX) = FLOP(S*XI(IX))
+         IF (XI(IX) /= 0.0D0) XI(IX) = FLOP(S*XI(IX))
          IX = IX + INCX
    10 CONTINUE
       RETURN
       END
       SUBROUTINE WSCAL(N,SR,SI,XR,XI,INCX)
       DOUBLE PRECISION SR,SI,XR(1),XI(1)
-      IF (N .LE. 0) RETURN
+      IF (N <= 0) RETURN
       IX = 1
       DO 10 I = 1, N
          CALL WMUL(SR,SI,XR(IX),XI(IX),XR(IX),XI(IX))
@@ -7421,33 +7421,33 @@ C-----------------------------------------------------------------------
    10 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WAXPY(N,SR,SI,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION SR,SI,XR(1),XI(1),YR(1),YI(1),FLOP
-      IF (N .LE. 0) RETURN
-      IF (SR .EQ. 0.0D0 .AND. SI .EQ. 0.0D0) RETURN
+      IF (N <= 0) RETURN
+      IF (SR == 0.0D0 .AND. SI == 0.0D0) RETURN
       IX = 1
       IY = 1
-      IF (INCX.LT.0) IX = (-N+1)*INCX + 1
-      IF (INCY.LT.0) IY = (-N+1)*INCY + 1
+      IF (INCX<0) IX = (-N+1)*INCX + 1
+      IF (INCY<0) IY = (-N+1)*INCY + 1
       DO 10 I = 1, N
          YR(IY) = FLOP(YR(IY) + SR*XR(IX) - SI*XI(IX))
          YI(IY) = YI(IY) + SR*XI(IX) + SI*XR(IX)
-         IF (YI(IY) .NE. 0.0D0) YI(IY) = FLOP(YI(IY))
+         IF (YI(IY) /= 0.0D0) YI(IY) = FLOP(YI(IY))
          IX = IX + INCX
          IY = IY + INCY
    10 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WDOTUR(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1),S,FLOP
       S = 0.0D0
-      IF (N .LE. 0) GOTO 20
+      IF (N <= 0) GOTO 20
       IX = 1
       IY = 1
-      IF (INCX.LT.0) IX = (-N+1)*INCX + 1
-      IF (INCY.LT.0) IY = (-N+1)*INCY + 1
+      IF (INCX<0) IX = (-N+1)*INCX + 1
+      IF (INCY<0) IY = (-N+1)*INCY + 1
       DO 10 I = 1, N
          S = FLOP(S + XR(IX)*YR(IY) - XI(IX)*YI(IY))
          IX = IX + INCX
@@ -7456,33 +7456,33 @@ C-----------------------------------------------------------------------
    20 WDOTUR = S
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WDOTUI(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1),S,FLOP
       S = 0.0D0
-      IF (N .LE. 0) GOTO 20
+      IF (N <= 0) GOTO 20
       IX = 1
       IY = 1
-      IF (INCX.LT.0) IX = (-N+1)*INCX + 1
-      IF (INCY.LT.0) IY = (-N+1)*INCY + 1
+      IF (INCX<0) IX = (-N+1)*INCX + 1
+      IF (INCY<0) IY = (-N+1)*INCY + 1
       DO 10 I = 1, N
          S = S + XR(IX)*YI(IY) + XI(IX)*YR(IY)
-         IF (S .NE. 0.0D0) S = FLOP(S)
+         IF (S /= 0.0D0) S = FLOP(S)
          IX = IX + INCX
          IY = IY + INCY
    10 CONTINUE
    20 WDOTUI = S
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WDOTCR(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1),S,FLOP
       S = 0.0D0
-      IF (N .LE. 0) GOTO 20
+      IF (N <= 0) GOTO 20
       IX = 1
       IY = 1
-      IF (INCX.LT.0) IX = (-N+1)*INCX + 1
-      IF (INCY.LT.0) IY = (-N+1)*INCY + 1
+      IF (INCX<0) IX = (-N+1)*INCX + 1
+      IF (INCY<0) IY = (-N+1)*INCY + 1
       DO 10 I = 1, N
          S = FLOP(S + XR(IX)*YR(IY) + XI(IX)*YI(IY))
          IX = IX + INCX
@@ -7491,32 +7491,32 @@ C-----------------------------------------------------------------------
    20 WDOTCR = S
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WDOTCI(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1),S,FLOP
       S = 0.0D0
-      IF (N .LE. 0) GOTO 20
+      IF (N <= 0) GOTO 20
       IX = 1
       IY = 1
-      IF (INCX.LT.0) IX = (-N+1)*INCX + 1
-      IF (INCY.LT.0) IY = (-N+1)*INCY + 1
+      IF (INCX<0) IX = (-N+1)*INCX + 1
+      IF (INCY<0) IY = (-N+1)*INCY + 1
       DO 10 I = 1, N
          S = S + XR(IX)*YI(IY) - XI(IX)*YR(IY)
-         IF (S .NE. 0.0D0) S = FLOP(S)
+         IF (S /= 0.0D0) S = FLOP(S)
          IX = IX + INCX
          IY = IY + INCY
    10 CONTINUE
    20 WDOTCI = S
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WCOPY(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1)
-      IF (N .LE. 0) RETURN
+      IF (N <= 0) RETURN
       IX = 1
       IY = 1
-      IF (INCX.LT.0) IX = (-N+1)*INCX + 1
-      IF (INCY.LT.0) IY = (-N+1)*INCY + 1
+      IF (INCX<0) IX = (-N+1)*INCX + 1
+      IF (INCY<0) IY = (-N+1)*INCY + 1
       DO 10 I = 1, N
          YR(IY) = XR(IX)
          YI(IY) = XI(IX)
@@ -7525,12 +7525,12 @@ C-----------------------------------------------------------------------
    10 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WSET(N,XR,XI,YR,YI,INCY)
       INTEGER N,INCY
       DOUBLE PRECISION XR,XI,YR(1),YI(1)
       IY = 1
-      IF (N .LE. 0 ) RETURN
+      IF (N <= 0 ) RETURN
       DO 10 I = 1,N
          YR(IY) = XR
          YI(IY) = XI
@@ -7538,14 +7538,14 @@ C-----------------------------------------------------------------------
    10 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE WSWAP(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1),T
-      IF (N .LE. 0) RETURN
+      IF (N <= 0) RETURN
       IX = 1
       IY = 1
-      IF (INCX.LT.0) IX = (-N+1)*INCX + 1
-      IF (INCY.LT.0) IY = (-N+1)*INCY + 1
+      IF (INCX<0) IX = (-N+1)*INCX + 1
+      IF (INCY<0) IY = (-N+1)*INCY + 1
       DO 10 I = 1, N
          T = XR(IX)
          XR(IX) = YR(IY)
@@ -7558,29 +7558,29 @@ C-----------------------------------------------------------------------
    10 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE RSET(N,DX,DY,INCY)
-C
-C     COPIES A SCALAR, X, TO A SCALAR, Y.
+!
+!     COPIES A SCALAR, X, TO A SCALAR, Y.
       DOUBLE PRECISION DX,DY(1)
-C
-      IF (N.LE.0) RETURN
+!
+      IF (N<=0) RETURN
       IY = 1
-      IF (INCY.LT.0) IY = (-N+1)*INCY + 1
+      IF (INCY<0) IY = (-N+1)*INCY + 1
       DO 10 I = 1,N
         DY(IY) = DX
         IY = IY + INCY
    10 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE RSWAP(N,X,INCX,Y,INCY)
       DOUBLE PRECISION X(1),Y(1),T
-      IF (N .LE. 0) RETURN
+      IF (N <= 0) RETURN
       IX = 1
       IY = 1
-      IF (INCX.LT.0) IX = (-N+1)*INCX+1
-      IF (INCY.LT.0) IY = (-N+1)*INCY+1
+      IF (INCX<0) IX = (-N+1)*INCX+1
+      IF (INCY<0) IY = (-N+1)*INCY+1
       DO 10 I = 1, N
          T = X(IX)
          X(IX) = Y(IY)
@@ -7590,18 +7590,18 @@ C-----------------------------------------------------------------------
    10 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE RROT(N,DX,INCX,DY,INCY,C,S)
-C
-C     APPLIES A PLANE ROTATION.
+!
+!     APPLIES A PLANE ROTATION.
       DOUBLE PRECISION DX(1),DY(1),DTEMP,C,S,FLOP
       INTEGER I,INCX,INCY,IX,IY,N
-C
-      IF (N.LE.0) RETURN
+!
+      IF (N<=0) RETURN
       IX = 1
       IY = 1
-      IF (INCX.LT.0) IX = (-N+1)*INCX + 1
-      IF (INCY.LT.0) IY = (-N+1)*INCY + 1
+      IF (INCX<0) IX = (-N+1)*INCX + 1
+      IF (INCY<0) IY = (-N+1)*INCY + 1
       DO 10 I = 1,N
         DTEMP = FLOP(C*DX(IX) + S*DY(IY))
         DY(IY) = FLOP(C*DY(IY) - S*DX(IX))
@@ -7611,78 +7611,78 @@ C
    10 CONTINUE
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE RROTG(DA,DB,C,S)
-C
-C     CONSTRUCT GIVENS PLANE ROTATION.
-C
+!
+!     CONSTRUCT GIVENS PLANE ROTATION.
+!
       DOUBLE PRECISION DA,DB,C,S,RHO,PYTHAG,FLOP,R,Z
-C
+!
       RHO = DB
-      IF ( DABS(DA) .GT. DABS(DB) ) RHO = DA
+      IF ( DABS(DA) > DABS(DB) ) RHO = DA
       C = 1.0D0
       S = 0.0D0
       Z = 1.0D0
       R = FLOP(DSIGN(PYTHAG(DA,DB),RHO))
-      IF (R .NE. 0.0D0) C = FLOP(DA/R)
-      IF (R .NE. 0.0D0) S = FLOP(DB/R)
-      IF ( DABS(DA) .GT. DABS(DB) ) Z = S
-      IF ( DABS(DB) .GE. DABS(DA) .AND. C .NE. 0.0D0 ) Z = FLOP(1.0D0/C)
+      IF (R /= 0.0D0) C = FLOP(DA/R)
+      IF (R /= 0.0D0) S = FLOP(DB/R)
+      IF ( DABS(DA) > DABS(DB) ) Z = S
+      IF ( DABS(DB) >= DABS(DA) .AND. C /= 0.0D0 ) Z = FLOP(1.0D0/C)
       DA = R
       DB = Z
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       LOGICAL FUNCTION EQID(X,Y)
-C     CHECK FOR EQUALITY OF TWO NAMES
+!     CHECK FOR EQUALITY OF TWO NAMES
       INTEGER X(4),Y(4)
       EQID = .TRUE.
       DO 10 I = 1, 4
-   10 EQID = EQID .AND. (X(I).EQ.Y(I))
+   10 EQID = EQID .AND. (X(I)==Y(I))
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       SUBROUTINE PUTID(X,Y)
-C     STORE A NAME
+!     STORE A NAME
       INTEGER X(4),Y(4)
       DO 10 I = 1, 4
    10 X(I) = Y(I)
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION ROUND(X)
       DOUBLE PRECISION X,Y,Z,E,H
       DATA H/1.0D9/
       save H
       Z = DABS(X)
       Y = Z + 1.0D0
-      IF (Y .EQ. Z) GOTO 40
+      IF (Y == Z) GOTO 40
       Y = 0.0D0
       E = H
-   10 IF (E .GE. Z) GOTO 20
+   10 IF (E >= Z) GOTO 20
          E = 2.0D0*E
          GOTO 10
-   20 IF (E .LE. H) GOTO 30
-         IF (E .LE. Z) Y = Y + E
-         IF (E .LE. Z) Z = Z - E
+   20 IF (E <= H) GOTO 30
+         IF (E <= Z) Y = Y + E
+         IF (E <= Z) Z = Z - E
          E = E/2.0D0
          GOTO 20
    30 Z = IDINT(Z + 0.5D0)
       Y = Y + Z
-      IF (X .LT. 0.0D0) Y = -Y
+      IF (X < 0.0D0) Y = -Y
       ROUND = Y
       RETURN
    40 ROUND = X
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION ML_DFLOAT(I)
-C
-C   THIS IS THE AMIGA FUNCTION WHICH CONVERTS INTEGERS TO DOUBLE FLOATS
-C
+!
+!   THIS IS THE AMIGA FUNCTION WHICH CONVERTS INTEGERS TO DOUBLE FLOATS
+!
       IMPLICIT NONE
       INTEGER I
       ML_DFLOAT = DBLE(I)
       RETURN
       END
-C-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
