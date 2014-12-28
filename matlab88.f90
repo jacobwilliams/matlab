@@ -1,7 +1,15 @@
+!
+! gfortran matlab88.f90 -fno-range-check -O3 -o matlab
+!
+
       PROGRAM BIGMAT
       CALL MATLAB(0)
       STOP
-      END
+      END PROGRAM BIGMAT
+      
+      !module matlab_module
+      !contains
+      
 !-----------------------------------------------------------------------
       SUBROUTINE CLAUSE
       DOUBLE PRECISION STKR(50505),STKI(50505)
@@ -181,7 +189,7 @@
    99 CALL ERROR(22)
       IF (ERR > 0) RETURN
       RETURN
-      END
+      END SUBROUTINE CLAUSE
 
 !-----------------------------------------------------------------------
       SUBROUTINE COMAND(ID)
@@ -421,7 +429,7 @@
 !
    98 CALL GETSYM
    99 RETURN
-      END
+      END SUBROUTINE COMAND
 
 !-----------------------------------------------------------------------
       SUBROUTINE EDIT(BUF,N)
@@ -432,7 +440,7 @@
 !     ENTER LOCAL EDITOR IF AVAILABLE
 !     OTHERWISE JUST
       RETURN
-      END
+      END SUBROUTINE EDIT
 !-----------------------------------------------------------------------
       SUBROUTINE ERROR(N)
       INTEGER N
@@ -592,7 +600,7 @@
       IF (LUNIT==WIO .OR. WIO==0) RETURN
       LUNIT = WIO
       GOTO 98
-      END
+      END SUBROUTINE ERROR
 !-----------------------------------------------------------------------
       SUBROUTINE EXPR
       DOUBLE PRECISION STKR(50505),STKI(50505)
@@ -663,7 +671,7 @@
    99 CALL ERROR(22)
       IF (ERR > 0) RETURN
       RETURN
-      END
+      END SUBROUTINE EXPR
 !-----------------------------------------------------------------------
       SUBROUTINE FACTOR
       DOUBLE PRECISION STKR(50505),STKI(50505)
@@ -899,7 +907,7 @@
    99 CALL ERROR(22)
       IF (ERR > 0) RETURN
       RETURN
-      END
+      END SUBROUTINE FACTOR
 !-----------------------------------------------------------------------
       SUBROUTINE FILES(LUNIT,INAME)
       INTEGER LUNIT
@@ -986,7 +994,7 @@
    99 CONTINUE
       RETURN
 !-----------------------------------------------------------------------
-      END
+      END SUBROUTINE FILES
 
       DOUBLE PRECISION FUNCTION FLOP(X)
       DOUBLE PRECISION X
@@ -1032,7 +1040,7 @@
       LX(2) = LX(2) .AND. LM(2)
       FLOP = XX
       RETURN
-      END
+      END FUNCTION FLOP
 !-----------------------------------------------------------------------
       SUBROUTINE FORMZ(LUNIT,X,Y)
       DOUBLE PRECISION X,Y
@@ -1043,7 +1051,7 @@
       IF (Y == 0.0D0) WRITE(LUNIT,10) X
    10 FORMAT(2Z18)
       RETURN
-      END
+      END SUBROUTINE FORMZ
 !-----------------------------------------------------------------------
       SUBROUTINE FUNS(ID)
       INTEGER ID(4)
@@ -1116,7 +1124,7 @@
       IF (RHS==0 .AND. FUNP(K)==606) FIN = 0
       IF (RHS==0 .AND. FUNP(K)==607) FIN = 0
       RETURN
-      END
+      END SUBROUTINE FUNS
 
 !-----------------------------------------------------------------------
       SUBROUTINE GETCH
@@ -1132,7 +1140,7 @@
       CHRA = LIN(L)
       IF (CHRA /= EOL) LPT(4) = L + 1
       RETURN
-      END
+      END SUBROUTINE GETCH
 
 !-----------------------------------------------------------------------
       SUBROUTINE GETLIN
@@ -1209,7 +1217,7 @@
       CALL EDIT(BUF,N)
       N = N + 1
       GOTO 15
-      END
+      END SUBROUTINE GETLIN
 
 !-----------------------------------------------------------------------
       SUBROUTINE GETSYM
@@ -1296,7 +1304,7 @@
   198 FORMAT(1X,'EOL')
   199 FORMAT(1X,G8.2)
       RETURN
-      END
+      END SUBROUTINE GETSYM
 
 !-----------------------------------------------------------------------
       SUBROUTINE GETVAL(S)
@@ -1309,7 +1317,7 @@
       S = 10.0D0*S + CHRA
       CALL GETCH
       GOTO 10
-      END
+      END SUBROUTINE GETVAL
 !-----------------------------------------------------------------------
 
       SUBROUTINE MATFN1
@@ -1580,7 +1588,7 @@
       GOTO 99
 !
    99 RETURN
-      END
+      END SUBROUTINE MATFN1
 
 !-----------------------------------------------------------------------
          SUBROUTINE MATFN2
@@ -1815,7 +1823,7 @@
       NSTK(TOP) = 1
       GOTO 99
    99 RETURN
-      END
+      END SUBROUTINE MATFN2
 
 !-----------------------------------------------------------------------
       SUBROUTINE MATFN3
@@ -2066,7 +2074,7 @@
       GOTO 99
 !
    99 RETURN
-      END
+      END SUBROUTINE MATFN3
 
 !-----------------------------------------------------------------------
       SUBROUTINE MATFN4
@@ -2253,7 +2261,7 @@
       GOTO 99
 !
    99 RETURN
-      END
+      END SUBROUTINE MATFN4
 !-----------------------------------------------------------------------
       SUBROUTINE MATFN5
 !
@@ -2544,7 +2552,7 @@
       GOTO 99
 !
    99 RETURN
-      END
+      END SUBROUTINE MATFN5
 !-----------------------------------------------------------------------
       SUBROUTINE MATFN6
 !
@@ -2814,7 +2822,7 @@
       GOTO 99
 !
    99 RETURN
-      END
+      END SUBROUTINE MATFN6
 !-----------------------------------------------------------------------
       SUBROUTINE MATLAB(INIT)
 !     INIT = 0 FOR ORDINARY FIRST ENTRY
@@ -2862,14 +2870,14 @@
           1HA,1HB,1HC,1HD,1HE,1HF,1HG,1HH,1HI,1HJ,&
           1HK,1HL,1HM,1HN,1HO,1HP,1HQ,1HR,1HS,1HT,&
           1HU,1HV,1HW,1HX,1HY,1HZ,1H ,1H(,1H),1H;,&
-          1H:,1H+,1H-,1H*,1H/,1H\,1H=,1H.,1H,,1H',&
+          1H:,1H+,1H-,1H*,1H/,1H\,1H=,1H.,1H,,1H',&          !' -JW : just to fix the syntax highlighting...
           1H<,1H>/
 !     ALTERNATE CHARACTER SET
       DATA ALPHB /1H0,1H1,1H2,1H3,1H4,1H5,1H6,1H7,1H8,1H9,&
           1Ha,1Hb,1Hc,1Hd,1He,1Hf,1Hg,1Hh,1Hi,1Hj,&
           1Hk,1Hl,1Hm,1Hn,1Ho,1Hp,1Hq,1Hr,1Hs,1Ht,&
           1Hu,1Hv,1Hw,1Hx,1Hy,1Hz,1H ,1H(,1H),1H;,&
-          1H|,1H+,1H-,1H*,1H/,1H$,1H=,1H.,1H,,1H",&
+          1H|,1H+,1H-,1H*,1H/,1H$,1H=,1H.,1H,,1H",&          !" -JW : just to fix the syntax highlighting...
           1H[,1H]/
 !
       SAVE ALPHB, ALPHA
@@ -2960,7 +2968,7 @@
       IF (FUN == 21) CALL MATFN1
       IF (FUN /= 99) GOTO 90
       RETURN
-      END
+      END SUBROUTINE MATLAB
 !-----------------------------------------------------------------------
 
       SUBROUTINE PARSE
@@ -3240,7 +3248,7 @@
 !
    99 CALL ERROR(22)
       GOTO 01
-      END
+      END SUBROUTINE PARSE
 
 !-----------------------------------------------------------------------
       SUBROUTINE PLOT(LUNIT,X,Y,N,P,K)
@@ -3288,7 +3296,7 @@
          WRITE(LUNIT,'(1X,A)') BUF(1:JMAX)
    40 CONTINUE
       RETURN
-      END
+      END SUBROUTINE PLOT
 !-----------------------------------------------------------------------
 
       SUBROUTINE PRINT(ID,K)
@@ -3413,7 +3421,7 @@
              '  ENTER BLANK LINE TO CONTINUE OUTPUT.')
    44 FORMAT(A1)
 !
-      END
+      END SUBROUTINE PRINT
 
 !-----------------------------------------------------------------------
       SUBROUTINE PRNTID(ID,ARGCNT)
@@ -3445,7 +3453,7 @@
       J1 = J1+8
       IF (J1 <= IABS(ARGCNT)) GOTO 10
       RETURN
-      END
+      END SUBROUTINE PRNTID
 
 !-----------------------------------------------------------------------
       SUBROUTINE PROMPT(PAUSE)
@@ -3461,8 +3469,9 @@
       IF (PAUSE == 1) READ(RTE,20) DUMMY
    20 FORMAT(A1)
       RETURN
-      END
+      END SUBROUTINE PROMPT
 
+!-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION PYTHAG(A,B)
       DOUBLE PRECISION A,B
       INTEGER DDT,ERR,FMT,LCT(4),LIN(1024),LPT(6),HIO,RIO,WIO,RTE,WTE,FE
@@ -3485,7 +3494,8 @@
       GOTO 10
    20 PYTHAG = P
       RETURN
-      END
+      END FUNCTION PYTHAG
+      
 !-----------------------------------------------------------------------
       SUBROUTINE RAT(X,LEN,MAXD,A,B,D)
       INTEGER LEN,MAXD
@@ -3521,7 +3531,8 @@
       A = T
       B = S
       RETURN
-      END
+      END SUBROUTINE RAT
+      
 !-----------------------------------------------------------------------
       SUBROUTINE SAVLOD(LUNIT,ID,M,N,IMG,JOB,XREAL,XIMAG)
       INTEGER LUNIT,ID(4),M,N,IMG,JOB
@@ -3567,7 +3578,7 @@
    30 M = 0
       N = 0
       RETURN
-      END
+      END SUBROUTINE SAVLOD
 !-----------------------------------------------------------------------
       SUBROUTINE STACK1(OP)
       INTEGER OP
@@ -3616,7 +3627,7 @@
    50 CONTINUE
       GOTO 99
    99 RETURN
-      END
+      END SUBROUTINE STACK1
 !-----------------------------------------------------------------------
       SUBROUTINE STACK2(OP)
       INTEGER OP
@@ -3890,7 +3901,7 @@
       GOTO 99
 !
    99 RETURN
-      END
+      END SUBROUTINE STACK2
 
 !-----------------------------------------------------------------------
       SUBROUTINE STACKG(ID)
@@ -3998,7 +4009,7 @@
    99 FIN = -1
       FUN = 0
       RETURN
-      END
+      END SUBROUTINE STACKG
 
 !-----------------------------------------------------------------------
       SUBROUTINE STACKP(ID)
@@ -4190,7 +4201,7 @@
    99 IF (M /= 0) TOP = TOP - 1 - RHS
       IF (M == 0) TOP = TOP - 1
       RETURN
-      END
+      END SUBROUTINE STACKP
 
 !-----------------------------------------------------------------------
       SUBROUTINE TERM
@@ -4244,7 +4255,7 @@
    99 CALL ERROR(22)
       IF (ERR > 0) RETURN
       RETURN
-      END
+      END SUBROUTINE TERM
 
 !-----------------------------------------------------------------------
       SUBROUTINE USER(A,M,N,S,T)
@@ -4260,7 +4271,7 @@
       M = 3
       N = 3
       RETURN
-      END
+      END SUBROUTINE USER
 
 !-----------------------------------------------------------------------
       SUBROUTINE XCHAR(BUF,K)
@@ -4277,7 +4288,7 @@
       IF (K /= -1) WRITE(6,10) BUF(1),L
    10 FORMAT(1X,1H',A1,4H' = ,Z2,' hex is not a MATLAB character.')
       RETURN
-      END
+      END SUBROUTINE XCHAR
 !-----------------------------------------------------------------------
       SUBROUTINE WGECO(AR,AI,LDA,N,IPVT,RCOND,ZR,ZI)
       INTEGER LDA,N,IPVT(1)
@@ -4510,7 +4521,7 @@
       IF (ANORM /= 0.0D0) RCOND = YNORM/ANORM
       IF (ANORM == 0.0D0) RCOND = 0.0D0
       RETURN
-      END
+      END SUBROUTINE WGECO
 !-----------------------------------------------------------------------
       SUBROUTINE WGEFA(AR,AI,LDA,N,IPVT,INFO)
       INTEGER LDA,N,IPVT(1),INFO
@@ -4625,7 +4636,7 @@
       IPVT(N) = N
       IF (CABS1(AR(N,N),AI(N,N)) == 0.0D0) INFO = N
       RETURN
-      END
+      END SUBROUTINE WGEFA
 !-----------------------------------------------------------------------
       SUBROUTINE WGESL(AR,AI,LDA,N,IPVT,BR,BI,JOB)
       INTEGER LDA,N,IPVT(1),JOB
@@ -4755,7 +4766,7 @@
    90    CONTINUE
   100 CONTINUE
       RETURN
-      END
+      END SUBROUTINE WGESL
 !-----------------------------------------------------------------------
       SUBROUTINE WGEDI(AR,AI,LDA,N,IPVT,DETR,DETI,WORKR,WORKI,JOB)
       INTEGER LDA,N,IPVT(1),JOB
@@ -4905,7 +4916,7 @@
   150    CONTINUE
   160 CONTINUE
       RETURN
-      END
+      END SUBROUTINE WGEDI
 !-----------------------------------------------------------------------
       SUBROUTINE WPOFA(AR,AI,LDA,N,INFO)
       DOUBLE PRECISION AR(LDA,1),AI(LDA,1)
@@ -4930,7 +4941,7 @@
    30 CONTINUE
       INFO = 0
    40 RETURN
-      END
+      END SUBROUTINE WPOFA
 !-----------------------------------------------------------------------
       SUBROUTINE RREF(AR,AI,LDA,M,N,EPS)
       DOUBLE PRECISION AR(LDA,1),AI(LDA,1),EPS,TOL,TR,TI,WASUM
@@ -4961,7 +4972,7 @@
       K = K+1
       L = L+1
       GOTO 20
-      END
+      END SUBROUTINE RREF
 !-----------------------------------------------------------------------
       SUBROUTINE HILBER(A,LDA,N)
       DOUBLE PRECISION A(LDA,N)
@@ -4981,7 +4992,7 @@
    10   CONTINUE
    20 CONTINUE
       RETURN
-      END
+      END SUBROUTINE HILBER
 !-----------------------------------------------------------------------
       SUBROUTINE HTRIDI(NM,N,AR,AI,D,E,E2,TAU)
 !
@@ -5135,7 +5146,7 @@
   300 CONTINUE
 !
       RETURN
-      END
+      END SUBROUTINE HTRIDI
 !-----------------------------------------------------------------------
       SUBROUTINE HTRIBK(NM,N,AR,AI,TAU,M,ZR,ZI)
 !
@@ -5225,7 +5236,7 @@
   140 CONTINUE
 !
   200 RETURN
-      END
+      END SUBROUTINE HTRIBK
 !-----------------------------------------------------------------------
       SUBROUTINE IMTQL2(NM,N,D,E,Z,IERR,JOB)
 !
@@ -5392,7 +5403,7 @@
 !                EIGENVALUE AFTER 30 ITERATIONS ..........
  1000 IERR = L
  1001 RETURN
-      END
+      END SUBROUTINE IMTQL2
 !-----------------------------------------------------------------------
       SUBROUTINE CORTH(NM,N,LOW,IGH,AR,AI,ORTR,ORTI)
 !
@@ -5524,7 +5535,7 @@
   180 CONTINUE
 !
   200 RETURN
-      END
+      END SUBROUTINE CORTH
 !-----------------------------------------------------------------------
       SUBROUTINE COMQR3(NM,N,LOW,IGH,ORTR,ORTI,HR,HI,WR,WI,ZR,ZI,IERR&
                        ,JOB)
@@ -5954,7 +5965,7 @@
 !                EIGENVALUE AFTER 30 ITERATIONS ..........
  1000 IERR = EN
  1001 RETURN
-      END
+      END SUBROUTINE COMQR3
 !-----------------------------------------------------------------------
       SUBROUTINE WSVDC(XR,XI,LDX,N,P,SR,SI,ER,EI,UR,UI,LDU,VR,VI,LDV,&
                        WORKR,WORKI,JOB,INFO)
@@ -6523,7 +6534,8 @@
       GOTO 440
   700 CONTINUE
       RETURN
-      END
+      END SUBROUTINE WSVDC
+      
       SUBROUTINE WQRDC(XR,XI,LDX,N,P,QRAUXR,QRAUXI,JPVT,WORKR,WORKI,&
                        JOB)
       INTEGER LDX,N,P,JOB
@@ -6756,7 +6768,8 @@
   200    CONTINUE
   210 CONTINUE
       RETURN
-      END
+      END SUBROUTINE WQRDC
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WQRSL(XR,XI,LDX,N,K,QRAUXR,QRAUXI,YR,YI,QYR,QYI,QTYR,&
                        QTYI,BR,BI,RSDR,RSDI,XBR,XBI,JOB,INFO)
@@ -7083,7 +7096,8 @@
   280    CONTINUE
   290 CONTINUE
       RETURN
-      END
+      END SUBROUTINE WQRSL
+      
 !-----------------------------------------------------------------------
       SUBROUTINE MAGIC(A,LDA,N)
 !
@@ -7160,7 +7174,8 @@
   110    CONTINUE
   120 CONTINUE
       RETURN
-      END
+      END SUBROUTINE MAGIC
+      
 !-----------------------------------------------------------------------
       SUBROUTINE BASE(X,B,EPS,S,N)
       DOUBLE PRECISION X,B,EPS,S(1),T
@@ -7209,7 +7224,8 @@
       T = T/B
       IF (L >= M+3) GOTO 20
       RETURN
-      END
+      END SUBROUTINE BASE
+      
       DOUBLE PRECISION FUNCTION URAND(IY)
       INTEGER IY
 !
@@ -7267,7 +7283,8 @@
       IF (IY < 0) IY = (IY + M2) + M2
       URAND = DFLOAT(IY)*S
       RETURN
-      END
+      END FUNCTION URAND
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WMUL(AR,AI,BR,BI,CR,CI)
       DOUBLE PRECISION AR,AI,BR,BI,CR,CI,T,FLOP
@@ -7277,7 +7294,8 @@
       CR = FLOP(AR*BR - AI*BI)
       CI = T
       RETURN
-      END
+      END SUBROUTINE WMUL
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WDIV(AR,AI,BR,BI,CR,CI)
       DOUBLE PRECISION AR,AI,BR,BI,CR,CI
@@ -7295,7 +7313,8 @@
       CI = (AIS*BRS - ARS*BIS)/D
       IF (CI /= 0.0D0) CI = FLOP(CI)
       RETURN
-      END
+      END SUBROUTINE WDIV
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WSIGN(XR,XI,YR,YI,ZR,ZI)
       DOUBLE PRECISION XR,XI,YR,YI,ZR,ZI,PYTHAG,T
@@ -7306,7 +7325,8 @@
       ZI = XI
       IF (T /= 0.0D0) CALL WMUL(YR/T,YI/T,ZR,ZI,ZR,ZI)
       RETURN
-      END
+      END SUBROUTINE WSIGN
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WSQRT(XR,XI,YR,YI)
       DOUBLE PRECISION XR,XI,YR,YI,S,TR,TI,PYTHAG,FLOP
@@ -7321,7 +7341,8 @@
       IF (TR < 0.0D0) YR = FLOP(0.5D0*(TI/YI))
       IF (TR > 0.0D0) YI = FLOP(0.5D0*(TI/YR))
       RETURN
-      END
+      END SUBROUTINE WSQRT
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WLOG(XR,XI,YR,YI)
       DOUBLE PRECISION XR,XI,YR,YI,T,R,PYTHAG
@@ -7334,7 +7355,8 @@
       YR = DLOG(R)
       YI = T
       RETURN
-      END
+      END SUBROUTINE WLOG
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WATAN(XR,XI,YR,YI)
 !     Y = ATAN(X) = (I/2)*LOG((I+X)/(I-X))
@@ -7351,7 +7373,8 @@
       YR = -(TI/2.0D0)
       YI = TR/2.0D0
       RETURN
-      END
+      END SUBROUTINE WATAN
+      
 !-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WNRM2(N,XR,XI,INCX)
       DOUBLE PRECISION XR(1),XI(1),PYTHAG,S
@@ -7366,7 +7389,8 @@
    10 CONTINUE
    20 WNRM2 = S
       RETURN
-      END
+      END FUNCTION WNRM2
+      
 !-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WASUM(N,XR,XI,INCX)
       DOUBLE PRECISION XR(1),XI(1),S,FLOP
@@ -7380,7 +7404,8 @@
    10 CONTINUE
    20 WASUM = S
       RETURN
-      END
+      END FUNCTION WASUM
+      
 !-----------------------------------------------------------------------
       INTEGER FUNCTION IWAMAX(N,XR,XI,INCX)
       DOUBLE PRECISION XR(1),XI(1),S,P
@@ -7398,7 +7423,8 @@
    10 CONTINUE
    20 IWAMAX = K
       RETURN
-      END
+      END FUNCTION IWAMAX
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WRSCAL(N,S,XR,XI,INCX)
       DOUBLE PRECISION S,XR(1),XI(1),FLOP
@@ -7410,7 +7436,8 @@
          IX = IX + INCX
    10 CONTINUE
       RETURN
-      END
+      END SUBROUTINE WRSCAL
+      
       SUBROUTINE WSCAL(N,SR,SI,XR,XI,INCX)
       DOUBLE PRECISION SR,SI,XR(1),XI(1)
       IF (N <= 0) RETURN
@@ -7420,7 +7447,8 @@
          IX = IX + INCX
    10 CONTINUE
       RETURN
-      END
+      END SUBROUTINE WSCAL
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WAXPY(N,SR,SI,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION SR,SI,XR(1),XI(1),YR(1),YI(1),FLOP
@@ -7438,7 +7466,8 @@
          IY = IY + INCY
    10 CONTINUE
       RETURN
-      END
+      END SUBROUTINE WAXPY
+      
 !-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WDOTUR(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1),S,FLOP
@@ -7455,7 +7484,8 @@
    10 CONTINUE
    20 WDOTUR = S
       RETURN
-      END
+      END FUNCTION WDOTUR
+      
 !-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WDOTUI(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1),S,FLOP
@@ -7473,7 +7503,8 @@
    10 CONTINUE
    20 WDOTUI = S
       RETURN
-      END
+      END FUNCTION WDOTUI
+      
 !-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WDOTCR(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1),S,FLOP
@@ -7490,7 +7521,8 @@
    10 CONTINUE
    20 WDOTCR = S
       RETURN
-      END
+      END FUNCTION WDOTCR
+      
 !-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION WDOTCI(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1),S,FLOP
@@ -7508,7 +7540,8 @@
    10 CONTINUE
    20 WDOTCI = S
       RETURN
-      END
+      END FUNCTION WDOTCI
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WCOPY(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1)
@@ -7524,7 +7557,8 @@
          IY = IY + INCY
    10 CONTINUE
       RETURN
-      END
+      END SUBROUTINE WCOPY
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WSET(N,XR,XI,YR,YI,INCY)
       INTEGER N,INCY
@@ -7537,7 +7571,8 @@
          IY = IY + INCY
    10 CONTINUE
       RETURN
-      END
+      END SUBROUTINE WSET
+      
 !-----------------------------------------------------------------------
       SUBROUTINE WSWAP(N,XR,XI,INCX,YR,YI,INCY)
       DOUBLE PRECISION XR(1),XI(1),YR(1),YI(1),T
@@ -7557,7 +7592,8 @@
          IY = IY + INCY
    10 CONTINUE
       RETURN
-      END
+      END SUBROUTINE WSWAP
+      
 !-----------------------------------------------------------------------
       SUBROUTINE RSET(N,DX,DY,INCY)
 !
@@ -7572,7 +7608,8 @@
         IY = IY + INCY
    10 CONTINUE
       RETURN
-      END
+      END SUBROUTINE RSET
+      
 !-----------------------------------------------------------------------
       SUBROUTINE RSWAP(N,X,INCX,Y,INCY)
       DOUBLE PRECISION X(1),Y(1),T
@@ -7589,7 +7626,8 @@
          IY = IY + INCY
    10 CONTINUE
       RETURN
-      END
+      END SUBROUTINE RSWAP
+      
 !-----------------------------------------------------------------------
       SUBROUTINE RROT(N,DX,INCX,DY,INCY,C,S)
 !
@@ -7610,7 +7648,8 @@
         IY = IY + INCY
    10 CONTINUE
       RETURN
-      END
+      END SUBROUTINE RROT
+      
 !-----------------------------------------------------------------------
       SUBROUTINE RROTG(DA,DB,C,S)
 !
@@ -7631,7 +7670,8 @@
       DA = R
       DB = Z
       RETURN
-      END
+      END SUBROUTINE RROTG
+      
 !-----------------------------------------------------------------------
       LOGICAL FUNCTION EQID(X,Y)
 !     CHECK FOR EQUALITY OF TWO NAMES
@@ -7640,7 +7680,8 @@
       DO 10 I = 1, 4
    10 EQID = EQID .AND. (X(I)==Y(I))
       RETURN
-      END
+      END FUNCTION EQID
+      
 !-----------------------------------------------------------------------
       SUBROUTINE PUTID(X,Y)
 !     STORE A NAME
@@ -7648,7 +7689,8 @@
       DO 10 I = 1, 4
    10 X(I) = Y(I)
       RETURN
-      END
+      END SUBROUTINE PUTID
+      
 !-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION ROUND(X)
       DOUBLE PRECISION X,Y,Z,E,H
@@ -7674,7 +7716,8 @@
       RETURN
    40 ROUND = X
       RETURN
-      END
+      END FUNCTION ROUND
+      
 !-----------------------------------------------------------------------
       DOUBLE PRECISION FUNCTION ML_DFLOAT(I)
 !
@@ -7684,5 +7727,8 @@
       INTEGER I
       ML_DFLOAT = DBLE(I)
       RETURN
-      END
+      END FUNCTION ML_DFLOAT
+      
 !-----------------------------------------------------------------------
+
+!end module matlab_module
